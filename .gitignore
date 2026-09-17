@@ -1,0 +1,25 @@
+# 敏感文件——绝不提交
+douyin_cookie.txt
+**/douyin_cookie.txt
+likes_history.json
+new_likes_report.json
+pipeline_history.json
+pipeline_temp/
+run.log
+*.log
+
+# 环境
+venv/
+__pycache__/
+*.pyc
+
+# 临时/测试产物
+signing-research/oracle_*.txt
+signing-research/my_*.txt
+signing-research/pw_*.json
+signing-research/*.png
+
+video-download/douyin_cookies.txt
+
+# local-douyin 视频与数据库
+local-douyin/data/

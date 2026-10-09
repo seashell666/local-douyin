@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>同好管理 - Local Douyin</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, "PingFang SC", sans-serif; background: #f5f5f5; color: #333; min-height: 100vh; padding: 16px; }
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .header h1 { font-size: 20px; font-weight: 700; }
+  .header a { color: #fe2c55; text-decoration: none; font-size: 14px; }
+  .stats { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .stat-card { background: #fff; border-radius: 12px; padding: 14px 18px; flex: 1; min-width: 100px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .stat-card .num { font-size: 24px; font-weight: 700; color: #fe2c55; }
+  .stat-card .label { font-size: 12px; color: #888; margin-top: 4px; }
+  .add-form { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .add-form h3 { font-size: 15px; margin-bottom: 12px; }
+  .add-form input { width: 100%; padding: 10px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 8px; color: #333; font-size: 14px; margin-bottom: 8px; }
+  .add-form input:focus { outline: none; border-color: #fe2c55; }
+  .add-form button { width: 100%; padding: 10px; background: #fe2c55; border: none; border-radius: 8px; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .add-form button:active { opacity: 0.8; }
+  .peer-list { display: flex; flex-direction: column; gap: 10px; }
+  .peer-card { background: #fff; border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .peer-top { display: flex; align-items: center; justify-content: space-between; }
+  .peer-info { flex: 1; }
+  .peer-name { font-size: 16px; font-weight: 600; }
+  .peer-meta { font-size: 12px; color: #888; margin-top: 3px; }
+  .weight-badge { font-size: 18px; font-weight: 700; padding: 4px 10px; border-radius: 8px; min-width: 60px; text-align: center; }
+  .weight-high { background: rgba(254,44,85,0.12); color: #fe2c55; }
+  .weight-mid { background: rgba(255,200,0,0.15); color: #b8860b; }
+  .weight-low { background: rgba(120,120,120,0.12); color: #888; }
+  .status-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-left: 6px; }
+  .status-active { background: rgba(46,204,113,0.12); color: #27ae60; }
+  .status-exploring { background: rgba(52,152,219,0.12); color: #2980b9; }
+  .status-paused { background: rgba(120,120,120,0.12); color: #888; }
+  .peer-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .peer-actions button { flex: 1; padding: 7px; background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 6px; color: #555; font-size: 12px; cursor: pointer; }
+  .peer-actions button.danger { border-color: #fe2c55; color: #fe2c55; }
+  .peer-actions button:active { opacity: 0.7; }
+  .explanation { background: #f9f9f9; border-radius: 8px; padding: 12px; margin-top: 10px; font-size: 12px; color: #666; white-space: pre-wrap; line-height: 1.6; display: none; }
+  .explanation.show { display: block; }
+  .empty { text-align: center; color: #aaa; padding: 40px 0; font-size: 14px; }
+  .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #fe2c55; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 14px; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  .import-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .import-bar button { padding: 8px 14px; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; color: #555; font-size: 13px; cursor: pointer; }
+  .import-bar button:active { opacity: 0.7; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>同好管理</h1>
+  <a href="/">← 返回播放器</a>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<div class="import-bar">
+  <button onclick="importFriends()">从朋友导入</button>
+  <button onclick="importAuthors()">从关注导入</button>
+  <button onclick="linkVideos()">关联视频-同好</button>
+  <button onclick="recalcAll()">重算全部权重</button>
+</div>
+
+<div class="add-form">
+  <h3>添加同好</h3>
+  <input type="text" id="secUid" placeholder="sec_uid（抖音用户唯一ID）">
+  <input type="text" id="nickname" placeholder="昵称（可选）">
+  <button onclick="addPeer()">添加同好</button>
+</div>
+
+<div class="peer-list" id="peerList"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+var API = "";
+
+function showToast(msg) {
+  var t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(function() { t.classList.remove("show"); }, 2000);
+}
+
+function weightClass(w) {
+  if (w >= 0.6) return "weight-high";
+  if (w >= 0.4) return "weight-mid";
+  return "weight-low";
+}
+
+function statusClass(s) {
+  if (s === "active") return "status-active";
+  if (s === "exploring") return "status-exploring";
+  return "status-paused";
+}
+
+function loadPeers() {
+  fetch(API + "/api/peers?limit=200")
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      renderStats(data.items);
+      renderList(data.items);
+    })
+    .catch(function() { showToast("加载失败"); });
+}
+
+function renderStats(peers) {
+  var active = peers.filter(function(p) { return p.status === "active"; }).length;
+  var exploring = peers.filter(function(p) { return p.status === "exploring"; }).length;
+  var avg = peers.length ? (peers.reduce(function(s, p) { return s + p.current_weight; }, 0) / peers.length).toFixed(3) : "0";
+  var high = peers.filter(function(p) { return p.current_weight >= 0.6; }).length;
+  document.getElementById("stats").innerHTML =
+    '<div class="stat-card"><div class="num">' + peers.length + '</div><div class="label">同好总数</div></div>' +
+    '<div class="stat-card"><div class="num">' + active + '</div><div class="label">活跃</div></div>' +
+    '<div class="stat-card"><div class="num">' + exploring + '</div><div class="label">探索中</div></div>' +
+    '<div class="stat-card"><div class="num">' + high + '</div><div class="label">高权重(≥0.6)</div></div>' +
+    '<div class="stat-card"><div class="num">' + avg + '</div><div class="label">平均权重</div></div>';
+}
+
+function renderList(peers) {
+  var list = document.getElementById("peerList");
+  if (!peers.length) {
+    list.innerHTML = '<div class="empty">还没有同好节点<br>添加一个或从朋友/关注导入</div>';
+    return;
+  }
+  list.innerHTML = peers.map(function(p) {
+    return '<div class="peer-card">' +
+      '<div class="peer-top">' +
+        '<div class="peer-info">' +
+          '<div class="peer-name">' + escapeHtml(p.nickname || p.sec_uid) +
+            '<span class="status-tag ' + statusClass(p.status) + '">' + p.status + '</span>' +
+          '</div>' +
+          '<div class="peer-meta">来源: ' + p.source + ' | 内容: ' + p.total_content + ' | 初始权重: ' + p.initial_weight.toFixed(2) + '</div>' +
+        '</div>' +
+        '<div class="weight-badge ' + weightClass(p.current_weight) + '">' + p.current_weight.toFixed(3) + '</div>' +
+      '</div>' +
+      '<div class="peer-actions">' +
+        '<a href="https://www.douyin.com/user/' + p.sec_uid + '" target="_blank" style="flex:1;padding:7px;background:#fe2c55;border:none;border-radius:6px;color:#fff;font-size:12px;cursor:pointer;text-align:center;text-decoration:none;display:block;">抖音主页</a>' +
+        '<button onclick="toggleExplain(' + p.id + ', this)">权重解释</button>' +
+        '<button onclick="toggleChart(' + p.id + ', this)">权重趋势</button>' +
+        '<button onclick="recalcPeer(' + p.id + ')">重算权重</button>' +
+        '<button class="danger" onclick="deletePeer(' + p.id + ')">删除</button>' +
+      '</div>' +
+      '<div class="explanation" id="exp-' + p.id + '"></div>' +
+      '<div class="explanation" id="chart-' + p.id + '"><canvas width="300" height="100" style="width:100%;height:100px;"></canvas></div>' +
+    '</div>';
+  }).join("");
+}
+
+function escapeHtml(s) {
+  var d = document.createElement("div");
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function addPeer() {
+  var sec = document.getElementById("secUid").value.trim();
+  var nick = document.getElementById("nickname").value.trim();
+  if (!sec) { showToast("sec_uid 不能为空"); return; }
+  fetch(API + "/api/peers", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sec_uid: sec, nickname: nick, source: "manual" }),
+  }).then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.ok) { showToast("已添加"); document.getElementById("secUid").value = ""; document.getElementById("nickname").value = ""; loadPeers(); }
+      else showToast("添加失败: " + (d.error || ""));
+    });
+}
+
+function deletePeer(id) {
+  if (!confirm("确定删除这个同好？")) return;
+  fetch(API + "/api/peers/" + id, { method: "DELETE" })
+    .then(function() { showToast("已删除"); loadPeers(); });
+}
+
+function recalcPeer(id) {
+  fetch(API + "/api/weights/recalculate?peer_id=" + id, { method: "POST" })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      showToast("权重: " + (d.new_weight ? d.new_weight.toFixed(3) : "无变化"));
+      loadPeers();
+    });
+}
+
+function recalcAll() {
+  fetch(API + "/api/weights/recalculate", { method: "POST" })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      showToast("已更新 " + d.updated + " 个同好权重");
+      loadPeers();
+    });
+}
+
+function toggleExplain(id, btn) {
+  var el = document.getElementById("exp-" + id);
+  if (el.classList.contains("show")) {
+    el.classList.remove("show");
+    return;
+  }
+  // 隐藏图表
+  document.getElementById("chart-" + id).classList.remove("show");
+  fetch(API + "/api/weights/" + id + "/explanation")
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      el.textContent = d.explanation || "暂无解释";
+      el.classList.add("show");
+    });
+}
+
+function toggleChart(id, btn) {
+  var el = document.getElementById("chart-" + id);
+  if (el.classList.contains("show")) {
+    el.classList.remove("show");
+    return;
+  }
+  // 隐藏解释
+  document.getElementById("exp-" + id).classList.remove("show");
+  el.classList.add("show");
+  fetch(API + "/api/weights/" + id + "/history?limit=50")
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      drawChart(el.querySelector("canvas"), d.items);
+    });
+}
+
+function drawChart(canvas, items) {
+  if (!items || !items.length) {
+    var ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#666";
+    ctx.font = "12px sans-serif";
+    ctx.fillText("暂无历史数据", 100, 55);
+    return;
+  }
+  var ctx = canvas.getContext("2d");
+  var W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // 数据（按时间正序）
+  var data = items.slice().reverse();
+  var weights = data.map(function(d) { return d.weight; });
+  var minW = Math.min.apply(null, weights) * 0.95;
+  var maxW = Math.max.apply(null, weights) * 1.05;
+  if (maxW - minW < 0.01) { maxW = minW + 0.1; }
+
+  var padL = 35, padR = 10, padT = 10, padB = 18;
+  var plotW = W - padL - padR;
+  var plotH = H - padT - padB;
+
+  // 网格线
+  ctx.strokeStyle = "#222";
+  ctx.lineWidth = 1;
+  for (var i = 0; i <= 4; i++) {
+    var y = padT + (plotH * i / 4);
+    ctx.beginPath();
+    ctx.moveTo(padL, y);
+    ctx.lineTo(W - padR, y);
+    ctx.stroke();
+    var val = maxW - (maxW - minW) * i / 4;
+    ctx.fillStyle = "#666";
+    ctx.font = "10px sans-serif";
+    ctx.fillText(val.toFixed(2), 2, y + 3);
+  }
+
+  // 折线
+  ctx.strokeStyle = "#fe2c55";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  data.forEach(function(d, i) {
+    var x = padL + (plotW * i / Math.max(1, data.length - 1));
+    var y = padT + plotH * (1 - (d.weight - minW) / (maxW - minW));
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // 数据点
+  ctx.fillStyle = "#fe2c55";
+  data.forEach(function(d, i) {
+    var x = padL + (plotW * i / Math.max(1, data.length - 1));
+    var y = padT + plotH * (1 - (d.weight - minW) / (maxW - minW));
+    ctx.beginPath();
+    ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // 最新值标注
+  var last = data[data.length - 1];
+  ctx.fillStyle = "#fe2c55";
+  ctx.font = "bold 11px sans-serif";
+  ctx.fillText(last.weight.toFixed(3), W - padR - 35, padT + 12);
+}
+
+function importFriends() {
+  fetch(API + "/api/discovery/import-friends", { method: "POST" })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      showToast("导入 " + d.added + " 个，跳过 " + d.skipped + " 个");
+      loadPeers();
+    });
+}
+
+function importAuthors() {
+  fetch(API + "/api/discovery/import-authors", { method: "POST" })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      showToast("导入 " + d.added + " 个，跳过 " + d.skipped + " 个");
+      loadPeers();
+    });
+}
+
+function linkVideos() {
+  fetch(API + "/api/discovery/link-videos", { method: "POST" })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      showToast("关联 " + d.linked + " 个，已关联 " + d.already_linked + " 个");
+    });
+}
+
+loadPeers();
+</script>
+</body>
+</html>

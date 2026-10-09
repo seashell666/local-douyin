@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>指标监控 · Local Douyin</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, "PingFang SC", "Segoe UI", sans-serif; background: #0a0a0a; color: #eee; min-height: 100vh; padding: 16px; }
+h1 { font-size: 20px; margin-bottom: 16px; color: #fff; }
+h2 { font-size: 15px; margin: 20px 0 10px; color: #aaa; border-left: 3px solid #ff2d55; padding-left: 8px; }
+.card { background: #1a1a1a; border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+.health { text-align: center; padding: 20px; }
+.health-score { font-size: 48px; font-weight: bold; color: #ff2d55; }
+.health-label { font-size: 13px; color: #888; margin-top: 4px; }
+.health-details { margin-top: 12px; text-align: left; font-size: 12px; color: #999; }
+.health-details div { margin: 4px 0; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.metric { background: #222; border-radius: 8px; padding: 12px; text-align: center; }
+.metric-value { font-size: 24px; font-weight: bold; color: #fff; }
+.metric-label { font-size: 11px; color: #888; margin-top: 4px; }
+.metric-value.good { color: #34c759; }
+.metric-value.warn { color: #ff9500; }
+.metric-value.bad { color: #ff3b30; }
+canvas { width: 100%; height: 160px; background: #111; border-radius: 8px; }
+.row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #222; }
+.row:last-child { border-bottom: none; }
+.row .label { color: #888; }
+.row .value { color: #fff; font-weight: 500; }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; background: #333; color: #aaa; }
+.tag.active { background: #ff2d55; color: #fff; }
+.back { display: inline-block; margin-bottom: 12px; color: #ff2d55; text-decoration: none; font-size: 14px; }
+</style>
+</head>
+<body>
+<a href="/" class="back">&larr; 返回播放器</a>
+<h1>指标监控面板</h1>
+
+<div class="card health" id="healthCard">
+  <div class="health-score" id="healthScore">--</div>
+  <div class="health-label">系统健康分 (0-100)</div>
+  <div class="health-details" id="healthDetails"></div>
+</div>
+
+<h2>核心指标 (近7天)</h2>
+<div class="grid" id="metricsGrid"></div>
+
+<h2>日度趋势 (近14天)</h2>
+<div class="card">
+  <canvas id="trendChart"></canvas>
+</div>
+
+<h2>内容与网络</h2>
+<div class="card" id="contentCard"></div>
+
+<h2>算法配置</h2>
+<div class="card" id="configCard"></div>
+
+<h2>A/B 测试</h2>
+<div class="card" id="abCard"></div>
+
+<script>
+function fmtPct(v) { return (v * 100).toFixed(1) + '%'; }
+function pctClass(v, goodThresh, warnThresh) {
+  if (v >= goodThresh) return 'good';
+  if (v >= warnThresh) return 'warn';
+  return 'bad';
+}
+
+async function loadAll() {
+  try {
+    // 1. Health + metrics
+    const m = await fetch('/api/metrics?days=7').then(r => r.json());
+    document.getElementById('healthScore').textContent = m.health.score;
+    document.getElementById('healthDetails').innerHTML =
+      m.health.details.map(d => '<div>' + d + '</div>').join('');
+
+    const grid = document.getElementById('metricsGrid');
+    const items = [
+      { label: '喜欢率', value: fmtPct(m.like_rate), cls: pctClass(m.like_rate, 0.1, 0.05) },
+      { label: '收藏率', value: fmtPct(m.collect_rate), cls: pctClass(m.collect_rate, 0.05, 0.02) },
+      { label: '跳过率', value: fmtPct(m.skip_rate), cls: m.skip_rate < 0.3 ? 'good' : m.skip_rate < 0.5 ? 'warn' : 'bad' },
+      { label: '完播率', value: fmtPct(m.completion_rate), cls: pctClass(m.completion_rate, 0.2, 0.1) },
+      { label: '播放次数', value: m.play_start, cls: '' },
+      { label: '平均观看', value: m.avg_watch_sec + 's', cls: '' },
+    ];
+    grid.innerHTML = items.map(i =>
+      '<div class="metric"><div class="metric-value ' + i.cls + '">' + i.value + '</div><div class="metric-label">' + i.label + '</div></div>'
+    ).join('');
+
+    // Content & network
+    document.getElementById('contentCard').innerHTML =
+      '<div class="row"><span class="label">视频总数</span><span class="value">' + m.total_videos + '</span></div>' +
+      '<div class="row"><span class="label">已观看</span><span class="value">' + m.watched_videos + ' (' + fmtPct(m.video_coverage) + ')</span></div>' +
+      '<div class="row"><span class="label">同好总数</span><span class="value">' + m.total_peers + '</span></div>' +
+      '<div class="row"><span class="label">活跃同好</span><span class="value">' + m.active_peers + '</span></div>' +
+      '<div class="row"><span class="label">探索中同好</span><span class="value">' + m.exploring_peers + '</span></div>' +
+      '<div class="row"><span class="label">期内新增同好</span><span class="value">' + m.new_peers_period + '</span></div>' +
+      '<div class="row"><span class="label">日均新同好</span><span class="value">' + m.new_peer_discovery_rate + '</span></div>';
+
+    // 2. Daily trend
+    const daily = await fetch('/api/metrics/daily?days=14').then(r => r.json());
+    drawTrend(daily.items);
+
+    // 3. Config versions
+    const cfgs = await fetch('/api/config/versions').then(r => r.json());
+    document.getElementById('configCard').innerHTML =
+      cfgs.versions.map(v =>
+        '<div class="row"><span class="label">' + v.version +
+        (v.is_active ? ' <span class="tag active">当前</span>' : '') +
+        '</span><span class="value">' + (v.change_reason || '-') + '</span></div>'
+      ).join('');
+
+    // 4. A/B test
+    const ab = await fetch('/api/ab-tests/active').then(r => r.json());
+    if (ab.active === false) {
+      document.getElementById('abCard').innerHTML = '<div class="row"><span class="label">无运行中的A/B测试</span></div>';
+    } else {
+      const variant = await fetch('/api/ab-tests/variant').then(r => r.json());
+      document.getElementById('abCard').innerHTML =
+        '<div class="row"><span class="label">测试名称</span><span class="value">' + ab.name + '</span></div>' +
+        '<div class="row"><span class="label">版本A</span><span class="value">' + ab.version_a + '</span></div>' +
+        '<div class="row"><span class="label">版本B</span><span class="value">' + ab.version_b + '</span></div>' +
+        '<div class="row"><span class="label">当前用户分配</span><span class="value">变量' + variant.variant + ' (' + variant.assigned_version + ')</span></div>';
+    }
+  } catch (e) {
+    document.body.innerHTML += '<p style="color:#ff3b30">加载失败: ' + e.message + '</p>';
+  }
+}
+
+function drawTrend(items) {
+  const canvas = document.getElementById('trendChart');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth, h = 160;
+  canvas.width = w * dpr; canvas.height = h * dpr;
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, w, h);
+
+  if (!items.length) { ctx.fillStyle = '#666'; ctx.fillText('暂无数据', w/2-30, h/2); return; }
+
+  const pad = { l: 36, r: 10, t: 10, b: 24 };
+  const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+  const maxV = Math.max(...items.map(d => Math.max(d.like_rate, d.skip_rate, d.completion_rate)), 0.01);
+
+  // grid
+  ctx.strokeStyle = '#222'; ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.t + ch * i / 4;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+    ctx.fillStyle = '#666'; ctx.font = '10px sans-serif';
+    ctx.fillText((maxV * (1 - i/4) * 100).toFixed(0) + '%', 2, y + 3);
+  }
+
+  function drawLine(key, color) {
+    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath();
+    items.forEach((d, i) => {
+      const x = pad.l + cw * i / Math.max(items.length - 1, 1);
+      const y = pad.t + ch * (1 - d[key] / maxV);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+  }
+  drawLine('like_rate', '#ff2d55');
+  drawLine('skip_rate', '#ff9500');
+  drawLine('completion_rate', '#34c759');
+
+  // x labels
+  ctx.fillStyle = '#666'; ctx.font = '9px sans-serif';
+  items.forEach((d, i) => {
+    if (i % 3 === 0 || i === items.length - 1) {
+      const x = pad.l + cw * i / Math.max(items.length - 1, 1);
+      ctx.fillText(d.date.slice(5), x - 14, h - 6);
+    }
+  });
+
+  // legend
+  ctx.font = '10px sans-serif';
+  ctx.fillStyle = '#ff2d55'; ctx.fillText('● 喜欢率', pad.l, h - 6);
+  ctx.fillStyle = '#ff9500'; ctx.fillText('● 跳过率', pad.l + 60, h - 6);
+  ctx.fillStyle = '#34c759'; ctx.fillText('● 完播率', pad.l + 120, h - 6);
+}
+
+loadAll();
+</script>
+</body>
+</html>

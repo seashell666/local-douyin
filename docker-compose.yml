@@ -1,0 +1,13 @@
+# local-douyin · 一键启动（Ubuntu Docker）
+# 用法: docker compose up -d
+# 手机浏览器访问: http://<Ubuntu局域网IP>:8000
+services:
+  local-douyin:
+    build: .
+    container_name: local-douyin
+    ports:
+      - "8000:8000"
+    volumes:
+      # 视频文件与数据库持久化（宿主机路径，方便直接往里面放视频）
+      - ./data:/app/data
+    restart: unless-stopped

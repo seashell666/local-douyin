@@ -779,6 +779,48 @@
     }
   }
 
+  // v9.1.10（黑屏根治·第一刀）：预"渲染"，而不是只预"加载"。
+  // 【诊断结论推翻了旧假设】实测下一个视频 rs=4、buf=14.5s —— 数据全是满的，照样黑。
+  // 根因：WebView 的 video 像素由独立 Surface 承载，"从未播放过"的元素 Surface
+  // 尚未合成，元素区域就是黑洞。所以真正的准备动作不是把数据拉下来，
+  // 而是让 Surface 建立并提交一帧。同时也解释了那个不对称现象：
+  //   下滑到下一个 = 全新 src、从未播过 → Surface 冷 → 黑；
+  //   上滑回上一个 = 那个 video 播过 → Surface 已建立、保留最后一帧 → 不黑。
+  // 做法：下一个视频数据就绪后，静音偷偷播 180ms 再暂停归零。
+  //   · muted=true：绝不发声，用户完全无感；
+  //   · 180ms：够 Surface 建立并提交首帧；数据已在缓冲里，几乎不额外耗流量；
+  //   · pause + currentTime=0：Surface 保留首帧附近的像素，滑到时立刻有画面。
+  function prerenderNext() {
+    var v = slideEls[2] && slideEls[2].querySelector("video");
+    if (!v || !v.src) return;
+    if (v.__prerendered) return;
+    if (v.readyState < 2) {
+      // 数据还没到第一帧：等 loadeddata 再回调一次，届时重试
+      v.addEventListener("loadeddata", function onceLD() {
+        v.removeEventListener("loadeddata", onceLD);
+        prerenderNext();
+      }, { once: true });
+      return;
+    }
+    v.__prerendered = true;
+    v.muted = true;
+    try {
+      var pr = v.play();
+      if (pr && pr.catch) pr.catch(function () {});
+    } catch (e) {}
+    setTimeout(function () {
+      try {
+        // 若这 180ms 内用户已经滑过来了，说明它已被正式接管为"当前正在播放"，
+        // 此时绝不能 pause —— 否则会出现滑过去反而停住不动的诡异现象。
+        if (typeof slideEls !== "undefined" && slideEls[1] && slideEls[1].querySelector("video") === v) return;
+        v.pause();
+        if (v.currentTime > 0.02) v.currentTime = 0;
+      } catch (e) {}
+      // 静音状态交回统一音控，避免把用户偏好写死
+      v.muted = !soundOn;
+    }, 180);
+  }
+
   function bindSlide(slide) {
     var video = slide.querySelector("video");
     var pWrap = slide.querySelector(".progress-wrap");
@@ -1064,18 +1106,41 @@
         applyVideoLayout(video, slide);
       }
     }
-    // v9.1.9：视频第一帧解码完成 → 撤掉封面遮罩，露出真实首帧画面。
-    // 这样滑动过程：封面图（图片加载快）→ 首帧画面，全程无黑屏。
-    function onFirstFrame() {
+    // v9.1.10（黑屏根治·第二刀）：撤封面遮罩的时机，从"数据解码好(loadeddata)"
+    // 改为"像素真的合成出来(playing + 帧已推进)"。
+    // 【为什么改】实测诊断读数：下一个视频 rs=4、buf=14.5s —— 数据完全是满的，屏幕照样黑。
+    // 这证明黑屏不在数据层。Android WebView 的 <video> 像素由独立 Surface/纹理承载，
+    // "rs=4 解码好"只代表帧进了解码队列，Surface 未合成前元素区域仍是黑洞。
+    // 这正是"音频先出、画面后到（下一 Sony 换了 SM8765 也没用）"的物理原因：
+    // 音轨走 AudioTrack 不需要 Surface，画面必须等 Surface 起来。
+    // 所以必须等帧真正推进（currentTime 有变化）才撤封面 —— 此时撤，看到的是真画面；
+    // Surface 万一迟迟不来，画面停在封面，也不会退回黑屏。封面现在是保险，不是主力。
+    var __revealTimer = null;
+    function revealVideo() {
+      if (video.__revealed) return;
+      // 只给"当前正在看的那一屏"撤封面：预渲染阶段的偷跑(屏幕外)不算，
+      // 否则会出现"还没滑过去封面就没了、Surface 又没跟上"的黑窗。
+      try { if (typeof slideEls !== "undefined" && slideEls && slideEls[1] && slideEls[1] !== slide) return; } catch (e) {}
+      video.__revealed = true;
+      if (mask) mask.classList.add("hide");
+      if (__revealTimer) { clearTimeout(__revealTimer); __revealTimer = null; }
+    }
+    if (video) video.__reveal = revealVideo;
+    function onFirstFrameDecoded() {
       var isAudioOnly = (video.videoWidth === 0 && video.videoHeight === 0);
       var isInvalid = (!video.duration || isNaN(video.duration) || !isFinite(video.duration) || video.duration === 0);
-      if (!isAudioOnly && !isInvalid) {
-        if (mask) mask.classList.add("hide");
-        applyVideoLayout(video, slide);
-      }
+      if (!isAudioOnly && !isInvalid) applyVideoLayout(video, slide);
+      return !isAudioOnly && !isInvalid;
     }
+    // 帧真正推进 = Surface 已提交像素，这才是"有画面"的唯一可信信号
+    function onTimeAdvance() {
+      if (video.currentTime > 0.02) revealVideo();
+    }
+    video.addEventListener("playing", function () { applyVideoLayout(video, slide); onTimeAdvance(); });
+    video.addEventListener("timeupdate", onTimeAdvance);
+    video.addEventListener("seeked", onTimeAdvance);
     video.addEventListener("loadedmetadata", onVideoMeta);
-    video.addEventListener("loadeddata", onFirstFrame);
+    video.addEventListener("loadeddata", onFirstFrameDecoded);
     // 关键：如果视频元数据已加载（缓存），立即执行排版
     if (video.readyState >= 1) {
       onVideoMeta();
@@ -1083,13 +1148,17 @@
       setTimeout(onVideoMeta, 300);
       setTimeout(onVideoMeta, 800);
     }
-    // 已缓存到第一帧（readyState>=2）时立即撤遮罩，避免重复滑动时还盖着封面
+    // 已缓存到第一帧（readyState>=2）：只排版，不撤封面（撤封面改由 playing/帧推进决定）
     if (video.readyState >= 2) {
-      onFirstFrame();
+      onFirstFrameDecoded();
+      onTimeAdvance();
     } else {
-      setTimeout(onFirstFrame, 400);
-      setTimeout(onFirstFrame, 1000);
+      setTimeout(onFirstFrameDecoded, 400);
+      setTimeout(onFirstFrameDecoded, 1000);
     }
+    // 兜底：个别机型 Surface 起不来/事件丢失时，最多让封面留 2.5s 就露出视频，
+    // 宁可看到视频也不让用户永久卡在一张图上
+    __revealTimer = setTimeout(revealVideo, 2500);
 
     var progress = slide.querySelector(".progress");
     var bar = slide.querySelector(".progress .bar");
@@ -1427,6 +1496,8 @@
       // video 元素自身也设 poster（封面图），与 mask 双保险
       if (v.cover_url) { vid.poster = v.cover_url; } else { vid.removeAttribute("poster"); }
       vid.__preloaded = false;
+      vid.__prerendered = false;
+      vid.__revealed = false;
       vid.__ready = false;
       vid.muted = !soundOn;
       // 统一清理备用音源，防止图集/音频/视频间切换残留双音乐（双播放器根因）
@@ -1700,17 +1771,7 @@
     if (slideEls[0].__note_timer) { clearInterval(slideEls[0].__note_timer); slideEls[0].__note_timer = null; }
     playCurrent();
     preloadNext();
-    // [DIAG-v9.1.9d] 临时诊断：layout 后 2 秒观察预加载结果
-    // 用来区分"加载慢"还是"浏览器根本没预加载"（WebView 常把 preload=auto 降级为 metadata）
-    try {
-      setTimeout(function () {
-        var _pv = slideEls[2] && slideEls[2].querySelector("video");
-        if (_pv) {
-          var _b = (_pv.buffered && _pv.buffered.length) ? _pv.buffered.end(0).toFixed(1) : "0";
-          showToast("[预载2s] rs=" + _pv.readyState + " buf=" + _b + "s");
-        }
-      }, 2000);
-    } catch (e) {}
+    prerenderNext();
     maybeLoadMore();
   }
 
@@ -2802,8 +2863,6 @@
       if (curV0) curV0.pause();
       if (curNA0) curNA0.pause();
       var tv = slideEls[2].querySelector("video");
-      // [DIAG-v9.1.9d] 临时诊断：下滑瞬间，下一个视频的 readyState
-      try { showToast("[下滑] 下一个 rs=" + tv.readyState); } catch (e) {}
       var tvPi = slideEls[2].querySelector(".pause-icon");
       if (tvPi) tvPi.classList.remove("show");
       var pos = videoPositions[slideEls[2].__id];
@@ -2821,8 +2880,6 @@
       if (curV1) curV1.pause();
       if (curNA1) curNA1.pause();
       var tv = slideEls[0].querySelector("video");
-      // [DIAG-v9.1.9d] 临时诊断：上滑瞬间，上一个视频的 readyState
-      try { showToast("[上滑] 上一个 rs=" + tv.readyState); } catch (e) {}
       var tvPi0 = slideEls[0].querySelector(".pause-icon");
       if (tvPi0) tvPi0.classList.remove("show");
       var pos = videoPositions[slideEls[0].__id];
@@ -2862,8 +2919,6 @@
     if (current >= videos.length - 1) { showToast("已是最后一个"); return false; }
     lockSwitch();
     var tv = slideEls[2].querySelector("video");
-    // [DIAG-v9.1.9d] 临时诊断：程序跳转瞬间，下一个视频的 readyState
-    try { showToast("[跳转] 下一个 rs=" + tv.readyState); } catch (e) {}
     var pos = videoPositions[slideEls[2].__id];
     if (pos && pos > 0.5 && tv.currentTime < 0.1 && tv.duration) tv.currentTime = Math.min(pos, tv.duration - 0.5);
     current++;

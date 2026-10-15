@@ -553,8 +553,8 @@
   "use strict";
 
   var videos = [];
-  // 版本标识：APK 验收时确认加载的是最新前端（v9.1.11=黑屏四刀修复+进度恢复保留；每次上线必须同步更新此标记）
-  window.__VER = "v9.1.11-20261015";
+  // 版本标识：A/B 对比版 = v9.1.9 黑屏回滚（prerender/撤封面时机回滚到 v9.1.9：loadeddata/loadedmetadata 撤封面、无预热、归零保留视频进度恢复；功能全集保留）
+  window.__VER = "v9.1.9-rollback-20261015";
   // feed 模式：默认"客户展示1"排序（加权随机+3视频夹1音频/图集，录展示视频用）；URL 带 ?mode=normal 回原测试排序
   try { window.__feedMode = new URLSearchParams(location.search).get("mode") || "customer1"; }
   catch (e) { window.__feedMode = "customer1"; }
@@ -778,73 +778,6 @@
       }, { once: true });
     }
   }
-
-  // v9.1.10（黑屏根治·第一刀）：预"渲染"，而不是只预"加载"。
-  // 【诊断结论推翻了旧假设】实测下一个视频 rs=4、buf=14.5s —— 数据全是满的，照样黑。
-  // 根因：WebView 的 video 像素由独立 Surface 承载，"从未播放过"的元素 Surface
-  // 尚未合成，元素区域就是黑洞。所以真正的准备动作不是把数据拉下来，
-  // 而是让 Surface 建立并提交一帧。同时也解释了那个不对称现象：
-  //   下滑到下一个 = 全新 src、从未播过 → Surface 冷 → 黑；
-  //   上滑回上一个 = 那个 video 播过 → Surface 已建立、保留最后一帧 → 不黑。
-  // 做法：目标视频数据就绪后，静音偷偷播到首帧渲染出来，再暂停（不归零）。
-  //   · muted=true：绝不发声，用户完全无感；
-  //   · 首帧渲染即停（requestVideoFrameCallback/rAF 轮询 currentTime>0）：
-  //     位置 = 首帧时间戳（约 0.02~0.04s，取决于帧率），视觉等于从头；
-  //   · 【v9.1.11 删掉"暂停后归零"】Android WebView 上播放后 seek(0) 会把
-  //     刚建立的 Surface 重置回冷态，热身后的视频反而每次首次滑到都黑更久
-  //     （用户实测"比没改之前还糟"）。现在只暂停不 seek，Surface 保留首帧像素。
-  // v9.1.11 通用化：prerenderSlide(slide) 同时服务"下一个"(下滑目标)与
-  // "上一个"(上滑目标)，双向都不黑。
-  function prerenderSlide(slide) {
-    if (!slide) return;
-    var v = slide.querySelector("video");
-    if (!v || !v.src) return;
-    if (v.__prerendered) return;
-    if (v.readyState < 2) {
-      // 数据还没到第一帧：等 loadeddata 再回调一次，届时重试
-      v.addEventListener("loadeddata", function onceLD() {
-        v.removeEventListener("loadeddata", onceLD);
-        prerenderSlide(slide);
-      }, { once: true });
-      return;
-    }
-    v.__prerendered = true;
-    v.muted = true;
-    try {
-      var pr = v.play();
-      if (pr && pr.catch) pr.catch(function () {});
-    } catch (e) {}
-    var stopped = false, rafId = 0;
-    function stopOnce() {
-      if (stopped) return; stopped = true;
-      if (rafId) cancelAnimationFrame(rafId);
-      try {
-        // 若首帧期间用户已经滑过来了，说明它已被正式接管为"当前正在播放"，
-        // 此时绝不能 pause —— 否则会出现滑过去反而停住不动的诡异现象。
-        if (typeof slideEls !== "undefined" && slideEls[1] && slideEls[1].querySelector("video") === v) return;
-        // 只暂停，绝不 seek 归零（v9.1.11：seek 会重置 Surface，黑屏更久）
-        v.pause();
-      } catch (e) {}
-      // 静音状态交回统一音控，避免把用户偏好写死
-      v.muted = !soundOn;
-    }
-    function poll() {
-      if (stopped) return;
-      if (v.currentTime > 0 && v.readyState >= 2) { stopOnce(); return; }
-      rafId = requestAnimationFrame(poll);
-    }
-    if (v.requestVideoFrameCallback) {
-      try {
-        v.requestVideoFrameCallback(function () { stopOnce(); });
-      } catch (e) { rafId = requestAnimationFrame(poll); }
-    } else {
-      rafId = requestAnimationFrame(poll);
-    }
-    // 超时兜底：个别机型首帧事件丢失时，180ms 后也停（Surface 大概率已建立），依然不归零
-    setTimeout(stopOnce, 180);
-  }
-  function prerenderNext() { prerenderSlide(slideEls[2]); }
-  function prerenderPrev() { prerenderSlide(slideEls[0]); }
 
   function bindSlide(slide) {
     var video = slide.querySelector("video");
@@ -1125,52 +1058,11 @@
       if (isAudioOnly || isInvalid) {
         if (mask) mask.classList.remove("hide");
       } else {
-        // v9.1.9：排版照旧在元数据就绪时做，但 mask 的隐藏推迟到第一帧真正解码
-        // （loadeddata = readyState>=2），避免在只有元数据时就把封面遮罩撤掉露出黑底。
-        // loadeddata 触发时机见下方 onFirstFrame。
+        if (mask) mask.classList.add("hide");
         applyVideoLayout(video, slide);
       }
     }
-    // v9.1.10（黑屏根治·第二刀）：撤封面遮罩的时机，从"数据解码好(loadeddata)"
-    // 改为"像素真的合成出来(playing + 帧已推进)"。
-    // 【为什么改】实测诊断读数：下一个视频 rs=4、buf=14.5s —— 数据完全是满的，屏幕照样黑。
-    // 这证明黑屏不在数据层。Android WebView 的 <video> 像素由独立 Surface/纹理承载，
-    // "rs=4 解码好"只代表帧进了解码队列，Surface 未合成前元素区域仍是黑洞。
-    // 这正是"音频先出、画面后到（下一 Sony 换了 SM8765 也没用）"的物理原因：
-    // 音轨走 AudioTrack 不需要 Surface，画面必须等 Surface 起来。
-    // 所以必须等帧真正推进（currentTime 有变化）才撤封面 —— 此时撤，看到的是真画面；
-    // Surface 万一迟迟不来，画面停在封面，也不会退回黑屏。封面现在是保险，不是主力。
-    var __revealTimer = null;
-    function revealVideo(force) {
-      if (video.__revealed) return;
-      // 只给"当前正在看的那一屏"撤封面：预渲染阶段的偷跑(屏幕外)不算，
-      // 否则会出现"还没滑过去封面就没了、Surface 又没跟上"的黑窗。
-      try { if (typeof slideEls !== "undefined" && slideEls && slideEls[1] && slideEls[1] !== slide) return; } catch (e) {}
-      // v9.1.11：非 force 时要求"视频确实在播放中"才撤封面。
-      // 原因：playing 事件在 prerender 偷跑时也会触发（muted 播放），若此刻撤封面，
-      // 用户滑过来时封面已没了、Surface 又没跟上 → 黑窗更明显。
-      // 只有真正在播（用户正在看）才撤；兜底 2.5s 用 force 强制撤，防永久卡封面。
-      if (!force && video.paused) return;
-      video.__revealed = true;
-      if (mask) mask.classList.add("hide");
-      if (__revealTimer) { clearTimeout(__revealTimer); __revealTimer = null; }
-    }
-    if (video) video.__reveal = revealVideo;
-    function onFirstFrameDecoded() {
-      var isAudioOnly = (video.videoWidth === 0 && video.videoHeight === 0);
-      var isInvalid = (!video.duration || isNaN(video.duration) || !isFinite(video.duration) || video.duration === 0);
-      if (!isAudioOnly && !isInvalid) applyVideoLayout(video, slide);
-      return !isAudioOnly && !isInvalid;
-    }
-    // 帧真正推进 = Surface 已提交像素，这才是"有画面"的唯一可信信号
-    function onTimeAdvance() {
-      if (video.currentTime > 0.02) revealVideo();
-    }
-    video.addEventListener("playing", function () { applyVideoLayout(video, slide); onTimeAdvance(); });
-    video.addEventListener("timeupdate", onTimeAdvance);
-    video.addEventListener("seeked", onTimeAdvance);
     video.addEventListener("loadedmetadata", onVideoMeta);
-    video.addEventListener("loadeddata", onFirstFrameDecoded);
     // 关键：如果视频元数据已加载（缓存），立即执行排版
     if (video.readyState >= 1) {
       onVideoMeta();
@@ -1178,17 +1070,6 @@
       setTimeout(onVideoMeta, 300);
       setTimeout(onVideoMeta, 800);
     }
-    // 已缓存到第一帧（readyState>=2）：只排版，不撤封面（撤封面改由 playing/帧推进决定）
-    if (video.readyState >= 2) {
-      onFirstFrameDecoded();
-      onTimeAdvance();
-    } else {
-      setTimeout(onFirstFrameDecoded, 400);
-      setTimeout(onFirstFrameDecoded, 1000);
-    }
-    // 兜底：个别机型 Surface 起不来/事件丢失时，最多让封面留 2.5s 就露出视频，
-    // 宁可看到视频也不让用户永久卡在一张图上（force=true 跳过"在播才撤"判定）
-    __revealTimer = setTimeout(function () { revealVideo(true); }, 2500);
 
     var progress = slide.querySelector(".progress");
     var bar = slide.querySelector(".progress .bar");
@@ -1505,29 +1386,24 @@
     if (slide.__id !== v.id) {
       var vid = slide.querySelector("video");
       var mask = slide.querySelector(".video-mask");
-      // v9.1.9：双保险根治黑屏（配合服务端推荐接口补 cover_url 字段）。
-      // 真正的根因：/api/recommendations 的 generate_recommendations 构造 item 时
-      // 只取到 row[22]，漏了 row[23](cover_url) → 前端 v.cover_url 永远为空 →
-      // mask 无封面可显示（纯黑）、video.poster 也为空 → 滑动过程纯黑屏。
-      // 服务端已补 cover_url（617/644 视频有真封面）。前端双保险：
-      //   1) mask 显示 cover_url 封面图 → 视频未加载好时看到封面（图片小、加载快），不黑；
-      //   2) video 解码出第一帧（loadeddata 事件）→ hide mask → 看到真实第一帧，不黑。
-      // 纯音频/error 时 onVideoMeta 或 error 事件重新显示 mask。
+      // v9.1.8：mask 直接 hide，让 video 元素自身的 poster（封面图）显示。
+      // 根因：mask z-index:2 在 video 上方，mask 显示时（即使有 cover_url 背景）
+      // 仍会遮住 video 的第一帧；用户实测"有些视频能看到第一帧上半部分"=video
+      // 已加载到 readyState>=1 触发 onVideoMeta hide 了 mask，能看到 video 第一帧；
+      // "有些黑屏"=video 还没加载好 mask 还在显示，纯黑或封面图都不对（用户要的是第一帧）。
+      // 正确方案：fillSlide 时直接 hide mask，video.poster 由 line 1404 设为 cover_url，
+      // video 元素加载期间显示 poster（封面），加载到 readyState>=2 显示第一帧——
+      // 滑动过程看到的就是 video 元素的内容（poster→第一帧），全程无黑。
+      // 纯音频/error 时 onVideoMeta 或 error 事件会重新显示 mask。
       if (mask) {
-        mask.classList.remove("hide");
-        if (v.cover_url) {
-          mask.style.background = "url('" + v.cover_url + "') center/cover no-repeat, #000";
-        } else {
-          mask.style.background = "#000";
-        }
+        mask.classList.add("hide");
+        mask.style.background = "";  // 清除上轮 cover_url 背景，回归默认 #000（仅 error 显示）
       }
       vid.style.visibility = "";
       vid.src = v.url;
-      // video 元素自身也设 poster（封面图），与 mask 双保险
+      // 封面 poster：视频加载/解码期显示封面而非灰底
       if (v.cover_url) { vid.poster = v.cover_url; } else { vid.removeAttribute("poster"); }
       vid.__preloaded = false;
-      vid.__prerendered = false;
-      vid.__revealed = false;
       vid.__ready = false;
       vid.muted = !soundOn;
       // 统一清理备用音源，防止图集/音频/视频间切换残留双音乐（双播放器根因）
@@ -1787,30 +1663,20 @@
     window.__visualIdx = current;
     var prevV = slideEls[0].querySelector("video");
     var prevNA = slideEls[0].querySelector(".note-audio");
-    var isFinished = false;
     if (slideEls[0].__id) {
       // 播放完的视频（接近末尾）记录为0，滑回来从头播
-      isFinished = prevV.duration && prevV.currentTime > prevV.duration - 0.5;
+      var isFinished = prevV.duration && prevV.currentTime > prevV.duration - 0.5;
       videoPositions[slideEls[0].__id] = isFinished ? 0 : prevV.currentTime;
     }
     prevV.pause();
     if (prevNA) prevNA.pause();
     var prevAE = slideEls[0].querySelector(".audio-el");
     if (prevAE) prevAE.pause();
-    // v9.1.11：只对"看完的"物理归零（下次从头播）；未看完的保留当前位置。
-    // 原因：无脑归零 = 每次布局都对上一个视频做一次 seek(0)，Android WebView 上
-    // 会打断 Surface（黑屏帮凶），且与"记住看到哪"进度恢复冲突。
-    // 未看完的保留当前位置：滑回来时 playCurrent 检测 currentTime 已在中途 →
-    // 不 seek、直接续播 = 自然接续上次进度（功能保留，Surface 也不被打断）。
-    if (isFinished && prevV.currentTime > 0.1) prevV.currentTime = 0;
+    if (prevV.currentTime > 0.1) prevV.currentTime = 0;
     // 清除上一个slide的图文自动轮播
     if (slideEls[0].__note_timer) { clearInterval(slideEls[0].__note_timer); slideEls[0].__note_timer = null; }
     playCurrent();
     preloadNext();
-    prerenderNext();
-    // v9.1.11：上滑目标(slideEls[0])也同等热身 —— 用户实测"从第二个滑向第一个也可能黑"，
-    // 根因同下滑：目标 video 从未播过 → Surface 冷 → 黑。双向热身，双向都不黑。
-    prerenderPrev();
     maybeLoadMore();
   }
 

@@ -5,6 +5,7 @@ local-douyin —— 本地家庭抖音 · 后端服务 v2（FastAPI）
 """
 import os
 import sys
+import time as _time
 from pathlib import Path
 
 from fastapi import FastAPI, Request
@@ -185,15 +186,91 @@ def _customer1_sort(items):
     return result
 
 
+# ---- 方案 A：固定顺序表（customer1）----
+# 排序逻辑 = 一次性的"抽签工具"，生成一张固定顺序表落库；
+# 之后翻页永远按这张表切片，不再每次重排 → 翻页永不重复。
+import json as _json
+import sqlite3 as _sqlite3
+
+def _feed_seq_table():
+    """确保 feed_sequence 表存在"""
+    conn = db.get_conn()
+    try:
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS feed_sequence ("
+            " mode TEXT PRIMARY KEY,"
+            " seq TEXT NOT NULL,"
+            " video_count INTEGER NOT NULL,"
+            " updated_at INTEGER NOT NULL)"
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+def _feed_seq_get(mode):
+    """读顺序表：返回 (seq列表, video_count)；无表/无记录返回 None"""
+    _feed_seq_table()
+    conn = db.get_conn()
+    try:
+        row = conn.execute(
+            "SELECT seq, video_count FROM feed_sequence WHERE mode=?", (mode,)
+        ).fetchone()
+        if not row:
+            return None
+        return _json.loads(row[0]), row[1]
+    finally:
+        conn.close()
+
+def _feed_seq_put(mode, seq, video_count):
+    """写入/覆盖顺序表"""
+    _feed_seq_table()
+    conn = db.get_conn()
+    try:
+        conn.execute(
+            "INSERT OR REPLACE INTO feed_sequence (mode, seq, video_count, updated_at)"
+            " VALUES (?,?,?,?)",
+            (mode, _json.dumps(seq), video_count, int(_time.time())),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+def _feed_seq_rebuild(mode="customer1"):
+    """用排序工具重新生成一张顺序表并落库，返回条目数"""
+    rows, total = db.list_videos(offset=0, limit=100000)
+    items = [_video_row_to_dict(r) for r in rows]
+    ordered = _customer1_sort(items)
+    seq = [x["id"] for x in ordered]
+    _feed_seq_put(mode, seq, len(seq))
+    return len(seq)
+
+def _feed_seq_items(mode="customer1"):
+    """按顺序表取全量 item dict；表缺失或视频数变化则自动重建"""
+    cached = _feed_seq_get(mode)
+    rows, total = db.list_videos(offset=0, limit=100000)
+    if cached is None or cached[1] != len(rows):
+        _feed_seq_rebuild(mode)
+        cached = _feed_seq_get(mode)
+    by_id = {}
+    for r in rows:
+        d = _video_row_to_dict(r)
+        by_id[d["id"]] = d
+    seq, _ = cached
+    ordered = []
+    for vid in seq:
+        d = by_id.get(vid)
+        if d is not None:
+            ordered.append(d)
+    return ordered
+
+
 @app.get("/api/videos")
 def api_videos(offset: int = 0, limit: int = 20, mode: str = ""):
-    """可见视频列表（分页，含博主头像/音乐封面）；mode=customer1 时按客户展示1全局排序再切片"""
+    """可见视频列表（分页，含博主头像/音乐封面）；mode=customer1 时按固定顺序表切片（生成一次、不再重排）"""
     limit = min(max(limit, 1), 200)
     if mode == "customer1":
-        # 全量（600+）排序一次，再按 offset/limit 切片 → 翻页顺序全局连续稳定
-        rows, total = db.list_videos(offset=0, limit=100000)
-        items = [_video_row_to_dict(r) for r in rows]
-        items = _customer1_sort(items)
+        # 固定顺序表：首次自动生成一次并落库，翻页永远按表切片 → 顺序稳定不重复
+        items = _feed_seq_items(mode)
         page = items[offset:offset + limit]
         return {"items": page, "total": len(items), "offset": offset,
                 "has_more": offset + len(page) < len(items)}
@@ -201,6 +278,36 @@ def api_videos(offset: int = 0, limit: int = 20, mode: str = ""):
     items = [_video_row_to_dict(r) for r in rows]
     return {"items": items, "total": total, "offset": offset,
             "has_more": offset + len(items) < total}
+
+
+@app.post("/api/feed/rebuild")
+def api_feed_rebuild(mode: str = "customer1"):
+    """手动重新生成顺序表（数据有更新/想换一版顺序时调用），返回新表条目数"""
+    n = _feed_seq_rebuild(mode)
+    return {"ok": True, "mode": mode, "count": n}
+
+
+
+@app.get("/api/videos/{vid}/peers")
+def api_video_peers(vid: int):
+    """获取发现该视频的同好节点（含 sec_uid，供前端"跳转到散人同好"唤起抖音主页）。
+    v9.1.3：1) likes 类走 video_peer_sources 关联表；2) 兜底——视频作者 sec_uid 匹配
+    peers 表（posts 类：作者即来源 peer），覆盖所有视频。按权重降序。"""
+    conn = db.get_conn()
+    rows = conn.execute(
+        "SELECT p.id, p.nickname, p.sec_uid, p.avatar, p.current_weight, vps.source_type "
+        "FROM video_peer_sources vps JOIN peers p ON vps.peer_id = p.id "
+        "WHERE vps.video_id=? ORDER BY p.current_weight DESC",
+        (vid,),
+    ).fetchall()
+    # v9.1.4：去掉"作者=peer"兜底——兜底会匹配到博主自己（跳到博主主页而非来源同好）。
+    # posts 类视频如实返回空，前端提示"暂无来源同好"。likes 类不受影响。
+    conn.close()
+    return {"items": [
+        {"peer_id": r[0], "nickname": r[1] or "", "sec_uid": r[2] or "",
+         "avatar": r[3] or "", "weight": r[4], "source_type": r[5] or ""}
+        for r in rows
+    ]}
 
 
 @app.get("/api/videos/{vid}/stream")

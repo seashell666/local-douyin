@@ -200,6 +200,8 @@ def generate_recommendations(limit=20, offset=0, config=None):
             "width": row[20] if len(row) > 20 else 0,
             "height": row[21] if len(row) > 21 else 0,
             "source_peer_id": row[22] if len(row) > 22 else 0,
+            "cover_url": row[23] if len(row) > 23 else "",
+            "media_type": row[24] if len(row) > 24 else "",
             "url": f"/api/videos/{row[0]}/stream",
             "curation_score": score,
             "curation_detail": detail,

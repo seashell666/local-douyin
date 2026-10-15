@@ -474,20 +474,20 @@
         <span class="lp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
         <span class="lp-text">下载视频</span>
       </div>
-      <div class="lp-item">
-        <span class="lp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="13" height="10" rx="1.5"/><path d="M17 10l5-3v10l-5-3z"/></svg></span>
-        <span class="lp-text">投屏</span>
+      <div class="lp-item" id="lpSuperLike">
+        <span class="lp-icon" id="lpSuperLikeIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>
+        <span class="lp-text">超级喜欢</span>
       </div>
-      <div class="lp-item">
-        <span class="lp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="14" height="11" rx="1.5"/><rect x="16" y="10" width="6" height="10" rx="1"/><line x1="6" y1="20" x2="12" y2="20"/></svg></span>
-        <span class="lp-text">电脑/Pad打开</span>
+      <div class="lp-item" id="lpPuzzle">
+        <span class="lp-icon" id="lpPuzzleIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/></svg></span>
+        <span class="lp-text">迷惑视频</span>
       </div>
     </div>
     <!-- 第二组 -->
     <div class="lp-group">
       <div class="lp-item" id="lpDefaultMute">
         <span class="lp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg></span>
-        <span class="lp-text">开启时默认静音</span>
+        <span class="lp-text">开启时默认不静音</span>
         <span class="lp-switch" id="lpDefaultMuteSwitch"><span class="lp-dot"></span></span>
       </div>
       <div class="lp-item" id="lpDefaultAutoPlay">
@@ -510,17 +510,17 @@
         <span class="lp-text">开启时默认清屏播放</span>
         <span class="lp-switch" id="lpCleanSwitch"><span class="lp-dot"></span></span>
       </div>
-      <div class="lp-item">
-        <span class="lp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="14" height="11" rx="1.5"/><path d="M16 10l5-3v10l-5-3z"/><rect x="14" y="16" width="8" height="5" rx="1"/></svg></span>
-        <span class="lp-text">后台小窗设置</span>
-        <span class="lp-arrow">关闭 &rsaquo;</span>
+      <div class="lp-item" id="lpNotInterested">
+        <span class="lp-icon" id="lpNotInterestedIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/><path d="M12 5.67 9.9 8.9l3.1 2.1-2.4 3.1 3.3 2.2"/></svg></span>
+        <span class="lp-text">不感兴趣</span>
+        <span class="lp-arrow" id="lpNotInterestedArrow">&rsaquo;</span>
       </div>
     </div>
     <!-- 第三组 -->
     <div class="lp-group">
-      <div class="lp-item">
-        <span class="lp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span>
-        <span class="lp-text">听抖音</span>
+      <div class="lp-item" id="lpSecretLike">
+        <span class="lp-icon" id="lpSecretLikeIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span>
+        <span class="lp-text">偷偷喜欢</span>
         <span class="lp-arrow">&rsaquo;</span>
       </div>
     </div>
@@ -532,13 +532,17 @@
   <div class="share-mask" id="shareMask"></div>
   <div class="share-panel">
     <div class="share-title">分享到</div>
-    <div class="share-row" id="shareCopyPassword">
-      <img src="/icons/share/copyPassword.png" alt="口令">
-      <span class="share-label">复制口令</span>
-    </div>
     <div class="share-row" id="shareCopyLink">
       <img src="/icons/share/copyLink.png" alt="链接">
       <span class="share-label">复制链接</span>
+    </div>
+    <div class="share-row" id="shareGoPeer">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E" alt="同好">
+      <span class="share-label">跳转到散人同好</span>
+    </div>
+    <div class="share-row" id="shareCopyPassword">
+      <img src="/icons/share/copyPassword.png" alt="口令">
+      <span class="share-label">复制口令</span>
     </div>
     <div class="share-cancel" id="shareCancel">取消</div>
   </div>
@@ -880,6 +884,8 @@
               ae.pause();
               setPauseIcon(true);
               setDiscPlaying(slide, false);
+              // v9.1.5：恢复"暂停退出清屏"（用户需求：清屏开启后暂停退出、上下滑动不退出、
+              // 连赞/菜单可再进）。v9.1.2 误删此处导致暂停不退清屏。
               if (cleanMode) setCleanMode(false);
             }
           }
@@ -892,7 +898,8 @@
             if (slide.__note_timer) { clearInterval(slide.__note_timer); slide.__note_timer = null; }
             if (na && na.src) { na.pause(); }
             setPauseIcon(true);
-            // 单击暂停时自动退出清屏模式
+            // v9.1.5：恢复"暂停退出清屏"（用户需求：清屏开启后暂停退出、上下滑动不退出、
+            // 连赞/菜单可再进）。v9.1.2 误删此处导致暂停不退清屏。
             if (cleanMode) setCleanMode(false);
           } else {
             // 继续：图片轮播 + 背景音乐一起恢复
@@ -928,7 +935,8 @@
             video.pause();
             pWrap.classList.add("paused");
             setPauseIcon(true);
-            // 单击暂停时自动退出清屏模式
+            // v9.1.5：恢复"暂停退出清屏"（用户需求：清屏开启后暂停退出、上下滑动不退出、
+            // 连赞/菜单可再进）。v9.1.2 误删此处导致暂停不退清屏。
             if (cleanMode) setCleanMode(false);
           }
         }
@@ -1050,17 +1058,37 @@
       if (isAudioOnly || isInvalid) {
         if (mask) mask.classList.remove("hide");
       } else {
+        // v9.1.9：排版照旧在元数据就绪时做，但 mask 的隐藏推迟到第一帧真正解码
+        // （loadeddata = readyState>=2），避免在只有元数据时就把封面遮罩撤掉露出黑底。
+        // loadeddata 触发时机见下方 onFirstFrame。
+        applyVideoLayout(video, slide);
+      }
+    }
+    // v9.1.9：视频第一帧解码完成 → 撤掉封面遮罩，露出真实首帧画面。
+    // 这样滑动过程：封面图（图片加载快）→ 首帧画面，全程无黑屏。
+    function onFirstFrame() {
+      var isAudioOnly = (video.videoWidth === 0 && video.videoHeight === 0);
+      var isInvalid = (!video.duration || isNaN(video.duration) || !isFinite(video.duration) || video.duration === 0);
+      if (!isAudioOnly && !isInvalid) {
         if (mask) mask.classList.add("hide");
         applyVideoLayout(video, slide);
       }
     }
     video.addEventListener("loadedmetadata", onVideoMeta);
+    video.addEventListener("loadeddata", onFirstFrame);
     // 关键：如果视频元数据已加载（缓存），立即执行排版
     if (video.readyState >= 1) {
       onVideoMeta();
     } else {
       setTimeout(onVideoMeta, 300);
       setTimeout(onVideoMeta, 800);
+    }
+    // 已缓存到第一帧（readyState>=2）时立即撤遮罩，避免重复滑动时还盖着封面
+    if (video.readyState >= 2) {
+      onFirstFrame();
+    } else {
+      setTimeout(onFirstFrame, 400);
+      setTimeout(onFirstFrame, 1000);
     }
 
     var progress = slide.querySelector(".progress");
@@ -1211,16 +1239,38 @@
       if (this.__lpFired) { this.__lpFired = false; return; }
       doSharePassword();
     });
-    // 分享长按（600ms）= 直接复制链接，不弹窗
+    // 分享：单击=复制口令+唤起(原样)；双击=复制链接；长按=跳转到散人同好主页
+    // v9.1.3：用户拍板去掉弹窗选项，长按直接跳转，双击直接复制链接
     (function () {
       var sBtn = slide.querySelector(".act.share");
       var sLP = null;
+      var lastTap = 0;
+      var singleTimer = null;
       sBtn.addEventListener("touchstart", function () {
         sBtn.__lpFired = false;
-        sLP = setTimeout(function () { sLP = null; sBtn.__lpFired = true; doShareLink(); }, 600);
+        sLP = setTimeout(function () {
+          sLP = null; sBtn.__lpFired = true;
+          if (singleTimer) { clearTimeout(singleTimer); singleTimer = null; }
+          jumpToSourcePeer();
+        }, 600);
       }, { passive: true });
       sBtn.addEventListener("touchmove", function () { if (sLP) { clearTimeout(sLP); sLP = null; } });
-      sBtn.addEventListener("touchend", function () { if (sLP) { clearTimeout(sLP); sLP = null; } });
+      sBtn.addEventListener("touchend", function (e) {
+        if (sLP) { clearTimeout(sLP); sLP = null; }
+        if (sBtn.__lpFired) { sBtn.__lpFired = false; e.preventDefault(); return; }
+        e.preventDefault(); // 阻止合成 click，避免与 touch 双触发
+        var now = Date.now();
+        if (now - lastTap < 320) {
+          // 双击 = 复制链接
+          if (singleTimer) { clearTimeout(singleTimer); singleTimer = null; }
+          lastTap = 0;
+          doShareLink();
+        } else {
+          lastTap = now;
+          // 单击延迟判断是否双击（330ms 内无第二次则执行原样 doSharePassword）
+          singleTimer = setTimeout(function () { singleTimer = null; doSharePassword(); }, 330);
+        }
+      });
     })();
     // 音乐按钮：单击=静音切换，长按=进入音乐页
     var musicBtn = slide.querySelector(".music");
@@ -1306,6 +1356,43 @@
     next();
   }
 
+  // HEIC/无法解码图片（HTTP 200 但 naturalWidth=0、onerror 静默失败）双保险降级：
+  // 事件(error) + 解码检查(complete&&naturalWidth===0) 逐级降级 chain
+  // 定义在外层：fillSlide 与 openMusicPage 共用（此前在 fillSlide 内部定义，
+  // openMusicPage 调用时抛 ReferenceError，导致唱片长按无法进入音乐页）
+  function setChainPic(img, chain, fallbackEl) {
+    var ci = 0;
+    var lock = false;
+    function finalFail() {
+      if (img.onerror) img.onerror = null;
+      img.style.display = "none";
+      if (fallbackEl) fallbackEl.style.display = "flex";
+    }
+    function applyNext() {
+      if (lock) return;
+      while (ci < chain.length) {
+        var s = chain[ci++];
+        if (s) {
+          lock = true;
+          img.onerror = function () { lock = false; applyNext(); };
+          img.onload = function () {
+            if (img.complete && img.naturalWidth === 0) { lock = false; applyNext(); }
+            else { lock = true; }
+          };
+          img.src = s;
+          img.style.display = "block";
+          if (fallbackEl) fallbackEl.style.display = "none";
+          setTimeout(function () {
+            if (img.complete && img.naturalWidth === 0) { lock = false; applyNext(); }
+          }, 600);
+          return;
+        }
+      }
+      finalFail();
+    }
+    applyNext();
+  }
+
   function fillSlide(slide, idx) {
     if (idx < 0 || idx >= videos.length) { slide.style.display = "none"; return; }
     slide.style.display = "";
@@ -1314,47 +1401,30 @@
     // 核心状态最先落：即使后续渲染抛错，博主身份也已锁定（串号根治）
     slide.__sec_uid = v.sec_uid || "";
     window.__currentSecUid = v.sec_uid || "";
-    // HEIC/无法解码图片（HTTP 200 但 naturalWidth=0、onerror 静默失败）双保险降级：
-    // 事件(error) + 解码检查(complete&&naturalWidth===0) 逐级降级 chain
-    function setChainPic(img, chain, fallbackEl) {
-      var ci = 0;
-      var lock = false;
-      function finalFail() {
-        if (img.onerror) img.onerror = null;
-        img.style.display = "none";
-        if (fallbackEl) fallbackEl.style.display = "flex";
-      }
-      function applyNext() {
-        if (lock) return;
-        while (ci < chain.length) {
-          var s = chain[ci++];
-          if (s) {
-            lock = true;
-            img.onerror = function () { lock = false; applyNext(); };
-            img.onload = function () {
-              if (img.complete && img.naturalWidth === 0) { lock = false; applyNext(); }
-              else { lock = true; }
-            };
-            img.src = s;
-            img.style.display = "block";
-            if (fallbackEl) fallbackEl.style.display = "none";
-            setTimeout(function () {
-              if (img.complete && img.naturalWidth === 0) { lock = false; applyNext(); }
-            }, 600);
-            return;
-          }
-        }
-        finalFail();
-      }
-      applyNext();
-    }
+    // setChainPic 定义在外层（fillSlide 上方），fillSlide 与 openMusicPage 共用
+    // 图片降级链：music_cover → 封面 → 头像，HEIC/解码失败自动换下一级
     if (slide.__id !== v.id) {
       var vid = slide.querySelector("video");
       var mask = slide.querySelector(".video-mask");
-      if (mask) mask.classList.remove("hide");
+      // v9.1.9：双保险根治黑屏（配合服务端推荐接口补 cover_url 字段）。
+      // 真正的根因：/api/recommendations 的 generate_recommendations 构造 item 时
+      // 只取到 row[22]，漏了 row[23](cover_url) → 前端 v.cover_url 永远为空 →
+      // mask 无封面可显示（纯黑）、video.poster 也为空 → 滑动过程纯黑屏。
+      // 服务端已补 cover_url（617/644 视频有真封面）。前端双保险：
+      //   1) mask 显示 cover_url 封面图 → 视频未加载好时看到封面（图片小、加载快），不黑；
+      //   2) video 解码出第一帧（loadeddata 事件）→ hide mask → 看到真实第一帧，不黑。
+      // 纯音频/error 时 onVideoMeta 或 error 事件重新显示 mask。
+      if (mask) {
+        mask.classList.remove("hide");
+        if (v.cover_url) {
+          mask.style.background = "url('" + v.cover_url + "') center/cover no-repeat, #000";
+        } else {
+          mask.style.background = "#000";
+        }
+      }
       vid.style.visibility = "";
       vid.src = v.url;
-      // 封面 poster：视频加载/解码期显示封面而非灰底
+      // video 元素自身也设 poster（封面图），与 mask 双保险
       if (v.cover_url) { vid.poster = v.cover_url; } else { vid.removeAttribute("poster"); }
       vid.__preloaded = false;
       vid.__ready = false;
@@ -1630,6 +1700,17 @@
     if (slideEls[0].__note_timer) { clearInterval(slideEls[0].__note_timer); slideEls[0].__note_timer = null; }
     playCurrent();
     preloadNext();
+    // [DIAG-v9.1.9d] 临时诊断：layout 后 2 秒观察预加载结果
+    // 用来区分"加载慢"还是"浏览器根本没预加载"（WebView 常把 preload=auto 降级为 metadata）
+    try {
+      setTimeout(function () {
+        var _pv = slideEls[2] && slideEls[2].querySelector("video");
+        if (_pv) {
+          var _b = (_pv.buffered && _pv.buffered.length) ? _pv.buffered.end(0).toFixed(1) : "0";
+          showToast("[预载2s] rs=" + _pv.readyState + " buf=" + _b + "s");
+        }
+      }, 2000);
+    } catch (e) {}
     maybeLoadMore();
   }
 
@@ -1895,6 +1976,31 @@
     var ok = copyToClipboard(contentLink(v));
     showToast(ok ? "链接已复制" : "复制失败");
   }
+  // v9.1.3：跳转到散人同好（视频来源节点）主页——fetch /api/videos/{vid}/peers，
+  // 取权重最高且有 sec_uid 的同好，用 snssdk1128 scheme 唤起抖音进其主页。
+  // 服务端路由兜底：likes 类走 video_peer_sources；posts 类走"作者=peer"匹配（覆盖所有视频）
+  function jumpToSourcePeer() {
+    var v = videos[current];
+    if (!v) { showToast("视频信息不存在"); return; }
+    showToast("正在查询来源同好…");
+    var authorSecUid = v.sec_uid || "";
+    fetch("/api/videos/" + v.id + "/peers")
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        var items = data.items || [];
+        var peer = null;
+        for (var i = 0; i < items.length; i++) {
+          // v9.1.4：排除博主自己（兜底"作者=peer"会匹配到博主，跳到博主主页而非来源同好）
+          if (items[i].sec_uid && items[i].sec_uid !== authorSecUid) { peer = items[i]; break; }
+        }
+        if (!peer) { showToast(items.length ? "来源同好缺少主页信息" : "该视频暂无来源同好"); return; }
+        showToast("跳转同好：" + (peer.nickname || "未知"));
+        setTimeout(function () {
+          openDouyinApp("snssdk1128://user/profile?sec_uid=" + encodeURIComponent(peer.sec_uid) + "&refer=web&needlaunchlog=1");
+        }, 350);
+      })
+      .catch(function () { showToast("查询来源同好失败"); });
+  }
 
   // 长按弹窗
   function openLongPressMenu() {
@@ -1903,12 +2009,39 @@
     var csw = document.getElementById("lpCleanSwitch");
     var dm = document.getElementById("lpDefaultMuteSwitch");
     var da = document.getElementById("lpDefaultAutoPlaySwitch");
-    var dc = document.getElementById("lpDefaultCleanSwitch");
-    if (autoPlayNext) sw.classList.add("on"); else sw.classList.remove("on");
+    // v9.1：lpSwitch(占位1)/lpDefaultCleanSwitch(占位2) 为独立纯 UI 开关，
+    // 不再被 autoPlayNext / dy_default_clean 强制同步（修"联动"与"永远关不掉"）
     if (cleanMode) csw.classList.add("on"); else csw.classList.remove("on");
-    if (dm) { try { if (localStorage.getItem("dy_default_mute") === "1") dm.classList.add("on"); else dm.classList.remove("on"); } catch(e) {} }
+    // 开启时默认不静音：dy_default_mute=0（不默认静音）→ 开关 on
+    if (dm) { try { if (localStorage.getItem("dy_default_mute") !== "1") dm.classList.add("on"); else dm.classList.remove("on"); } catch(e) {} }
     if (da) { try { if (localStorage.getItem("dy_default_autoplay") === "1") da.classList.add("on"); else da.classList.remove("on"); } catch(e) {} }
-    if (dc) { try { if (localStorage.getItem("dy_default_clean") === "1") dc.classList.add("on"); else dc.classList.remove("on"); } catch(e) {} }
+    // v9.1.2：按当前视频的真实反馈状态重置四个反馈图标（修"图标跨视频残留填色"）。
+    // 迷惑视频：用户拍板——未确认一律不绿底（移除原"上条无反馈自动预打勾"逻辑），
+    // 只有当前视频已被确认标记（手动/自动已入库）才显示白勾绿底。
+    try {
+      var _cv2 = (typeof window.__currentVid === "function") ? window.__currentVid() : null;
+      var _st = (typeof window.__getFeedbackState === "function") ? window.__getFeedbackState(_cv2) : {};
+      var niIc = document.getElementById("lpNotInterestedIcon");
+      if (niIc) niIc.style.color = _st.not_interested ? "#fe2c55" : "";
+      var slIc = document.getElementById("lpSuperLikeIcon");
+      if (slIc) { slIc.style.color = _st.super_like ? "#8B008B" : ""; var slSv = slIc.querySelector("svg"); if (slSv) slSv.setAttribute("fill", _st.super_like ? "#8B008B" : "none"); }
+      var scIc = document.getElementById("lpSecretLikeIcon");
+      if (scIc) { scIc.style.color = _st.secret_like ? "#ffc107" : ""; var scSv = scIc.querySelector("svg"); if (scSv) scSv.setAttribute("fill", _st.secret_like ? "#ffc107" : "none"); }
+      var pz = document.getElementById("lpPuzzleIcon");
+      if (pz) {
+        if (_st.puzzle) { pz.style.color = "#fff"; pz.style.background = "#34c759"; pz.style.borderRadius = "4px"; }
+        else { pz.style.color = ""; pz.style.background = ""; pz.style.borderRadius = ""; }
+      }
+    } catch(e) {}
+    // 不感兴趣行的状态指示：当前视频是否已反馈（动态，替代原静态"已反馈"文案）
+    try {
+      var niArrow = document.getElementById("lpNotInterestedArrow");
+      if (niArrow) {
+        var _cv = (typeof window.__currentVid === "function") ? window.__currentVid() : null;
+        var _hasFb = _cv && (typeof window.__hasAnyFeedback === "function") ? window.__hasAnyFeedback(_cv) : false;
+        niArrow.textContent = _hasFb ? "已反馈 \u203a" : "\u203a";
+      }
+    } catch(e) {}
     mask.style.display = "flex";
   }
   function closeLongPressMenu() {
@@ -2536,23 +2669,48 @@
   document.getElementById("shareMask").addEventListener("click", closeShareSheet);
   document.getElementById("shareCancel").addEventListener("click", closeShareSheet);
 
+  // v9.1.2：跳转到散人同好——查该视频的来源同好节点（/api/videos/{vid}/peers），
+  // 取权重最高的同好，用 snssdk1128 scheme 唤起抖音进其主页（与单击分享同一唤起通道）。
+  // scheme 用 sec_uid query 形式；若无来源同好或缺 sec_uid 则提示。
+  document.getElementById("shareGoPeer").addEventListener("click", function () {
+    var v = videos[current];
+    if (!v) { closeShareSheet(); return; }
+    closeShareSheet();
+    showToast("正在查询来源同好…");
+    fetch("/api/videos/" + v.id + "/peers")
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        var items = data.items || [];
+        var peer = null;
+        for (var i = 0; i < items.length; i++) {
+          if (items[i].sec_uid) { peer = items[i]; break; } // 服务端已按权重降序
+        }
+        if (!peer) { showToast(items.length ? "来源同好缺少主页信息" : "该视频暂无来源同好"); return; }
+        showToast("跳转同好：" + (peer.nickname || "未知"));
+        setTimeout(function () {
+          openDouyinApp("snssdk1128://user/profile?sec_uid=" + encodeURIComponent(peer.sec_uid) + "&refer=web&needlaunchlog=1");
+        }, 350);
+      })
+      .catch(function () { showToast("查询来源同好失败"); });
+  });
+
   // 长按弹窗事件
   document.getElementById("longPressMask").addEventListener("click", function (e) {
     if (e.target === this) closeLongPressMenu();
   });
   document.getElementById("lpSwitch").addEventListener("click", function (e) {
     e.stopPropagation();
-    autoPlayNext = !autoPlayNext;
-    if (autoPlayNext) this.classList.add("on"); else this.classList.remove("on");
-    showToast(autoPlayNext ? "自动连播已开启" : "自动连播已关闭");
+    // 占位项（功能待开发）：仅 UI 层面响应开关动画，无实际功能（2026-10-14 需求冻结）
+    this.classList.toggle("on");
   });
-  document.getElementById("lpCleanSwitch").addEventListener("click", function (e) {
+  document.getElementById("lpDefaultCleanSwitch").addEventListener("click", function (e) {
     e.stopPropagation();
-    setCleanMode(!cleanMode);
-    showToast(cleanMode ? "清屏连播已开启" : "清屏连播已关闭");
-    closeLongPressMenu();
+    // 占位项（功能待开发）：仅 UI 层面响应开关动画，无实际功能（2026-10-14 v9.1 补监听器，修"永远关不掉"）
+    this.classList.toggle("on");
   });
-
+  // v9.1.3：删除 lpCleanSwitch 小球独立处理器——它和全局委托(capture先执行)双重 toggle 抵消，
+  // 导致开关视觉不变+localStorage回原值+toast一直"已开启"。现在点小球冒泡到行→全局委托
+  // 走完整持久化链路（setStorage + saveSettingToServer + window.setCleanMode）。
 
   // 下载视频
   document.getElementById("lpDownload").addEventListener("click", function () {
@@ -2561,16 +2719,29 @@
     var v = videos.find(function(x) { return x.id === vid; });
     if (!v) { showToast("视频信息不存在"); return; }
     closeLongPressMenu();
+    // v9.1.2：文件名 = 博主名-标题（清洗文件名非法字符，标题截断60字）
+    // v9.1.3：文件名 = 博主名-标题。严格清洗：只保留中文/字母数字/空格/横杠，
+    // 去掉 emoji/#/特殊符号/点（防原生下载把点后当扩展名导致后缀漏缺/下载失败）
+    var _dlTitle = String(v.title || "")
+      .replace(/[\r\n]+/g, " ")
+      .replace(/[^\u4e00-\u9fa5a-zA-Z0-9\s\-]/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 50);
+    var _dlAuthor = String(v.author || "douyin")
+      .replace(/[^\u4e00-\u9fa5a-zA-Z0-9\s]/g, "")
+      .trim()
+      .slice(0, 30) || "douyin";
+    var _dlName = _dlAuthor + (_dlTitle ? "-" + _dlTitle : "") + ".mp4";
     // APK环境：调用Android下载接口保存到/storage/emulated/0/douyin/
     if (window.AndroidBridge && window.AndroidBridge.downloadVideo) {
-      var fileName = (v.author || "douyin") + "_" + (v.aweme_id || vid) + ".mp4";
-      window.AndroidBridge.downloadVideo(v.url, fileName);
-      showToast("开始下载：" + fileName);
+      window.AndroidBridge.downloadVideo(v.url, _dlName);
+      // v9.1.4：去掉黑底 toast（用户反馈屏幕上半部分黑底弹窗是Web端的，只要系统白底弹窗）
     } else {
       // 浏览器环境：用a标签下载
       var a = document.createElement("a");
       a.href = v.url;
-      a.download = (v.author || "douyin") + "_" + (v.aweme_id || vid) + ".mp4";
+      a.download = _dlName;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -2631,6 +2802,8 @@
       if (curV0) curV0.pause();
       if (curNA0) curNA0.pause();
       var tv = slideEls[2].querySelector("video");
+      // [DIAG-v9.1.9d] 临时诊断：下滑瞬间，下一个视频的 readyState
+      try { showToast("[下滑] 下一个 rs=" + tv.readyState); } catch (e) {}
       var tvPi = slideEls[2].querySelector(".pause-icon");
       if (tvPi) tvPi.classList.remove("show");
       var pos = videoPositions[slideEls[2].__id];
@@ -2648,6 +2821,8 @@
       if (curV1) curV1.pause();
       if (curNA1) curNA1.pause();
       var tv = slideEls[0].querySelector("video");
+      // [DIAG-v9.1.9d] 临时诊断：上滑瞬间，上一个视频的 readyState
+      try { showToast("[上滑] 上一个 rs=" + tv.readyState); } catch (e) {}
       var tvPi0 = slideEls[0].querySelector(".pause-icon");
       if (tvPi0) tvPi0.classList.remove("show");
       var pos = videoPositions[slideEls[0].__id];
@@ -2681,6 +2856,49 @@
     slideEls = Array.from(slider.children);
     layout();
   }
+
+  // 全局：跳到下一个视频（供外部注入代码/新菜单复用，逻辑与 ended/滚轮一致）
+  window.goNextSlide = function () {
+    if (current >= videos.length - 1) { showToast("已是最后一个"); return false; }
+    lockSwitch();
+    var tv = slideEls[2].querySelector("video");
+    // [DIAG-v9.1.9d] 临时诊断：程序跳转瞬间，下一个视频的 readyState
+    try { showToast("[跳转] 下一个 rs=" + tv.readyState); } catch (e) {}
+    var pos = videoPositions[slideEls[2].__id];
+    if (pos && pos > 0.5 && tv.currentTime < 0.1 && tv.duration) tv.currentTime = Math.min(pos, tv.duration - 0.5);
+    current++;
+    // v9.1.8：EASE 改非过冲曲线 cubic-bezier(0.16,1,0.3,1)（ease-out-expo 风格），
+    // 修 v9.1.7 引入的"向上抖动"——cubic-bezier(0.34,1.3,0.64,1) 第二控制点 y=1.3>1
+    // 产生过冲回弹，视觉上"滑到位后又向上抖一下"。新曲线起步有阻力、末段平滑减速无回弹。
+    // 时长 .5s→.45s，配合无过冲曲线更有手滑的自然到位感。
+    slider.style.transition = "transform .45s cubic-bezier(0.16,1,0.3,1)";
+    slider.style.transform = "translateY(-100%)";
+    var _tv = tv;
+    setTimeout(function () {
+      _tv.muted = !soundOn; _tv.play().catch(function () {});
+      resetAndLayout(1);
+    }, 450);
+    return true;
+  };
+  // 全局：设置当前会话连播状态（供"启动时默认自动连播"开关使用）
+  window.setAutoPlayNext = function (on) {
+    autoPlayNext = !!on;
+    // v9.1：不再同步占位1(lpSwitch) 开关样式，各开关独立（修"联动"bug）
+  };
+  // v9.1.1：暴露声音/清屏运行时接口（修服务器回灌在全局作用域赋值变隐式全局变量、
+  // 主IIFE运行时状态永不更新的致命bug）
+  window.setSoundOn = function (on) {
+    soundOn = !!on;
+    try {
+      var slides = document.querySelectorAll(".slide");
+      if (slides[1]) { var tv = slides[1].querySelector("video"); if (tv) tv.muted = !soundOn; }
+      // v9.1.4：music 按钮默认带 off prompt 类（HTML模板），soundOn=true 时必须主动移除 prompt，
+      // 否则"取消静音"胶囊永不消失（用户实测：进APP前几秒/首个视频循环时胶囊一直在）
+      if (soundOn) { hideUnmutePrompt(); }
+      else { showUnmutePrompt(); }
+    } catch(e) {}
+  };
+  window.setCleanMode = setCleanMode;
 
   var wheelLock = false;
   document.addEventListener("wheel", function (e) {
@@ -2976,15 +3194,28 @@
   };
 
   // 应用默认设置
-    // defaultAutoPlay只控制播完后是否跳下一个，不控制第一个视频是否播放
-    if (defaultAutoPlay) autoPlayNext = true;
-    if (defaultCleanMode) { setCleanMode(true); } else { setCleanMode(false); }
+    // v9.1.5 核心修复：loadDefaults() 定义了但从未被调用（grep 仅 581 行定义），
+    // defaultAutoPlay/defaultCleanMode 永远是初始值 false → 启动时永远不连播/不清屏。
+    // 直接读 localStorage，不依赖 defaultXXX 变量。
+    var _apDef = localStorage.getItem("dy_default_autoplay");
+    if (window.setAutoPlayNext) window.setAutoPlayNext(_apDef === null ? true : _apDef === "1");
+    // 开启时默认不静音：dy_default_mute=0（不默认静音）→ soundOn=true 有声音
+    try { if (localStorage.getItem("dy_default_mute") !== "1") { if (window.setSoundOn) window.setSoundOn(true); } } catch(e) {}
+    var _cmDef = localStorage.getItem("dy_default_clean");
+    setCleanMode(_cmDef === "1");
 
   fetchPage().then(function() {
     loading.style.display = "none";
     // 延迟设置历史记录，避免影响视频自动播放
     setTimeout(function() { try { setupHomeHistory(); } catch(e) {} }, 2000);
     try { layout(); } catch(e) { console.error("layout error", e); }
+    // v9.1.5：fetchPage 后 video/music 元素是新创建的，music 模板默认带 off prompt 类。
+    // 启动时 setSoundOn 在 video 创建前调用，hideUnmutePrompt 移除的是旧元素。
+    // 必须在 layout 后再次同步：soundOn=true 则清除 music 的 prompt 类（取消静音胶囊）。
+    try {
+      if (localStorage.getItem("dy_default_mute") !== "1") { if (window.setSoundOn) window.setSoundOn(true); }
+      else { if (window.setSoundOn) window.setSoundOn(false); }
+    } catch(e) {}
     setTimeout(showUnmutePrompt, 600);
     // 第一个视频开始播放后淡出开屏遮罩
     var splash = document.getElementById("splash");
@@ -3019,29 +3250,36 @@
 
 
 /* ===== 毛玻璃弹窗整栏点击（全局事件委托，直接操作DOM） ===== */
+// v9.1.1：工具函数提升为全局——原定义在委托回调内部，主IIFE内的 lpCleanSwitch
+// 小球监听器调用时 ReferenceError（v9.1 引入的回归，点击清屏开关直接失效）
+function lpSetSwitch(switchId, on) {
+  var sw = document.getElementById(switchId);
+  if (sw) { if (on) sw.classList.add("on"); else sw.classList.remove("on"); }
+}
+function lpGetStorage(key) { return localStorage.getItem(key) === "1"; }
+function lpSetStorage(key, val) { localStorage.setItem(key, val ? "1" : "0"); }
 document.addEventListener("click", function(e) {
   var item = e.target.closest ? e.target.closest(".lp-item") : null;
   if (!item) return;
   var mask = item.closest("#longPressMask");
   if (!mask) return;
 
-  function setSwitch(switchId, on) {
-    var sw = document.getElementById(switchId);
-    if (sw) { if (on) sw.classList.add("on"); else sw.classList.remove("on"); }
-  }
-  function getStorage(key) { return localStorage.getItem(key) === "1"; }
-  function setStorage(key, val) { localStorage.setItem(key, val ? "1" : "0"); }
+  var setSwitch = lpSetSwitch, getStorage = lpGetStorage, setStorage = lpSetStorage;
   function toast(msg) {
     var t = document.getElementById("toast");
     if (t) { t.textContent = msg; t.style.opacity = "1"; setTimeout(function(){ t.style.opacity = "0"; }, 1500); }
   }
 
   if (item.id === "lpDefaultMute") {
-    var v = !getStorage("dy_default_mute");
-    setStorage("dy_default_mute", v);
-    setSwitch("lpDefaultMuteSwitch", v);
-    saveSettingToServer("dy_default_mute", v ? "1" : "0");
-    toast(v ? "开启时默认静音已开启" : "开启时默认静音已关闭");
+    // v9.1.1 修语义反转：dy_default_mute=1 表示"默认静音"，菜单是"开启时默认不静音"。
+    // 开关on=不静音=存"0"。原代码 v=!getStorage() 直接把"1"当开启存，开关/toast/存储三者矛盾。
+    var newOn = localStorage.getItem("dy_default_mute") === "1"; // 当前默认静音 → 点击后不静音
+    setStorage("dy_default_mute", !newOn);
+    setSwitch("lpDefaultMuteSwitch", newOn);
+    saveSettingToServer("dy_default_mute", newOn ? "0" : "1");
+    // v9.1.7：立即同步当前运行时（原只存 localStorage，soundOn/video.muted 不变 → 点了没声音）
+    if (window.setSoundOn) window.setSoundOn(newOn);
+    toast(newOn ? "开启时默认不静音已开启" : "开启时默认不静音已关闭");
     return;
   }
   if (item.id === "lpDefaultAutoPlay") {
@@ -3049,6 +3287,8 @@ document.addEventListener("click", function(e) {
     setStorage("dy_default_autoplay", v2);
     setSwitch("lpDefaultAutoPlaySwitch", v2);
     saveSettingToServer("dy_default_autoplay", v2 ? "1" : "0");
+    // 同步当前会话的连播状态（修复：原来开关只写存储不生效）
+    if (window.setAutoPlayNext) window.setAutoPlayNext(v2);
     toast(v2 ? "启动时默认自动连播已开启" : "启动时默认自动连播已关闭");
     return;
   }
@@ -3063,16 +3303,16 @@ document.addEventListener("click", function(e) {
     return;
   }
   if (item.id === "lpCleanMode") {
-    var v5 = !getStorage("dy_default_clean");
+    // v9.1.4：基于运行时状态(lpCleanSwitch.on class) 翻转，不基于 localStorage。
+    // 根因：点赞7次进清屏走 setCleanMode(true) 同步了 lpCleanSwitch.on，但不改 localStorage。
+    // 原 v5=!getStorage 导致"已清屏时点开关仍提示已开启"。
+    var _cmSw = document.getElementById("lpCleanSwitch");
+    var v5 = _cmSw ? !_cmSw.classList.contains("on") : !getStorage("dy_default_clean");
     setStorage("dy_default_clean", v5);
-    setSwitch("lpCleanSwitch", v5);
     saveSettingToServer("dy_default_clean", v5 ? "1" : "0");
-    // 同时切换当前清屏模式（直接操作DOM，setCleanMode是IIFE内部函数）
-    if (v5) {
-      document.body.classList.add("clean-mode");
-    } else {
-      document.body.classList.remove("clean-mode");
-    }
+    // v9.1.1：走 window.setCleanMode 同步主IIFE运行时（原只改body class，
+    // cleanMode变量不更新，下次打开菜单开关被旧值重置）
+    if (window.setCleanMode) window.setCleanMode(v5);
     toast(v5 ? "开启时默认清屏播放已开启" : "开启时默认清屏播放已关闭");
     return;
   }
@@ -3110,6 +3350,229 @@ document.addEventListener("click", function(e) {
       } catch(e) {}
     }
     window.reportBehavior = reportBehavior;
+
+    // 包装 reportBehavior：like/collect 等强反馈也记入 _feedbackSet（迷惑视频判定用）
+    var _origReportBehavior = reportBehavior;
+    window.reportBehavior = function (eventType, vid, pos, dur, meta) {
+      try {
+        if (eventType === "like" || eventType === "collect" || eventType === "unlike" || eventType === "uncollect") {
+          if (vid && window.__markFeedback) {
+            if (eventType === "like") window.__markFeedback(vid, "like");
+            else if (eventType === "collect") window.__markFeedback(vid, "collect");
+            else if (eventType === "unlike") window.__markFeedback(vid, "unlike");
+            else if (eventType === "uncollect") window.__markFeedback(vid, "uncollect");
+          }
+        }
+      } catch(e) {}
+      return _origReportBehavior(eventType, vid, pos, dur, meta);
+    };
+
+    // ===== 可复用毛玻璃提示弹窗（透明度92% 白底黑字，1:1 复刻官方抖音反馈弹窗） =====
+    // 形状：长方形小圆角、几乎铺满横向（左右各留12px间隔）、文字居中（v9.1 用户拍板）
+    // 位置：底部导航条(56px)+安全区 上方，留出与导航条的间隔并避开进度条层(24px)
+    var _fbToastEl = null;
+    function feedbackToast(msg) {
+      try {
+        if (!_fbToastEl) {
+          _fbToastEl = document.createElement("div");
+          _fbToastEl.id = "feedbackToast";
+          _fbToastEl.style.cssText = "position:fixed;left:12px;right:12px;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateY(10px);" +
+            "background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);" +
+            "color:#000;padding:11px 22px;border-radius:8px;font-size:14px;font-weight:500;z-index:99999;" +
+            "box-shadow:0 4px 16px rgba(0,0,0,0.10);opacity:0;transition:opacity .25s ease,transform .25s ease;pointer-events:none;" +
+            "text-align:center";
+          document.body.appendChild(_fbToastEl);
+        }
+        _fbToastEl.textContent = msg;
+        _fbToastEl.style.opacity = "1";
+        _fbToastEl.style.transform = "translateY(0)";
+        clearTimeout(_fbToastEl.__t);
+        _fbToastEl.__t = setTimeout(function () { if (_fbToastEl) _fbToastEl.style.opacity = "0"; }, 1600);
+      } catch(e) {}
+    }
+    window.feedbackToast = feedbackToast;
+
+    // ===== 反馈记账（用于"迷惑视频"判定：看完无任何反馈→自动打勾） =====
+    var _feedbackSet = {};
+    try {
+      var _fs = localStorage.getItem("dy_feedback_set");
+      if (_fs) _feedbackSet = JSON.parse(_fs);
+    } catch(e) {}
+    function saveFeedbackSet() {
+      try { localStorage.setItem("dy_feedback_set", JSON.stringify(_feedbackSet)); } catch(e) {}
+    }
+    function markFeedback(vid, kind) {
+      if (!vid) return;
+      _feedbackSet[vid] = _feedbackSet[vid] || {};
+      if (kind === "unlike") { delete _feedbackSet[vid]["like"]; delete _feedbackSet[vid]["unlike"]; }
+      else if (kind === "uncollect") { delete _feedbackSet[vid]["collect"]; delete _feedbackSet[vid]["uncollect"]; }
+      else _feedbackSet[vid][kind] = 1;
+      saveFeedbackSet();
+    }
+    function hasAnyFeedback(vid) {
+      if (!vid) return false;
+      var f = _feedbackSet[vid];
+      if (!f) return false;
+      // 点赞/收藏被取消（unlike/uncollect）→ 不算有反馈；只看正向强反馈
+      // v9.1.1：puzzle 计入——手动标记后 ended 不再重复自动上报
+      return !!(f.like || f.collect || f.not_interested || f.super_like || f.secret_like || f.puzzle);
+    }
+    window.__markFeedback = markFeedback;
+    window.__hasAnyFeedback = hasAnyFeedback;
+    // v9.1.2：暴露原始反馈状态（供菜单打开时按当前视频重置四个反馈图标）
+    window.__getFeedbackState = function(vid) {
+      if (!vid) return {};
+      return _feedbackSet[vid] || {};
+    };
+
+    // 当前视频ID（由 slide.__vid 更新，供菜单读取）
+    function currentVid() {
+      try {
+        var slides = document.querySelectorAll(".slide");
+        if (!slides.length) return null;
+        var cur = slides[1]; // 中间=当前
+        if (cur && cur.__vid) return cur.__vid;
+        // 兜底：取正在播放的
+        for (var i = 0; i < slides.length; i++) {
+          var v = slides[i].querySelector("video");
+          if (v && !v.paused && slides[i].__vid) return slides[i].__vid;
+        }
+        return null;
+      } catch(e) { return null; }
+    }
+    window.__currentVid = currentVid;
+
+    // 跳下一个（复用 IIFE 内的 goNextSlide）
+    function goNext() {
+      if (window.goNextSlide) { try { return window.goNextSlide(); } catch(e) {} }
+      return false;
+    }
+
+    // 关闭长按弹窗
+    function closeLP() {
+      var m = document.getElementById("longPressMask");
+      if (m) m.style.display = "none";
+    }
+
+    // ===== 新菜单项点击处理 =====
+    document.addEventListener("click", function(e) {
+      var item = e.target.closest ? e.target.closest(".lp-item") : null;
+      if (!item) return;
+      var mask = item.closest("#longPressMask");
+      if (!mask) return;
+      var id = item.id;
+      if (id !== "lpNotInterested" && id !== "lpPuzzle" && id !== "lpSecretLike" && id !== "lpSuperLike") return;
+      var vid = currentVid();
+      e.stopPropagation();
+
+      // 修复(2026-10-14)：原代码引用未定义的 label 变量导致 ReferenceError，
+      // 四个反馈菜单项（不感兴趣/超级喜欢/偷偷喜欢/迷惑视频）全部静默失效。
+      // 改为按 id 判定，与菜单文案解耦。
+      // v9.1：支持"再点一次取消"——已反馈→取消（图标还原、删记录、上报取消事件、不跳转）；
+      // 未反馈→确认（图标填色、上报、弹提示、自动跳下一条，含迷惑视频）。
+      function _fbHas(kind) { return !!(vid && _feedbackSet[vid] && _feedbackSet[vid][kind]); }
+      function _fbClear(kind) { if (vid && _feedbackSet[vid]) { delete _feedbackSet[vid][kind]; saveFeedbackSet(); } }
+      if (id === "lpNotInterested") {
+        var ic = document.getElementById("lpNotInterestedIcon");
+        if (_fbHas("not_interested")) {
+          _fbClear("not_interested");
+          if (vid) reportBehavior("not_interested_cancel", vid, 0, 0, {reason: "cancel"});
+          if (ic) ic.style.color = "";
+          closeLP();
+          feedbackToast("已取消不感兴趣");
+          return;
+        }
+        if (vid) { reportBehavior("not_interested", vid, 0, 0, {reason: "not_interested"}); markFeedback(vid, "not_interested"); }
+        if (ic) ic.style.color = "#fe2c55";
+        closeLP();
+        feedbackToast("✅反馈成功，可选择具体理由");
+        goNext();
+        return;
+      }
+      if (id === "lpSuperLike") {
+        var ic = document.getElementById("lpSuperLikeIcon");
+        if (_fbHas("super_like")) {
+          _fbClear("super_like");
+          if (vid) reportBehavior("super_like_cancel", vid, 0, 0, {reason: "cancel"});
+          if (ic) { ic.style.color = ""; var sv = ic.querySelector("svg"); if (sv) sv.setAttribute("fill", "none"); }
+          closeLP();
+          feedbackToast("已取消超级喜欢");
+          return;
+        }
+        if (vid) { reportBehavior("super_like", vid, 0, 0, {reason: "super_like"}); markFeedback(vid, "super_like"); }
+        if (ic) { ic.style.color = "#8B008B"; var sv = ic.querySelector("svg"); if (sv) sv.setAttribute("fill", "#8B008B"); }
+        closeLP();
+        feedbackToast("💜超级喜欢，可选择具体理由");
+        goNext();
+        return;
+      }
+      if (id === "lpSecretLike") {
+        var ic = document.getElementById("lpSecretLikeIcon");
+        if (_fbHas("secret_like")) {
+          _fbClear("secret_like");
+          if (vid) reportBehavior("secret_like_cancel", vid, 0, 0, {reason: "cancel"});
+          if (ic) { ic.style.color = ""; var sv = ic.querySelector("svg"); if (sv) sv.setAttribute("fill", "none"); }
+          closeLP();
+          feedbackToast("已取消偷偷喜欢");
+          return;
+        }
+        if (vid) { reportBehavior("secret_like", vid, 0, 0, {reason: "secret_like"}); markFeedback(vid, "secret_like"); }
+        if (ic) { ic.style.color = "#ffc107"; var sv = ic.querySelector("svg"); if (sv) sv.setAttribute("fill", "#ffc107"); }
+        closeLP();
+        feedbackToast("❤️偷偷喜欢，可选择具体理由");
+        goNext();
+        return;
+      }
+      if (id === "lpPuzzle") {
+        var ic = document.getElementById("lpPuzzleIcon");
+        if (_fbHas("puzzle")) {
+          _fbClear("puzzle");
+          if (vid) reportBehavior("puzzle_cancel", vid, 0, 0, {reason: "cancel"});
+          if (ic) { ic.style.color = ""; ic.style.background = ""; ic.style.borderRadius = ""; }
+          closeLP();
+          feedbackToast("已取消迷惑视频标记");
+          return;
+        }
+        // 点击迷惑视频：手动确认打勾（白勾绿底），上报行为，v9.1 确认后同样跳下一条
+        if (vid) { reportBehavior("puzzle", vid, 0, 0, {reason: "manual"}); markFeedback(vid, "puzzle"); }
+        if (ic) {
+          ic.style.color = "#fff";
+          ic.style.background = "#34c759";
+          ic.style.borderRadius = "4px";
+        }
+        closeLP();
+        feedbackToast("✅已标记为迷惑视频");
+        goNext();
+        return;
+      }
+    }, true);
+
+    // ===== 迷惑视频自动打勾：视频看完且无任何反馈→下一个视频的空心方框打白勾绿底 =====
+    var _lastVidFeedback = null;
+    window.__lastVideoNoFeedback = false;
+    // 监听 ended（捕获阶段）：记录"看完这个视频时是否有反馈"
+    document.addEventListener("ended", function(e) {
+      if (e.target.tagName !== "VIDEO") return;
+      var sl = e.target.closest ? e.target.closest(".slide") : null;
+      var vid = sl && sl.__vid ? sl.__vid : null;
+      if (vid) {
+        _lastVidFeedback = hasAnyFeedback(vid);
+        window.__lastVideoNoFeedback = (_lastVidFeedback === false);
+        // 看完且无任何反馈 → 自动记为迷惑视频（数据进库：reason=auto_no_feedback）
+        // v9.1.1：上报后补本地记账，防止该视频重播完重复上报
+        if (window.__lastVideoNoFeedback) {
+          try { reportBehavior("puzzle", vid, 0, 0, {reason: "auto_no_feedback"}); markFeedback(vid, "puzzle"); } catch(err) {}
+        }
+      }
+    }, true);
+    // 每次视频开始播放时：记录当前视频是否有反馈（供后续 ended 判定用，不覆盖"上个视频"状态）
+    document.addEventListener("play", function(e) {
+      if (e.target.tagName !== "VIDEO") return;
+      var sl = e.target.closest ? e.target.closest(".slide") : null;
+      var vid = sl && sl.__vid ? sl.__vid : null;
+      if (vid) _lastVidFeedback = hasAnyFeedback(vid);
+    }, true);
+    // 长按菜单打开时由 openLongPressMenu 读取 __lastVideoNoFeedback 打勾
 
     function isAndroidWebView() {
       var ua = navigator.userAgent || "";
@@ -3234,14 +3697,11 @@ document.addEventListener("click", function(e) {
             var mask = document.getElementById("longPressMask");
             if (mask) {
               // 更新开关状态（与openLongPressMenu保持一致）
+              // v9.1：占位1(lpSwitch)/占位2(lpDefaultCleanSwitch) 不再被强制同步（修"联动"/"永远关不掉"）
               var dm = document.getElementById("lpDefaultMuteSwitch");
               var da = document.getElementById("lpDefaultAutoPlaySwitch");
-              var dc = document.getElementById("lpDefaultCleanSwitch");
-              var sw = document.getElementById("lpSwitch");
-              var csw = document.getElementById("lpCleanSwitch");
-              try { if (dm) { if (localStorage.getItem("dy_default_mute") === "1") dm.classList.add("on"); else dm.classList.remove("on"); } } catch(e) {}
+              try { if (dm) { if (localStorage.getItem("dy_default_mute") !== "1") dm.classList.add("on"); else dm.classList.remove("on"); } } catch(e) {}
               try { if (da) { if (localStorage.getItem("dy_default_autoplay") === "1") da.classList.add("on"); else da.classList.remove("on"); } } catch(e) {}
-              try { if (dc) { if (localStorage.getItem("dy_default_clean") === "1") dc.classList.add("on"); else dc.classList.remove("on"); } } catch(e) {}
               mask.style.display = "flex";
             }
           }, 350);
@@ -3421,6 +3881,9 @@ document.addEventListener("click", function(e) {
           if (!data || typeof data !== "object") return;
           var keys = ["dy_default_mute", "dy_default_autoplay", "dy_default_clean"];
           var changed = false;
+          var prevAutoPlay = localStorage.getItem("dy_default_autoplay");
+          var prevMute = localStorage.getItem("dy_default_mute");
+          var prevClean = localStorage.getItem("dy_default_clean");
           for (var i = 0; i < keys.length; i++) {
             if (data[keys[i]] !== undefined) {
               localStorage.setItem(keys[i], data[keys[i]]);
@@ -3432,9 +3895,19 @@ document.addEventListener("click", function(e) {
             var dm = document.getElementById("lpDefaultMuteSwitch");
             var da = document.getElementById("lpDefaultAutoPlaySwitch");
             var dc = document.getElementById("lpCleanSwitch");
-            if (dm) { if (localStorage.getItem("dy_default_mute") === "1") dm.classList.add("on"); else dm.classList.remove("on"); }
+            if (dm) { if (localStorage.getItem("dy_default_mute") !== "1") dm.classList.add("on"); else dm.classList.remove("on"); }
             if (da) { if (localStorage.getItem("dy_default_autoplay") === "1") da.classList.add("on"); else da.classList.remove("on"); }
             if (dc) { if (localStorage.getItem("dy_default_clean") === "1") dc.classList.add("on"); else dc.classList.remove("on"); }
+            // v9.1.5：回灌改为无条件执行（服务器值即真值）。
+            // 原条件 `!== prevXXX` 让"localStorage 已与服务器一致"时跳过回灌——
+            // 但启动时 defaultAutoPlay/defaultCleanMode 是错的（loadDefaults 从未调用），
+            // 必须强制回灌运行时，否则永远是错误的初始值。
+            try {
+              // v9.1.1：走 window.setAutoPlayNext 真正回灌主IIFE运行时
+              if (window.setAutoPlayNext) window.setAutoPlayNext(localStorage.getItem("dy_default_autoplay") === "1");
+              if (window.setSoundOn) window.setSoundOn(localStorage.getItem("dy_default_mute") !== "1");
+              if (window.setCleanMode) window.setCleanMode(localStorage.getItem("dy_default_clean") === "1");
+            } catch(e2) {}
           }
         })
         .catch(function() {});

@@ -249,50 +249,80 @@
   .page-empty-icon { font-size: 48px; margin-bottom: 16px; }
   .page-empty-text { font-size: 16px; color: #999; }
 
-  /* ===== 博主主页（像素级复刻抖音） ===== */
-  #profile { position: fixed; inset: 0; background: #fff; z-index: 50; transform: translateX(100%); transition: transform .12s cubic-bezier(0.2, 0, 0.2, 1); overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  /* ===== 博主主页（像素级复刻抖音官方"我"页面） ===== */
+  #profile { position: fixed; inset: 0; background: #f5f5f5; z-index: 50; transform: translateX(100%); transition: transform .12s cubic-bezier(0.2, 0, 0.2, 1); }
+  .profile-content { position: absolute; top: 0; bottom: 0; left: 0; right: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
   #profile.show { transform: translateX(0); }
-  .profile-header { position: relative; height: 200px; overflow: hidden; }
-  .profile-header-bg { position: absolute; inset: 0; background-size: cover; background-position: center; filter: blur(30px); transform: scale(1.3); }
-  .profile-header-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,.15), rgba(255,255,255,.3)); }
-  .profile-topbar { position: absolute; top: calc(env(safe-area-inset-top) + 10px); left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; z-index: 5; }
-  .profile-back { width: 36px; height: 36px; background: rgba(0,0,0,.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 22px; border: none; cursor: pointer; backdrop-filter: blur(4px); }
-  .profile-top-actions { display: flex; gap: 10px; }
-  .profile-top-actions button { width: 36px; height: 36px; background: rgba(0,0,0,.3); border-radius: 50%; border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px); font-size: 16px; }
-  .profile-header-info { position: absolute; left: 20px; bottom: 16px; display: flex; align-items: flex-end; gap: 14px; z-index: 5; }
-  .profile-avatar { width: 80px; height: 80px; border-radius: 50%; border: 2.5px solid #fff; object-fit: cover; background: #ddd; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
-  .profile-header-name { padding-bottom: 8px; }
-  .profile-name { font-size: 20px; font-weight: 700; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.4); }
-  .profile-id-header { font-size: 12px; color: rgba(255,255,255,.85); margin-top: 3px; text-shadow: 0 1px 3px rgba(0,0,0,.3); }
-  .profile-body { padding: 12px 16px 16px; }
+
+  /* 顶部背景图区域 */
+  .profile-hero { position: relative; height: 420px; overflow: hidden; }
+  .profile-hero-bg { position: absolute; inset: 0; background-size: cover; background-position: center top; }
+  .profile-hero-topbar { position: absolute; top: calc(env(safe-area-inset-top) + 10px); left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; z-index: 5; }
+  .profile-add-friend { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,.35); backdrop-filter: blur(8px); color: #fff; border: none; border-radius: 20px; padding: 8px 16px; font-size: 14px; cursor: pointer; }
+  .profile-top-actions { display: flex; align-items: center; gap: 10px; }
+  .profile-top-actions .icon-btn { width: 36px; height: 36px; background: rgba(0,0,0,.35); backdrop-filter: blur(8px); border-radius: 50%; border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; }
+
+  /* 头像昵称区域（叠在背景图上） */
+  .profile-hero-info { position: absolute; left: 20px; bottom: 30px; display: flex; align-items: flex-end; gap: 14px; z-index: 5; }
+  .profile-avatar-wrap { position: relative; }
+  .profile-avatar { width: 90px; height: 90px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; background: #ddd; }
+  .profile-avatar-add { position: absolute; right: -4px; bottom: -4px; width: 28px; height: 28px; background: #06c660; border: 2px solid #fff; border-radius: 50%; color: #fff; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .profile-name-block { padding-bottom: 10px; }
+  .profile-name { font-size: 22px; font-weight: 700; color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,.5); display: flex; align-items: center; gap: 6px; }
+  .profile-name .dropdown { font-size: 14px; opacity: .9; }
+  .profile-id { font-size: 13px; color: rgba(255,255,255,.85); margin-top: 6px; text-shadow: 0 1px 3px rgba(0,0,0,.4); display: flex; align-items: center; gap: 4px; }
+  .profile-ai-btn { display: inline-flex; align-items: center; gap: 4px; background: rgba(0,0,0,.3); backdrop-filter: blur(8px); color: #fff; border: none; border-radius: 18px; padding: 6px 14px; font-size: 13px; margin-top: 10px; cursor: pointer; }
+
+  /* 白色卡片（浮在背景图上，顶部圆角） */
+  .profile-card { position: relative; background: #fff; border-radius: 20px 20px 0 0; margin-top: -20px; padding: 20px 16px 16px; z-index: 10; }
+
+  /* 统计数字 + 编辑主页 */
+  .profile-stats-row { display: flex; align-items: center; justify-content: space-between; }
   .profile-stats { display: flex; gap: 24px; align-items: center; }
-  .profile-stats .stat { font-size: 14px; color: #161823; display: flex; align-items: baseline; }
-  .profile-stats .stat .num { font-weight: 700; font-size: 18px; margin-right: 4px; }
-  .profile-stats .stat .label { color: #999; font-size: 13px; }
-  .profile-stats .stat .load-more-btn { width: 18px; height: 18px; border: none; background: none; cursor: pointer; opacity: .15; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #999; padding: 0; margin-left: 2px; transition: opacity .2s; }
-  .profile-stats .stat .load-more-btn:hover { opacity: .5; }
-  .profile-bio-wrap { position: relative; margin-top: 10px; }
-  .profile-bio { font-size: 14px; color: #161823; line-height: 1.5; white-space: pre-wrap; max-height: 84px; overflow: hidden; position: relative; padding-right: 50px; }
-  .profile-bio.expanded { max-height: none; padding-right: 0; }
-  .profile-bio .at-link { color: #1269e0; cursor: pointer; }
-  .bio-more { display: none; position: absolute; bottom: 0; right: 0; font-size: 14px; color: #999; cursor: pointer; line-height: 1.5; background: #fff; padding-left: 4px; }
-  .profile-ip { font-size: 12px; color: #999; margin-top: 6px; }
-  .profile-buttons { display: flex; gap: 10px; margin-top: 14px; align-items: center; }
-  .profile-follow { flex: 1; height: 40px; background: #FE2C55; color: #fff; border: none; border-radius: 4px; font-size: 16px; font-weight: 600; cursor: pointer; }
-  .profile-follow.followed { background: #f0f0f0; color: #999; }
-  .profile-msg { width: 44px; height: 40px; background: #f0f0f0; color: #161823; border: none; border-radius: 4px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .profile-tabs { display: flex; border-bottom: 1px solid #f0f0f0; margin-top: 14px; position: sticky; top: 0; background: #fff; z-index: 3; }
-  .profile-tab { padding: 12px 16px; font-size: 15px; color: #999; cursor: pointer; border-bottom: 2px solid transparent; display: flex; align-items: center; gap: 4px; }
+  .profile-stats .stat { display: flex; flex-direction: column; }
+  .profile-stats .stat .num { font-weight: 700; font-size: 20px; color: #161823; }
+  .profile-stats .stat .label { color: #999; font-size: 13px; margin-top: 2px; }
+  .profile-edit-btn { background: #f5f5f5; color: #161823; border: none; border-radius: 8px; padding: 10px 24px; font-size: 15px; cursor: pointer; }
+
+  /* 简介 */
+  .profile-bio { font-size: 14px; color: #161823; line-height: 1.6; white-space: pre-wrap; margin-top: 16px; }
+  .profile-tags { display: flex; gap: 8px; margin-top: 12px; }
+  .profile-tag { background: #f5f5f5; color: #666; font-size: 13px; padding: 6px 12px; border-radius: 16px; }
+
+  /* 功能入口 */
+  .profile-features { display: flex; justify-content: space-around; margin-top: 24px; padding: 16px 0; }
+  .profile-feature { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
+  .profile-feature .icon { font-size: 24px; color: #161823; }
+  .profile-feature .label { font-size: 13px; color: #666; }
+
+  /* Tab栏 */
+  .profile-tabs { display: flex; border-bottom: 1px solid #f0f0f0; margin-top: 8px; position: sticky; top: 0; background: #fff; z-index: 3; }
+  .profile-tab { padding: 12px 0; margin-right: 24px; font-size: 15px; color: #999; cursor: pointer; border-bottom: 2px solid transparent; display: flex; align-items: center; gap: 4px; }
   .profile-tab.active { color: #161823; font-weight: 600; border-bottom-color: #161823; }
   .profile-tab .count { font-weight: 400; color: #999; font-size: 14px; }
   .profile-tab.active .count { color: #161823; }
-  .profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 2px 0; }
+
+  /* 私密作品入口 */
+  .profile-private-entry { display: flex; align-items: center; justify-content: space-between; background: #fafafa; border-radius: 12px; padding: 12px 14px; margin-top: 12px; cursor: pointer; }
+  .profile-private-entry .left { display: flex; align-items: center; gap: 12px; }
+  .profile-private-entry .thumb { width: 40px; height: 40px; background: #eee; border-radius: 6px; }
+  .profile-private-entry .label { font-size: 15px; color: #161823; }
+  .profile-private-entry .count { font-size: 14px; color: #999; }
+
+  /* 九宫格 */
+  .profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 12px 0; }
   .profile-grid-item { position: relative; aspect-ratio: 3/4; background: #f0f0f0; cursor: pointer; overflow: hidden; }
   .profile-grid-item video, .profile-grid-item img { width: 100%; height: 100%; object-fit: cover; }
   .profile-grid-item .play-count { position: absolute; bottom: 6px; left: 6px; color: #fff; font-size: 12px; text-shadow: 0 1px 3px rgba(0,0,0,.6); display: flex; align-items: center; gap: 3px; }
-  .profile-grid-item .time-tag { position: absolute; top: 6px; left: 6px; background: rgba(0,0,0,.45); color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 3px; }
   .profile-empty { text-align: center; padding: 60px 20px; color: #999; font-size: 14px; }
   .profile-loading { text-align: center; padding: 40px; color: #999; font-size: 14px; }
+
+  /* 顶部白色导航栏（视差滚动后显示） */
+  .profile-top-nav { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; z-index: 100; opacity: 0; transform: translateY(-100%); transition: all .2s ease; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+  .profile-top-nav.show { opacity: 1; transform: translateY(0); }
+  .top-nav-name { font-size: 17px; font-weight: 600; color: #161823; }
+  .top-nav-actions { display: flex; gap: 16px; }
+  .top-nav-actions button { background: none; border: none; font-size: 18px; cursor: pointer; color: #161823; }
 
   /* ===== 音乐页 ===== */
   #musicPage { position: fixed; inset: 0; background: #fff; z-index: 51; transform: translateY(100%); transition: transform .12s cubic-bezier(0.2, 0, 0.2, 1); overflow-y: auto; -webkit-overflow-scrolling: touch; }
@@ -338,7 +368,7 @@
 <div class="tabbar">
   <div class="tab active">首页<span class="caret">⌄</span></div>
   <div class="tab">朋友</div>
-  <div class="tab plus">+</div>
+  <div class="tab plus" id="tabPlusBtn">+</div>
   <div class="tab">消息<span class="badge">99+</span></div>
   <div class="tab">我</div>
 </div>
@@ -385,62 +415,256 @@
   </div>
 </div>
 
-<!-- 我页面（空白占位） -->
+<!-- 我页面（底部tab） -->
 <div id="profilePage">
-  <div class="page-topbar">
-    <div class="page-title">我</div>
-  </div>
-  <div class="page-body">
-    <div class="page-empty">
-      <div class="page-empty-icon">👤</div>
-      <div class="page-empty-text">个人中心开发中</div>
+  <!-- 顶部背景图区域 -->
+  <div class="profile-hero">
+    <div class="profile-hero-bg" id="myProfileHeaderBg"></div>
+    <div class="profile-hero-topbar">
+      <button class="profile-add-friend">
+        <span>👤</span><span>添加好友</span>
+      </button>
+      <div class="profile-top-actions">
+        <button class="icon-btn">✍️</button>
+        <button class="icon-btn">
+          <span>👥</span><span style="position:absolute;top:-2px;right:-2px;background:#fe2c55;color:#fff;font-size:10px;border-radius:10px;padding:1px 4px;">2</span>
+        </button>
+        <button class="icon-btn">🔍</button>
+        <button class="icon-btn">☰</button>
+      </div>
     </div>
+    <div class="profile-hero-info">
+      <div class="profile-avatar-wrap">
+        <img class="profile-avatar" id="myProfileAvatar" src="" alt="">
+        <div class="profile-avatar-add">+</div>
+      </div>
+      <div class="profile-name-block">
+        <div class="profile-name">
+          <span id="myProfileNameText">主角只看精彩瞬间</span>
+          <span class="dropdown">▼</span>
+        </div>
+        <div class="profile-id">
+          <span>抖音号: shellhappyhappyhappy</span>
+          <span>ⓘ</span>
+        </div>
+        <button class="profile-ai-btn">
+          <span>创建 AI 形象</span>
+          <span>›</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 白色卡片 -->
+  <div class="profile-card">
+    <!-- 统计 + 编辑主页 -->
+    <div class="profile-stats-row">
+      <div class="profile-stats">
+        <div class="stat">
+          <span class="num">1.4万</span>
+          <span class="label">获赞</span>
+        </div>
+        <div class="stat">
+          <span class="num">25</span>
+          <span class="label">互关</span>
+        </div>
+        <div class="stat">
+          <span class="num">133</span>
+          <span class="label">关注</span>
+        </div>
+        <div class="stat">
+          <span class="num">877</span>
+          <span class="label">粉丝</span>
+        </div>
+      </div>
+      <button class="profile-edit-btn">编辑主页</button>
+    </div>
+
+    <!-- 简介 -->
+    <div class="profile-bio">
+      day12<br>
+      没有天赋，只有重复<br>
+      他的目光如磐石般坚硬，他的心中只剩下坚持<br>
+      日更主角高光时刻 | 只看最美好的精彩瞬间
+    </div>
+    <div class="profile-tags">
+      <div class="profile-tag">17岁</div>
+      <div class="profile-tag">+ 添加性别等标签</div>
+    </div>
+
+    <!-- 功能入口 -->
+    <div class="profile-features">
+      <div class="profile-feature">
+        <div class="icon">🎵</div>
+        <div class="label">我的音乐</div>
+      </div>
+      <div class="profile-feature">
+        <div class="icon">🕐</div>
+        <div class="label">观看历史</div>
+      </div>
+      <div class="profile-feature">
+        <div class="icon">👤</div>
+        <div class="label">常访问的人</div>
+      </div>
+      <div class="profile-feature">
+        <div class="icon">▶️</div>
+        <div class="label">稍后再看</div>
+      </div>
+      <div class="profile-feature">
+        <div class="icon">⊞</div>
+        <div class="label">全部功能</div>
+      </div>
+    </div>
+
+    <!-- Tab栏 -->
+    <div class="profile-tabs">
+      <div class="profile-tab active">
+        <span>作品</span>
+        <span class="dropdown">▼</span>
+      </div>
+      <div class="profile-tab">日常</div>
+      <div class="profile-tab">推荐</div>
+      <div class="profile-tab">收藏</div>
+      <div class="profile-tab">喜欢</div>
+    </div>
+
+    <!-- 私密作品入口 -->
+    <div class="profile-private-entry">
+      <div class="left">
+        <div class="thumb"></div>
+        <div class="label">私密作品</div>
+      </div>
+      <div class="count">87 ›</div>
+    </div>
+
+    <!-- 九宫格作品 -->
+    <div class="profile-grid" id="myProfileGrid"></div>
   </div>
 </div>
 
-<!-- 博主主页 -->
+<!-- 博主主页（复刻官方"我"页面） -->
 <div id="profile">
-  <div class="profile-header">
-    <div class="profile-header-bg" id="profileHeaderBg"></div>
-    <div class="profile-header-overlay"></div>
-    <div class="profile-topbar">
-      <button class="profile-back" id="profileBack">‹</button>
+  <div class="profile-content">
+  <!-- 顶部背景图区域 -->
+  <div class="profile-hero">
+    <div class="profile-hero-bg" id="profileHeaderBg"></div>
+    <div class="profile-hero-topbar">
+      <button class="profile-add-friend" id="profileAddFriend">
+        <span>👤</span><span>添加好友</span>
+      </button>
       <div class="profile-top-actions">
-        <button id="profileSearch" title="加载更多">↻</button>
-        <button id="profileMore">⋯</button>
+        <button class="icon-btn" id="profileHandwrite">✍️</button>
+        <button class="icon-btn" id="profileVisitors">
+          <span>👥</span><span style="position:absolute;top:-2px;right:-2px;background:#fe2c55;color:#fff;font-size:10px;border-radius:10px;padding:1px 4px;">2</span>
+        </button>
+        <button class="icon-btn" id="profileSearch">🔍</button>
+        <button class="icon-btn" id="profileMore">☰</button>
       </div>
     </div>
-    <div class="profile-header-info">
-      <img class="profile-avatar" id="profileAvatar" src="" alt="">
-      <div class="profile-header-name">
-        <div class="profile-name" id="profileName"></div>
-        <div class="profile-id-header" id="profileIdHeader"></div>
+    <div class="profile-hero-info">
+      <div class="profile-avatar-wrap">
+        <img class="profile-avatar" id="profileAvatar" src="" alt="">
+        <div class="profile-avatar-add" id="profileAvatarAdd">+</div>
+      </div>
+      <div class="profile-name-block">
+        <div class="profile-name" id="profileName">
+          <span id="profileNameText"></span>
+          <span class="dropdown">▼</span>
+        </div>
+        <div class="profile-id" id="profileIdHeader">
+          <span id="profileIdText"></span>
+          <span>ⓘ</span>
+        </div>
+        <button class="profile-ai-btn">
+          <span>创建 AI 形象</span>
+          <span>›</span>
+        </button>
       </div>
     </div>
   </div>
-  <div class="profile-body">
-    <div class="profile-stats">
-      <div class="stat"><span class="num" id="profileFavorited">0</span><span class="label">获赞</span></div>
-      <div class="stat"><span class="num" id="profileFollowing">0</span><span class="label">关注</span></div>
-      <div class="stat"><span class="num" id="profileFollowers">0</span><span class="label">粉丝</span></div>
+
+  <!-- 白色卡片 -->
+  <div class="profile-card">
+    <!-- 统计 + 编辑主页 -->
+    <div class="profile-stats-row">
+      <div class="profile-stats">
+        <div class="stat">
+          <span class="num" id="profileFavorited">0</span>
+          <span class="label">获赞</span>
+        </div>
+        <div class="stat">
+          <span class="num" id="profileMutual">0</span>
+          <span class="label">互关</span>
+        </div>
+        <div class="stat">
+          <span class="num" id="profileFollowing">0</span>
+          <span class="label">关注</span>
+        </div>
+        <div class="stat">
+          <span class="num" id="profileFollowers">0</span>
+          <span class="label">粉丝</span>
+        </div>
+      </div>
+      <button class="profile-edit-btn" id="profileEdit">编辑主页</button>
     </div>
-    <div class="profile-bio-wrap">
-      <div class="profile-bio" id="profileBio"></div>
-      <span class="bio-more" id="bioMore">更多</span>
+
+    <!-- 简介 -->
+    <div class="profile-bio" id="profileBio"></div>
+    <div class="profile-tags">
+      <div class="profile-tag">17岁</div>
+      <div class="profile-tag">+ 添加性别等标签</div>
     </div>
-    <div class="profile-ip" id="profileIp"></div>
-    <div class="profile-buttons">
-      <button class="profile-follow" id="profileFollow">+ 关注</button>
-      <button class="profile-msg" id="profileMsg">✈</button>
+
+    <!-- 功能入口 -->
+    <div class="profile-features">
+      <div class="profile-feature">
+        <div class="icon">🎵</div>
+        <div class="label">我的音乐</div>
+      </div>
+      <div class="profile-feature">
+        <div class="icon">🕐</div>
+        <div class="label">观看历史</div>
+      </div>
+      <div class="profile-feature">
+        <div class="icon">👤</div>
+        <div class="label">常访问的人</div>
+      </div>
+      <div class="profile-feature">
+        <div class="icon">▶️</div>
+        <div class="label">稍后再看</div>
+      </div>
+      <div class="profile-feature">
+        <div class="icon">⊞</div>
+        <div class="label">全部功能</div>
+      </div>
     </div>
+
+    <!-- Tab栏 -->
     <div class="profile-tabs" id="profileTabs">
-      <div class="profile-tab active" data-tab="works">作品 <span class="count" id="worksCount"></span></div>
-      <div class="profile-tab" data-tab="likes">喜欢</div>
+      <div class="profile-tab active" data-tab="works">
+        <span>作品</span>
+        <span class="dropdown">▼</span>
+      </div>
+      <div class="profile-tab" data-tab="daily">日常</div>
+      <div class="profile-tab" data-tab="recommend">推荐</div>
       <div class="profile-tab" data-tab="collect">收藏</div>
+      <div class="profile-tab" data-tab="likes">喜欢</div>
     </div>
+
+    <!-- 私密作品入口 -->
+    <div class="profile-private-entry" id="profilePrivateEntry">
+      <div class="left">
+        <div class="thumb"></div>
+        <div class="label">私密作品</div>
+      </div>
+      <div class="count" id="profilePrivateCount">87 ›</div>
+    </div>
+
+    <!-- 九宫格作品 -->
     <div class="profile-grid" id="profileGrid"></div>
     <div class="profile-empty" id="profileEmpty" style="display:none">暂无作品</div>
     <div class="profile-loading" id="profileLoading" style="display:none">加载中…</div>
+  </div>
   </div>
 </div>
 
@@ -2264,6 +2488,16 @@
   // 底部导航tab点击
   document.querySelectorAll(".tabbar .tab").forEach(function (tab) {
     tab.addEventListener("click", function () {
+      // 用class判断是否是加号按钮，更可靠
+      if (tab.classList.contains("plus")) {
+        // 点击加号：清除所有数据，然后重启应用
+        if (confirm("确定要清除所有数据并重启吗？")) {
+          localStorage.clear();
+          sessionStorage.clear();
+          location.reload();
+        }
+        return;
+      }
       var text = tab.textContent.trim();
       if (text.indexOf("首页") === 0) {
         switchPage("home");
@@ -2276,6 +2510,20 @@
       }
     });
   });
+
+  // 单独绑定加号按钮的点击事件（用ID，最可靠）
+  var tabPlusBtn = document.getElementById("tabPlusBtn");
+  if (tabPlusBtn) {
+    tabPlusBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (confirm("确定要清除所有数据并重启吗？")) {
+        localStorage.clear();
+        sessionStorage.clear();
+        location.reload();
+      }
+    });
+  }
 
   // ===== 博主主页 =====
   var profileEl = document.getElementById("profile");
@@ -2315,17 +2563,42 @@
     if (currentPage === "home") resumeCurrentVideo();
   }
 
-  document.getElementById("profileBack").addEventListener("click", closeProfile);
   document.getElementById("profileMore").addEventListener("click", function () { showToast("更多功能开发中"); });
   document.getElementById("profileSearch").addEventListener("click", function () {
     if (currentProfileSecUid) loadProfileLower(currentProfileSecUid);
   });
-  document.getElementById("profileMsg").addEventListener("click", function () { showToast("私信功能开发中"); });
-  document.getElementById("bioMore").addEventListener("click", function () {
-    var bioEl = document.getElementById("profileBio");
-    var isExp = bioEl.classList.toggle("expanded");
-    this.textContent = isExp ? "收起" : "更多";
-  });
+  document.getElementById("profileEdit").addEventListener("click", function () { showToast("编辑主页功能开发中"); });
+  document.getElementById("profileAddFriend").addEventListener("click", function () { showToast("添加好友功能开发中"); });
+
+  // 视差滚动效果：先注释掉，测试滑动问题
+  // var profileEl = document.getElementById("profile");
+  // var profileHero = document.querySelector(".profile-hero");
+  // var profileHeroBg = document.querySelector(".profile-hero-bg");
+
+  // // 顶部白色导航栏（滑到底时显示）
+  // var profileTopNav = document.createElement("div");
+  // profileTopNav.className = "profile-top-nav";
+  // profileTopNav.innerHTML = '<div class="top-nav-name" id="topNavName"></div><div class="top-nav-actions"><button>🔍</button><button>☰</button></div>';
+  // profileEl.appendChild(profileTopNav);
+
+  // profileEl.addEventListener("scroll", function() {
+  //   var scrollTop = profileEl.scrollTop;
+  //   var heroHeight = 420; // 背景图高度
+
+  //   // 背景图视差：滚动时背景图向上移动，速度是内容的0.5倍
+  //   if (scrollTop < heroHeight) {
+  //     var parallax = scrollTop * 0.5;
+  //     profileHeroBg.style.transform = "translateY(" + parallax + "px)";
+  //     profileHero.style.opacity = 1 - (scrollTop / heroHeight);
+  //   }
+
+  //   // 顶部白色导航栏：滚动超过一定程度时显示
+  //   if (scrollTop > 200) {
+  //     profileTopNav.classList.add("show");
+  //   } else {
+  //     profileTopNav.classList.remove("show");
+  //   }
+  // });
 
   document.querySelectorAll(".profile-tab").forEach(function(tab) {
     tab.addEventListener("click", function() {
@@ -2387,64 +2660,96 @@
   function loadProfileVideos(secUid) {
     document.getElementById("profileLoading").style.display = "block";
     document.getElementById("profileEmpty").style.display = "none";
-    // 先获取本地视频
-    fetch("/api/authors/" + encodeURIComponent(secUid) + "/videos?source=local&limit=50")
-      .then(function (r) { return r.json(); })
-      .then(function (localData) {
-        var localItems = localData.items || [];
-        // 本地不足9条时，从抖音远程补充（15秒超时）
-        if (localItems.length < 9) {
-          var controller = new AbortController();
-          var timeoutId = setTimeout(function() { controller.abort(); }, 15000);
-          fetch("/api/authors/" + encodeURIComponent(secUid) + "/videos?source=remote&limit=20", { signal: controller.signal })
-            .then(function (r) { clearTimeout(timeoutId); return r.json(); })
-            .then(function (remoteData) {
-              var remoteItems = remoteData.items || [];
-              var localIds = {};
-              localItems.forEach(function(v) { if (v.aweme_id) localIds[v.aweme_id] = true; });
-              var merged = localItems.concat(remoteItems.filter(function(v) {
-                return !localIds[v.aweme_id];
-              }));
-              renderProfileVideos({ items: merged, total: merged.length });
-            })
-            .catch(function () {
-              clearTimeout(timeoutId);
-              renderProfileVideos(localData);
-            });
-        } else {
-          renderProfileVideos(localData);
+
+    // 深采的51条作品ID列表
+    var deepCollectedIds = [
+      "7673485528179690804", "7673451371315744019", "7673336064626412842",
+      "7673130333134540066", "7673080573962816803", "7672992655047118080",
+      "7672769480845528335", "7672649325712772403", "7672613661826944271",
+      "7672374684356300051"
+    ];
+
+    // 先尝试加载本地我的作品数据（个人节点深采数据）
+    fetch("/my_posts.json")
+      .then(function (r) {
+        if (!r.ok) {
+          showToast("加载my_posts失败: HTTP " + r.status);
+          throw new Error("HTTP " + r.status);
         }
+        return r.text();
       })
-      .catch(function () { document.getElementById("profileLoading").style.display = "none"; });
+      .then(function (text) {
+        var myPosts;
+        try {
+          myPosts = JSON.parse(text);
+        } catch (e) {
+          showToast("JSON解析失败: " + e.message + "，长度: " + text.length);
+          throw e;
+        }
+        showToast("my_posts加载成功: " + myPosts.length + "条");
+        // 过滤出深采的作品（只保留前51条）
+        var filtered = myPosts.slice(0, 51);
+        // 转换数据格式
+        var items = filtered.map(function (v) {
+          return {
+            aweme_id: v.aweme_id,
+            cover: v.cover,
+            like_count: v.stats ? v.stats.digg : 0,
+            comment_count: v.stats ? v.stats.comment : 0,
+            desc: v.desc,
+            duration: v.duration,
+            isRemote: true
+          };
+        });
+        renderProfileVideos({ items: items, total: items.length });
+      })
+      .catch(function (err) {
+        showToast("加载失败: " + err.message);
+        // 如果本地数据加载失败，走原来的逻辑
+        // 如果本地数据加载失败，走原来的逻辑
+        fetch("/api/authors/" + encodeURIComponent(secUid) + "/videos?source=local&limit=50")
+          .then(function (r) { return r.json(); })
+          .then(function (localData) {
+            var localItems = localData.items || [];
+            if (localItems.length < 9) {
+              var controller = new AbortController();
+              var timeoutId = setTimeout(function() { controller.abort(); }, 15000);
+              fetch("/api/authors/" + encodeURIComponent(secUid) + "/videos?source=remote&limit=20", { signal: controller.signal })
+                .then(function (r) { clearTimeout(timeoutId); return r.json(); })
+                .then(function (remoteData) {
+                  var remoteItems = remoteData.items || [];
+                  var localIds = {};
+                  localItems.forEach(function(v) { if (v.aweme_id) localIds[v.aweme_id] = true; });
+                  var merged = localItems.concat(remoteItems.filter(function(v) {
+                    return !localIds[v.aweme_id];
+                  }));
+                  renderProfileVideos({ items: merged, total: merged.length });
+                })
+                .catch(function () {
+                  clearTimeout(timeoutId);
+                  renderProfileVideos(localData);
+                });
+            } else {
+              renderProfileVideos(localData);
+            }
+          })
+          .catch(function () { document.getElementById("profileLoading").style.display = "none"; });
+      });
   }
 
   function renderProfileInfo(data, secUid) {
-    document.getElementById("profileName").textContent = data.nickname || "";
-    document.getElementById("profileIdHeader").textContent = data.unique_id ? "抖音号：" + data.unique_id : "";
+    document.getElementById("profileNameText").textContent = data.nickname || "";
+    document.getElementById("profileIdText").textContent = data.unique_id ? "抖音号：" + data.unique_id : "";
     document.getElementById("profileFavorited").textContent = fmtNumWan(data.total_favorited || 0);
     document.getElementById("profileFollowing").textContent = fmtNumWan(data.following_count || 0);
     document.getElementById("profileFollowers").textContent = fmtNumWan(data.follower_count || 0);
     var bioEl = document.getElementById("profileBio");
-    var bioMore = document.getElementById("bioMore");
     var sig = data.signature || "";
-    bioEl.classList.remove("expanded");
     if (sig) {
       bioEl.innerHTML = sig.replace(/@([\w\u4e00-\u9fa5^_]+)/g, '<span class="at-link">@$1</span>');
-      // 检测是否超过4行（bioMore 是 bioEl 的兄弟节点，不会被 innerHTML 销毁）
-      setTimeout(function() {
-        if (!bioMore) return;
-        if (bioEl.scrollHeight > bioEl.clientHeight + 2) {
-          bioMore.style.display = "block";
-          bioMore.textContent = "更多";
-        } else {
-          bioMore.style.display = "none";
-        }
-      }, 50);
     } else {
       bioEl.textContent = "";
-      if (bioMore) bioMore.style.display = "none";
     }
-    document.getElementById("profileIp").textContent = data.ip_location ? "IP属地：" + data.ip_location : "";
     var av = document.getElementById("profileAvatar");
     var headerBg = document.getElementById("profileHeaderBg");
     // 主页头像三级兜底：接口头像 → 本博主 feed 头像 → 隐藏
@@ -2513,10 +2818,10 @@
       return;
     }
     grid.innerHTML = "";
-    items.forEach(function (v) {
+    items.forEach(function (v, i) {
       var div = document.createElement("div");
       div.className = "profile-grid-item";
-      var isRemote = !v.id && v.cover;
+      var isRemote = !v.url && v.cover;
       var likeCount = v.like_count || v.digg_count || 0;
 
       if (isRemote) {
@@ -2553,13 +2858,27 @@
       div.appendChild(pc);
 
       div.addEventListener("click", function () {
-        if (isRemote) {
-          showToast("该视频未下载，点击下载后可播放");
-          return;
-        }
+        // 独立全屏播放：用九宫格的作品列表，按顺序播放
+        var myVideos = items.map(function(v, idx) {
+          return {
+            id: v.aweme_id || v.id,
+            cover: v.cover,
+            url: v.play_url || v.url || "",
+            desc: v.desc || "",
+            like_count: v.like_count || 0
+          };
+        });
+        // 保存当前播放列表和起始位置
+        window.profilePlaylist = myVideos;
+        window.profileStartIdx = i;
+        // 跳转到首页播放模式
         closeProfile();
-        var idx = videos.findIndex(function (vv) { return vv.id === v.id; });
-        if (idx >= 0) { current = idx; layout(); }
+        // 切换到首页播放
+        currentPage = "home";
+        videos = myVideos;
+        current = i;
+        layout();
+        showToast("从第" + (i+1) + "条开始播放，共" + myVideos.length + "条");
       });
       grid.appendChild(div);
     });

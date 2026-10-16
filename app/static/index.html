@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -55,6 +55,14 @@
   .lp-switch.on { background: #fe2c55; }
   .lp-switch .lp-dot { position: absolute; top: 2px; left: 2px; width: 26px; height: 26px; background: #fff; border-radius: 50%; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
   .lp-switch.on .lp-dot { transform: translateX(22px); }
+  /* 跳转仪式方案弹窗（v9.1.12i） */
+  .lp-ritual-item { cursor: pointer; }
+  .lp-cancel-item .lp-text { text-align: center; }
+  .lp-sub { font-size: 12px; color: rgba(255,255,255,.35); width: 56px; text-align: right; flex-shrink: 0; margin-right: 8px; font-weight: 400; }
+  .lp-mask.custom-on .lp-sub { color: #fff; }
+  #jumpRitualCustom .lp-text { flex: 1; }
+  .lp-ritual-check { width: 22px; height: 22px; border: 2px solid rgba(255,255,255,.5); border-radius: 50%; margin-left: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: transparent; font-size: 14px; font-weight: 700; transition: all .2s; }
+  .lp-ritual-check.on { background: #fe2c55; border-color: #fe2c55; color: #fff; }
 
   /* 清屏播放模式：隐藏所有UI，只留视频 */
   .clean-mode .actions,
@@ -502,7 +510,7 @@
       </div>
       <div class="lp-item" id="lpDefaultCleanMode">
         <span class="lp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></span>
-        <span class="lp-text">功能待开发</span>
+        <span class="lp-text">跳转仪式</span>
         <span class="lp-switch" id="lpDefaultCleanSwitch"><span class="lp-dot"></span></span>
       </div>
       <div class="lp-item" id="lpCleanMode">
@@ -522,6 +530,39 @@
         <span class="lp-icon" id="lpSecretLikeIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span>
         <span class="lp-text">偷偷喜欢</span>
         <span class="lp-arrow">&rsaquo;</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 跳转仪式：方案选择弹窗（v9.1.12i） -->
+<div id="jumpRitualMask" class="lp-mask" style="display:none">
+  <div class="lp-panel">
+    <div class="lp-handle"></div>
+    <div class="lp-group">
+      <div class="lp-item lp-ritual-item" data-ritual="s1">
+        <span class="lp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+        <span class="lp-text">方案一 · 无动画直切</span>
+        <span class="lp-sub">兴趣迷惑</span>
+        <span class="lp-ritual-check" data-check="s1"></span>
+      </div>
+      <div class="lp-item lp-ritual-item" data-ritual="s2">
+        <span class="lp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c4 0 5-8 9-8s5 8 9 8"/></svg></span>
+        <span class="lp-text">方案二 · 0.7s 直接了当</span>
+        <span class="lp-sub">偷偷喜欢</span>
+        <span class="lp-ritual-check" data-check="s2"></span>
+      </div>
+      <div class="lp-item lp-ritual-item" data-ritual="s3">
+        <span class="lp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c3 0 6-9 9-9s6 9 9 9"/></svg></span>
+        <span class="lp-text">方案三 · 0.7s 粘稠柔和</span>
+        <span class="lp-sub">超级喜欢</span>
+        <span class="lp-ritual-check" data-check="s3"></span>
+      </div>
+    </div>
+    <div class="lp-group">
+      <div class="lp-item" id="jumpRitualCustom">
+        <span class="lp-text">各自专用自定义</span>
+        <span class="lp-switch" id="jumpRitualCustomSwitch"><span class="lp-dot"></span></span>
       </div>
     </div>
   </div>
@@ -554,7 +595,7 @@
 
   var videos = [];
   // 版本标识：A/B 对比版 = v9.1.9 黑屏回滚（prerender/撤封面时机回滚到 v9.1.9：loadeddata/loadedmetadata 撤封面、无预热、归零保留视频进度恢复；功能全集保留）
-  window.__VER = "v9.1.9-rollback-20261015";
+  window.__VER = "v9.1.16";
   // feed 模式：默认"客户展示1"排序（加权随机+3视频夹1音频/图集，录展示视频用）；URL 带 ?mode=normal 回原测试排序
   try { window.__feedMode = new URLSearchParams(location.search).get("mode") || "customer1"; }
   catch (e) { window.__feedMode = "customer1"; }
@@ -826,12 +867,12 @@
         slide.__note_vel = 0;
         slide.__note_lastX = e.touches[0].clientX;
         slide.__note_lastT = Date.now();
-        // 长按检测：350ms
+        // 长按检测：300ms
         slide.__lpTimer = setTimeout(function () {
           slide.__lpTimer = null;
-          if (navigator.vibrate) navigator.vibrate(15);
+          playVibrate()
           openLongPressMenu();
-        }, 350);
+        }, 300);
       }, { passive: true });
       tapLayer.addEventListener("touchmove", function (e) {
         var dx = e.touches[0].clientX - tapLayer.__tsX;
@@ -1210,6 +1251,30 @@
         openProfile(secUid);
       });
     }
+    // v9.1.12r：长按头像/博主名称 → 跳官方抖音博主主页（snssdk scheme）
+    (function () {
+      var targets = [slide.querySelector(".avatar-wrap"), authorEl];
+      targets.forEach(function (el) {
+        if (!el) return;
+        var lpT = null;
+        el.addEventListener("touchstart", function (e) {
+          e.stopPropagation();
+          if (slide.__lpTimer) { clearTimeout(slide.__lpTimer); slide.__lpTimer = null; }
+          lpT = setTimeout(function () {
+            lpT = null;
+            playVibrate()
+            var secUid = visualSecUid();
+            if (!secUid) { showToast("暂无博主信息"); return; }
+            openDouyinApp("snssdk1128://user/profile?sec_uid=" + encodeURIComponent(secUid) + "&refer=web&needlaunchlog=1");
+          }, 300);
+        }, { passive: true });
+        el.addEventListener("touchmove", function (e) { e.stopPropagation(); if (lpT) { clearTimeout(lpT); lpT = null; } });
+        el.addEventListener("touchend", function (e) {
+          e.stopPropagation();
+          if (lpT) { clearTimeout(lpT); lpT = null; }
+        });
+      });
+    })();
 
     slide.querySelector(".act.like").addEventListener("click", function (e) { e.stopPropagation(); doLike(slide, false); });
     slide.querySelector(".act.collect").addEventListener("click", function (e) { e.stopPropagation(); toggleCollect(slide); });
@@ -1226,16 +1291,20 @@
       var sLP = null;
       var lastTap = 0;
       var singleTimer = null;
-      sBtn.addEventListener("touchstart", function () {
+      sBtn.addEventListener("touchstart", function (e) {
+        e.stopPropagation(); // 阻止冒泡到 tapLayer 全局长按（避免350ms弹长按菜单干扰分享长按跳转）
+        if (slide.__lpTimer) { clearTimeout(slide.__lpTimer); slide.__lpTimer = null; }
         sBtn.__lpFired = false;
         sLP = setTimeout(function () {
           sLP = null; sBtn.__lpFired = true;
+          playVibrate()
           if (singleTimer) { clearTimeout(singleTimer); singleTimer = null; }
           jumpToSourcePeer();
-        }, 600);
+        }, 300);
       }, { passive: true });
-      sBtn.addEventListener("touchmove", function () { if (sLP) { clearTimeout(sLP); sLP = null; } });
+      sBtn.addEventListener("touchmove", function (e) { e.stopPropagation(); if (sLP) { clearTimeout(sLP); sLP = null; } });
       sBtn.addEventListener("touchend", function (e) {
+        e.stopPropagation();
         if (sLP) { clearTimeout(sLP); sLP = null; }
         if (sBtn.__lpFired) { sBtn.__lpFired = false; e.preventDefault(); return; }
         e.preventDefault(); // 阻止合成 click，避免与 touch 双触发
@@ -1273,10 +1342,11 @@
     });
     musicBtn.addEventListener("touchstart", function (e) {
       e.stopPropagation();
+      if (slide.__lpTimer) { clearTimeout(slide.__lpTimer); slide.__lpTimer = null; }
       isLongPress = false;
       // 胶囊状态（取消静音提示）下不启动长按定时器，只能取消静音
       if (!musicBtn.classList.contains("prompt")) {
-        slide.__musicLpTimer = setTimeout(function () { isLongPress = true; slide.__musicLpTimer = null; if (navigator.vibrate) navigator.vibrate(20); openMusicPage(slide); }, 27);
+        slide.__musicLpTimer = setTimeout(function () { isLongPress = true; slide.__musicLpTimer = null; playVibrate(); openMusicPage(slide); }, 27);
       }
     }, { passive: true });
     musicBtn.addEventListener("touchmove", function (e) {
@@ -1297,7 +1367,7 @@
       if ('ontouchstart' in window) return;
       // 胶囊状态（取消静音提示）下不启动长按定时器，只能取消静音
       if (!musicBtn.classList.contains("prompt")) {
-        desktopLongPressTimer = setTimeout(function () { desktopLongPressTimer = null; if (navigator.vibrate) navigator.vibrate(20); openMusicPage(slide); }, 500);
+        desktopLongPressTimer = setTimeout(function () { desktopLongPressTimer = null; playVibrate(); openMusicPage(slide); }, 27);
       }
     });
     musicBtn.addEventListener("mouseup", function (e) {
@@ -1860,6 +1930,11 @@
     b.querySelector(".num").textContent = fmtNum((on ? 1 : 0) + (Number(videos[current].collect_count) || 0));
   }
 
+  var __vbCount = 0;
+  function playVibrate() {
+    if (navigator.vibrate) navigator.vibrate([80]);
+  }
+
   function showToast(msg) {
     toast.textContent = msg; toast.classList.add("show");
     setTimeout(function () { toast.classList.remove("show"); }, 1500);
@@ -1932,7 +2007,6 @@
     var v = videos[current];
     if (!v) return;
     var ok = copyToClipboard(buildShareText(v));
-    showToast(ok ? "口令已复制" : "复制失败");
     setTimeout(function () { openDouyinApp(deepLink(v)); }, 350);
   }
   // 长按分享：只复制链接
@@ -1981,6 +2055,12 @@
     // 开启时默认不静音：dy_default_mute=0（不默认静音）→ 开关 on
     if (dm) { try { if (localStorage.getItem("dy_default_mute") !== "1") dm.classList.add("on"); else dm.classList.remove("on"); } catch(e) {} }
     if (da) { try { if (localStorage.getItem("dy_default_autoplay") === "1") da.classList.add("on"); else da.classList.remove("on"); } catch(e) {} }
+    // v9.1.12i：跳转仪式开关视觉跟随所选方案 —— 方案一(s1)=关，方案二/三(s2/s3)=开
+    try {
+      var ritualNow = localStorage.getItem("dy_jump_ritual") || "s3";
+      var rsw = document.getElementById("lpDefaultCleanSwitch");
+      if (rsw) rsw.classList.toggle("on", ritualNow !== "s1");
+    } catch(e) {}
     // v9.1.2：按当前视频的真实反馈状态重置四个反馈图标（修"图标跨视频残留填色"）。
     // 迷惑视频：用户拍板——未确认一律不绿底（移除原"上条无反馈自动预打勾"逻辑），
     // 只有当前视频已被确认标记（手动/自动已入库）才显示白勾绿底。
@@ -2621,7 +2701,6 @@
     var v = videos[current];
     if (!v) return;
     var ok = copyToClipboard(buildShareText(v));
-    if (ok) showToast("口令已复制");
     closeShareSheet();
     openDouyinApp(deepLink(v));
   });
@@ -2671,8 +2750,17 @@
   });
   document.getElementById("lpDefaultCleanSwitch").addEventListener("click", function (e) {
     e.stopPropagation();
-    // 占位项（功能待开发）：仅 UI 层面响应开关动画，无实际功能（2026-10-14 v9.1 补监听器，修"永远关不掉"）
-    this.classList.toggle("on");
+    // v9.1.12i：跳转仪式开关 —— 开=按所选方案动画(s2/s3)，关=无动画直切(s1)
+    // 点击开关在"当前方案"与"无动画"之间切换：若当前非s1 → 切到s1(关)；若当前s1 → 恢复动画(上次动画方案或默认s3)
+    var cur = localStorage.getItem("dy_jump_ritual") || "s3";
+    var lastAnim = localStorage.getItem("dy_jump_ritual_last") || "s3";
+    var next;
+    if (cur === "s1") { next = (lastAnim === "s1") ? "s3" : lastAnim; }
+    else { next = "s1"; }
+    localStorage.setItem("dy_jump_ritual", next);
+    if (next !== "s1") localStorage.setItem("dy_jump_ritual_last", next);
+    this.classList.toggle("on", next !== "s1");
+    showToast(next === "s1" ? "跳转仪式：已切换为无动画直切" : "跳转仪式：已启用" + (next === "s2" ? "方案二" : "方案三") + "动画");
   });
   // v9.1.3：删除 lpCleanSwitch 小球独立处理器——它和全局委托(capture先执行)双重 toggle 抵消，
   // 导致开关视觉不变+localStorage回原值+toast一直"已开启"。现在点小球冒泡到行→全局委托
@@ -2799,13 +2887,16 @@
     }
   });
 
-  function animateTo(targetPx, cb) {
-    slider.style.transition = "transform 0.35s " + EASE;
+  function animateTo(targetPx, cb, dur, curve) {
+    var d = dur || 0.35;
+    slider.style.transition = "transform " + d + "s " + (curve || EASE);
     slider.style.transform = "translateY(" + targetPx + "px)";
     var done = false;
     function handler() { if (done) return; done = true; slider.removeEventListener("transitionend", handler); if (cb) cb(); }
     slider.addEventListener("transitionend", handler);
-    setTimeout(handler, 460);
+    // 兜底超时 = 动画时长 + 110ms 余量（0.35s→460ms；0.7s→810ms），
+    // 避免长动画未跑完就被 resetAndLayout 打断（transition 被置 none 截断动画）
+    setTimeout(handler, Math.round(d * 1000) + 110);
   }
 
   function resetAndLayout(direction) {
@@ -2823,21 +2914,48 @@
   window.goNextSlide = function () {
     if (current >= videos.length - 1) { showToast("已是最后一个"); return false; }
     lockSwitch();
+    // v9.1.12d：跳转前立即暂停当前slide的所有音频（与触摸滑动路径一致），
+    // 消除"下一个已开始播、上一个没立马停"的 450ms 声音重叠窗口（原依赖 layout() 动画后才暂停）。
+    var curV0 = slideEls[1].querySelector("video");
+    var curNA0 = slideEls[1].querySelector(".note-audio");
+    var curAE0 = slideEls[1].querySelector(".audio-el");
+    if (curV0) curV0.pause();
+    if (curNA0) curNA0.pause();
+    if (curAE0) curAE0.pause();
     var tv = slideEls[2].querySelector("video");
+    var tvPi = slideEls[2].querySelector(".pause-icon");
+    if (tvPi) tvPi.classList.remove("show");
     var pos = videoPositions[slideEls[2].__id];
     if (pos && pos > 0.5 && tv.currentTime < 0.1 && tv.duration) tv.currentTime = Math.min(pos, tv.duration - 0.5);
-    current++;
-    // v9.1.8：EASE 改非过冲曲线 cubic-bezier(0.16,1,0.3,1)（ease-out-expo 风格），
-    // 修 v9.1.7 引入的"向上抖动"——cubic-bezier(0.34,1.3,0.64,1) 第二控制点 y=1.3>1
-    // 产生过冲回弹，视觉上"滑到位后又向上抖一下"。新曲线起步有阻力、末段平滑减速无回弹。
-    // 时长 .5s→.45s，配合无过冲曲线更有手滑的自然到位感。
-    slider.style.transition = "transform .45s cubic-bezier(0.16,1,0.3,1)";
-    slider.style.transform = "translateY(-100%)";
-    var _tv = tv;
-    setTimeout(function () {
-      _tv.muted = !soundOn; _tv.play().catch(function () {});
-      resetAndLayout(1);
-    }, 450);
+    // v9.1.12b：play 提前到滑动动画开始前（与触摸滑动路径一致），
+    // Surface 在滑动期间即建立 → 消除"菜单确认跳转前几帧黑屏"（对比触摸滑动不黑的根因差异）。
+    tv.muted = !soundOn; tv.play().catch(function () {});
+    var tvNA = slideEls[2].querySelector(".note-audio");
+    if (tvNA && tvNA.src) { tvNA.muted = !soundOn; tvNA.play().catch(function () {}); }
+    // v9.1.12i：跳转仪式 —— 按 dy_jump_ritual 方案分流
+    // s1 = 无动画直切；s2 = 0.7s cubic-bezier(0.2,0.9,0.4,1)；s3 = 0.7s cubic-bezier(0.5,0.06,0.13,1)
+    // v9.1.12p：各自专用自定义模式 —— 按反馈类型(kind)映射方案：
+    //   not_interested/puzzle → s1；secret_like → s2；super_like → s3
+    var ritual = "s3";
+    try { ritual = localStorage.getItem("dy_jump_ritual") || "s3"; } catch (e) {}
+    var customOn = false;
+    try { customOn = localStorage.getItem("dy_jump_ritual_custom") === "on"; } catch (e) {}
+    if (customOn && window.__lastFeedbackKind) {
+      var k = window.__lastFeedbackKind;
+      if (k === "not_interested" || k === "puzzle") ritual = "s1";
+      else if (k === "secret_like") ritual = "s2";
+      else if (k === "super_like") ritual = "s3";
+    }
+    window.__visualIdx = current + 1;
+    if (ritual === "s1") {
+      slider.style.transition = "none";
+      slider.style.transform = "translateY(-100%)";
+      current++; resetAndLayout(1);
+    } else if (ritual === "s2") {
+      animateTo(-window.innerHeight, function () { current++; resetAndLayout(1); }, 0.7, "cubic-bezier(0.2, 0.9, 0.4, 1)");
+    } else {
+      animateTo(-window.innerHeight, function () { current++; resetAndLayout(1); }, 0.7, "cubic-bezier(0.5, 0.06, 0.13, 1)");
+    }
     return true;
   };
   // 全局：设置当前会话连播状态（供"启动时默认自动连播"开关使用）
@@ -2865,6 +2983,13 @@
     if (wheelLock || animating) return; wheelLock = true;
     if (e.deltaY > 0 && current < videos.length - 1) {
       lockSwitch();
+      // v9.1.12d：滚轮跳转同样先暂停当前音频，避免新旧重叠
+      var cV0 = slideEls[1].querySelector("video");
+      var cNA0 = slideEls[1].querySelector(".note-audio");
+      var cAE0 = slideEls[1].querySelector(".audio-el");
+      if (cV0) cV0.pause();
+      if (cNA0) cNA0.pause();
+      if (cAE0) cAE0.pause();
       var tv = slideEls[2].querySelector("video");
       var pos = videoPositions[slideEls[2].__id];
       if (pos && pos > 0.5 && tv.currentTime < 0.1 && tv.duration) tv.currentTime = Math.min(pos, tv.duration - 0.5);
@@ -2872,6 +2997,13 @@
       current++; resetAndLayout(1);
     } else if (e.deltaY < 0 && current > 0) {
       lockSwitch();
+      // v9.1.12d：滚轮上滑同样先暂停当前音频
+      var cV1 = slideEls[1].querySelector("video");
+      var cNA1 = slideEls[1].querySelector(".note-audio");
+      var cAE1 = slideEls[1].querySelector(".audio-el");
+      if (cV1) cV1.pause();
+      if (cNA1) cNA1.pause();
+      if (cAE1) cAE1.pause();
       var tv = slideEls[0].querySelector("video");
       var pos = videoPositions[slideEls[0].__id];
       if (pos && pos > 0.5 && tv.currentTime < 0.1 && tv.duration) tv.currentTime = Math.min(pos, tv.duration - 0.5);
@@ -3252,9 +3384,15 @@ document.addEventListener("click", function(e) {
     toast(v2 ? "启动时默认自动连播已开启" : "启动时默认自动连播已关闭");
     return;
   }
-  // lpDefaultCleanMode 功能待开发，UI占位保留
+  // lpDefaultCleanMode：跳转仪式 —— 点击行区域（含图标/文字，开关点击已被其自身监听 stopPropagation 拦截）弹出三方案选择窗
   if (item.id === "lpDefaultCleanMode") {
-    toast("功能待开发");
+    // 排除点击目标是开关本身（开关自身监听已 stopPropagation，capture 阶段这里仍会先到，需判定来源）
+    if (e.target.closest && e.target.closest("#lpDefaultCleanSwitch")) return;
+    var jm = document.getElementById("jumpRitualMask");
+    if (jm) {
+      jm.style.display = "flex";
+      if (window.refreshJumpRitualUI) window.refreshJumpRitualUI();
+    }
     return;
   }
   // lpAutoPlay 功能待开发，UI占位保留
@@ -3277,6 +3415,74 @@ document.addEventListener("click", function(e) {
     return;
   }
 }, true);
+
+/* ===== 跳转仪式方案选择弹窗（v9.1.12i / v9.1.12p 各自专用自定义） ===== */
+(function () {
+  var jm = document.getElementById("jumpRitualMask");
+  if (!jm) return;
+  function closeRitual() { jm.style.display = "none"; }
+  function toastR(msg) {
+    var t = document.getElementById("toast");
+    if (t) { t.textContent = msg; t.style.opacity = "1"; setTimeout(function(){ t.style.opacity = "0"; }, 1500); }
+  }
+  // v9.1.12p：同步弹窗视觉到当前存储状态
+  function refreshCustomUI() {
+    var customOn = false;
+    try { customOn = localStorage.getItem("dy_jump_ritual_custom") === "on"; } catch (e) {}
+    jm.classList.toggle("custom-on", customOn);
+    var sw = document.getElementById("jumpRitualCustomSwitch");
+    if (sw) sw.classList.toggle("on", customOn);
+    var checks = jm.querySelectorAll(".lp-ritual-check");
+    var curR = localStorage.getItem("dy_jump_ritual") || "s3";
+    for (var ci = 0; ci < checks.length; ci++) {
+      var ck = checks[ci].getAttribute("data-check");
+      var on = customOn ? true : (ck === curR);
+      checks[ci].classList.toggle("on", on);
+      checks[ci].textContent = on ? "✓" : "";
+    }
+  }
+  jm.addEventListener("click", function (e) {
+    if (e.target === jm) { closeRitual(); return; }
+    // 各自专用自定义开关：点整行（文字区或开关）都切换
+    if (e.target.closest && e.target.closest("#jumpRitualCustom")) {
+      var now = false;
+      try { now = localStorage.getItem("dy_jump_ritual_custom") === "on"; } catch (e2) {}
+      var next = !now;
+      try { localStorage.setItem("dy_jump_ritual_custom", next ? "on" : "off"); } catch (e3) {}
+      // 开=外层跳转仪式开关强制开；关=恢复单选逻辑（外层开关按所选方案决定）
+      var outerSw = document.getElementById("lpDefaultCleanSwitch");
+      if (outerSw) {
+        if (next) outerSw.classList.add("on");
+        else {
+          var r = localStorage.getItem("dy_jump_ritual") || "s3";
+          outerSw.classList.toggle("on", r !== "s1");
+        }
+      }
+      refreshCustomUI();
+      toastR(next ? "各自专用自定义已开启" : "各自专用自定义已关闭");
+      return;
+    }
+    var item = e.target.closest ? e.target.closest(".lp-ritual-item") : null;
+    if (item) {
+      var s = item.getAttribute("data-ritual");
+      if (!s) return;
+      // 各自专用模式下不响应单选（三个方案同时生效）
+      var customOn = false;
+      try { customOn = localStorage.getItem("dy_jump_ritual_custom") === "on"; } catch (e4) {}
+      if (customOn) { toastR("各自专用自定义开启中：三方案同时生效"); return; }
+      localStorage.setItem("dy_jump_ritual", s);
+      if (s !== "s1") localStorage.setItem("dy_jump_ritual_last", s);
+      var sw = document.getElementById("lpDefaultCleanSwitch");
+      if (sw) sw.classList.toggle("on", s !== "s1");
+      refreshCustomUI();
+      var names = { s1: "方案一·无动画直切", s2: "方案二·0.7s直接了当", s3: "方案三·0.7s粘稠柔和" };
+      toastR("跳转仪式已设为 " + (names[s] || s));
+      return;
+    }
+  });
+  window.closeJumpRitual = closeRitual;
+  window.refreshJumpRitualUI = refreshCustomUI;
+})();
 
 /* ===== 策展引擎注入（不修改原有UI/交互代码） ===== */
   (function() {
@@ -3414,6 +3620,16 @@ document.addEventListener("click", function(e) {
       if (m) m.style.display = "none";
     }
 
+    // v9.1.12c：反馈确认后的时序 —— 菜单立即完全关闭，弹窗立即显示并与开始滑动同时进行。
+    // v9.1.12p：confirmAndAdvance 接受 kind（not_interested/puzzle/super_like/secret_like），
+    // 写入 window.__lastFeedbackKind，供 goNextSlide 在"各自专用自定义"模式下选方案。
+    function confirmAndAdvance(msg, kind) {
+      if (kind) window.__lastFeedbackKind = kind;
+      closeLP();
+      feedbackToast(msg);
+      goNext();
+    }
+
     // ===== 新菜单项点击处理 =====
     document.addEventListener("click", function(e) {
       var item = e.target.closest ? e.target.closest(".lp-item") : null;
@@ -3444,9 +3660,7 @@ document.addEventListener("click", function(e) {
         }
         if (vid) { reportBehavior("not_interested", vid, 0, 0, {reason: "not_interested"}); markFeedback(vid, "not_interested"); }
         if (ic) ic.style.color = "#fe2c55";
-        closeLP();
-        feedbackToast("✅反馈成功，可选择具体理由");
-        goNext();
+        confirmAndAdvance("✅反馈成功，可选择具体理由", "not_interested");
         return;
       }
       if (id === "lpSuperLike") {
@@ -3461,9 +3675,7 @@ document.addEventListener("click", function(e) {
         }
         if (vid) { reportBehavior("super_like", vid, 0, 0, {reason: "super_like"}); markFeedback(vid, "super_like"); }
         if (ic) { ic.style.color = "#8B008B"; var sv = ic.querySelector("svg"); if (sv) sv.setAttribute("fill", "#8B008B"); }
-        closeLP();
-        feedbackToast("💜超级喜欢，可选择具体理由");
-        goNext();
+        confirmAndAdvance("💜超级喜欢，可选择具体理由", "super_like");
         return;
       }
       if (id === "lpSecretLike") {
@@ -3478,9 +3690,7 @@ document.addEventListener("click", function(e) {
         }
         if (vid) { reportBehavior("secret_like", vid, 0, 0, {reason: "secret_like"}); markFeedback(vid, "secret_like"); }
         if (ic) { ic.style.color = "#ffc107"; var sv = ic.querySelector("svg"); if (sv) sv.setAttribute("fill", "#ffc107"); }
-        closeLP();
-        feedbackToast("❤️偷偷喜欢，可选择具体理由");
-        goNext();
+        confirmAndAdvance("❤️偷偷喜欢，可选择具体理由", "secret_like");
         return;
       }
       if (id === "lpPuzzle") {
@@ -3500,9 +3710,7 @@ document.addEventListener("click", function(e) {
           ic.style.background = "#34c759";
           ic.style.borderRadius = "4px";
         }
-        closeLP();
-        feedbackToast("✅已标记为迷惑视频");
-        goNext();
+        confirmAndAdvance("✅已标记为迷惑视频", "puzzle");
         return;
       }
     }, true);

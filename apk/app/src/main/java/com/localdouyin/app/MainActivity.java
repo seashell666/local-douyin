@@ -629,7 +629,7 @@ public class MainActivity extends Activity {
                     ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                     if (cm != null) {
                         cm.setPrimaryClip(ClipData.newPlainText("douyin_share", text));
-                        Toast.makeText(MainActivity.this, "口令已复制", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "跳转官方源", Toast.LENGTH_SHORT).show();
                     }
                 } catch (Exception ignored) {}
             });

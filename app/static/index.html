@@ -2917,6 +2917,8 @@
       audioEl.muted = false;
       audioEl.play().catch(function () {});
       musicPagePlaying = true;
+      // 保险：确保唱片带 playing（打开时若 playing 丢失，点击播放时补上，否则不转）
+      if (!disc.classList.contains("playing")) disc.classList.add("playing");
       disc.classList.remove("paused");
       pauseIcon.classList.remove("show"); // 播放时隐藏图标
     }
@@ -5463,8 +5465,9 @@ document.addEventListener("click", function(e) {
       // 初始声音状态跟随全局"默认不静音"开关：dy_default_mute=0（不默认静音）→ 有声
       mySoundOn = localStorage.getItem("dy_default_mute") !== "1";
       // 长按菜单提到播放器之上：播放器 z-index 2000，菜单默认 100 会被盖住（唤出却看不到）
-      var _lpMask = document.getElementById("longPressMask");
-      if (_lpMask) { _lpMask.style.zIndex = "2500"; }
+      // 一劳永逸：提升所有 .lp-mask（长按菜单 + 跳转仪式方案窗）到播放器(z2000)之上
+      var _lps = document.querySelectorAll(".lp-mask");
+      for (var _i = 0; _i < _lps.length; _i++) { _lps[_i].style.zIndex = "2500"; }
       var tabbar = document.querySelector(".tabbar");
       if (tabbar) tabbar.style.display = "none";
       myPlayer.style.display = "block";
@@ -5486,8 +5489,8 @@ document.addEventListener("click", function(e) {
       __mySavedUnmute = null;
       __mySavedSetSoundOn = null;
       // 恢复长按菜单 z-index（回到 CSS 默认 100）
-      var _lpMask = document.getElementById("longPressMask");
-      if (_lpMask) { _lpMask.style.zIndex = ""; }
+      var _lps = document.querySelectorAll(".lp-mask");
+      for (var _i = 0; _i < _lps.length; _i++) { _lps[_i].style.zIndex = ""; }
       var tabbar = document.querySelector(".tabbar");
       if (tabbar) tabbar.style.display = "";
       for (var i = 0; i < mySlideEls.length; i++) {
@@ -5501,60 +5504,83 @@ document.addEventListener("click", function(e) {
     // 注意：不能贴物理边缘(0~30px)触发——APK/手机上那里是系统手势导航区，
     // 会被系统当成"返回手势"直接退应用。改为 40~110px 带状区，
     // 手感仍是"从左边缘向右滑 / 从右边缘向左滑"，但避开系统手势。
-    var myEdge = { active: false, side: "", startX: 0, startY: 0 };
-    if (myPlayer) {
-      myPlayer.addEventListener("touchstart", function(e) {
-        var t = e.touches[0];
-        var w = window.innerWidth;
-        if (t.clientX >= 40 && t.clientX <= 110) { myEdge.active = true; myEdge.side = "left"; myEdge.startX = t.clientX; myEdge.startY = t.clientY; }
-        else if (t.clientX >= w - 110 && t.clientX <= w - 40) { myEdge.active = true; myEdge.side = "right"; myEdge.startX = t.clientX; myEdge.startY = t.clientY; }
-        else { myEdge.active = false; }
-      }, { passive: true });
-      myPlayer.addEventListener("touchmove", function(e) {
-        if (!myEdge.active || mySwiping) return;
-        var t = e.touches[0];
-        var dx = t.clientX - myEdge.startX;
-        var dy = t.clientY - myEdge.startY;
-        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 12) {
-          if (myEdge.side === "left" && dx > 0) e.preventDefault();
-          else if (myEdge.side === "right" && dx < 0) e.preventDefault();
-        }
-      }, { passive: false });
-      myPlayer.addEventListener("touchend", function(e) {
-        if (!myEdge.active) return;
-        myEdge.active = false;
-        var t = e.changedTouches[0];
-        var dx = t.clientX - myEdge.startX;
-        var dy = t.clientY - myEdge.startY;
-        if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
-          if (myEdge.side === "left" && dx > 0) closeMyPlayer();
-          else if (myEdge.side === "right" && dx < 0) closeMyPlayer();
-        }
-      });
+    // ===== my 播放器手势（合并版，照搬首页播放精华） =====
+    // 竖滑：全区域跟随手指 + 首尾阻尼(0.35) + 速度惯性；上滑=下一个/下滑=上一个
+    // 横滑退出：左右 40~110px 带状区、横向主导时退出播放器（避开系统手势区，防退应用）
+    var myStartY = 0, myDragging = false, myDy = 0, myGMode = "";
+    var myGStartX = 0, myGSide = "", myStartT = 0;
+    function myAnimateTo(targetPx, cb, dur) {
+      var d = dur || 0.3;
+      mySlider.style.transition = "transform " + d + "s " + myEase;
+      mySlider.style.transform = "translateY(" + targetPx + "px)";
+      var done = false;
+      function handler() { if (done) return; done = true; mySlider.removeEventListener("transitionend", handler); if (cb) cb(); }
+      mySlider.addEventListener("transitionend", handler);
+      setTimeout(handler, Math.round(d * 1000) + 110);
     }
-
-    // 竖滑切换：上滑=下一个，下滑=上一个（从点击位置开始）
-    var myStartY = 0, myDragging = false, myDy = 0;
     if (myPlayer) {
       myPlayer.addEventListener("touchstart", function(e) {
-        // 左右带状区（40~110px）交给 myEdge 横滑退出；竖滑只在中间区域工作
-        var t = e.touches[0];
-        if (t.clientX < 110 || t.clientX > window.innerWidth - 110) return;
-        myStartY = t.clientY;
-        myDragging = true;
-        myDy = 0;
+        var t = e.touches[0]; var w = window.innerWidth; var x = t.clientX;
+        myGStartX = x; myStartY = t.clientY; myStartT = Date.now();
+        myDy = 0; myDragging = true; myGMode = "";
+        if (x >= 40 && x <= 110) myGSide = "left";
+        else if (x >= w - 110 && x <= w - 40) myGSide = "right";
+        else myGSide = "";
+        mySlider.style.transition = "none"; // 进入拖拽：取消过渡动画，跟随手指
       }, { passive: true });
       myPlayer.addEventListener("touchmove", function(e) {
-        if (!myDragging || mySwiping) return;
-        myDy = e.touches[0].clientY - myStartY;
+        if (!myDragging || myAnimating) return;
+        var t = e.touches[0];
+        var dx = t.clientX - myGStartX, dy = t.clientY - myStartY;
+        // 首次方向锁定：横向主导且处于带状区 → 横滑退出；否则 → 竖滑跟随
+        if (!myGMode) {
+          if (myGSide && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 12) { myGMode = "edge"; }
+          else if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 8) { myGMode = "v"; }
+          else return;
+        }
+        if (myGMode === "edge") {
+          if ((myGSide === "left" && dx > 0) || (myGSide === "right" && dx < 0)) e.preventDefault();
+          return;
+        }
+        // 竖滑：跟随手指 + 首尾阻尼（对齐首页 0.35）
+        myDy = dy;
+        var list = window.__myPosts || [];
+        if ((myIdx === 0 && myDy > 0) || (myIdx === list.length - 1 && myDy < 0)) myDy = myDy * 0.35;
+        // 真正开始上下滑时暂停当前视频（防双音重叠，首页同款）
+        if (Math.abs(myDy) > 10) {
+          var _cp = mySlideEls[1] ? mySlideEls[1].querySelector("video") : null;
+          if (_cp && !_cp.paused) _cp.pause();
+        }
+        mySlider.style.transform = "translateY(" + myDy + "px)";
         if (Math.abs(myDy) > 8) e.preventDefault();
       }, { passive: false });
-      myPlayer.addEventListener("touchend", function() {
+      myPlayer.addEventListener("touchend", function(e) {
         if (!myDragging) return;
         myDragging = false;
-        if (mySwiping || Math.abs(myDy) < 50) return;
-        if (myDy < 0) myGoNext();
-        else myGoPrev();
+        var t0 = e.changedTouches[0];
+        var dx = t0.clientX - myGStartX, dy0 = t0.clientY - myStartY;
+        if (myGMode === "edge") {
+          if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy0) * 1.5) {
+            if (myGSide === "left" && dx > 0) closeMyPlayer();
+            else if (myGSide === "right" && dx < 0) closeMyPlayer();
+          }
+          myGMode = ""; myGSide = "";
+          return;
+        }
+        myGMode = ""; myGSide = "";
+        var VH = window.innerHeight;
+        var dt = Math.max(1, Date.now() - myStartT);
+        var velocity = Math.abs(myDy) / dt;
+        var shouldGo = Math.abs(myDy) > 80 || (velocity > 0.3 && Math.abs(myDy) > 40);
+        var list = window.__myPosts || [];
+        if (myAnimating) { mySlider.style.transition = "none"; mySlider.style.transform = "translateY(0)"; return; }
+        if (myDy < 0 && shouldGo && myIdx < list.length - 1) {
+          myAnimateTo(-VH, function() { myIdx++; myResetAndLayout(1); });
+        } else if (myDy > 0 && shouldGo && myIdx > 0) {
+          myAnimateTo(VH, function() { myIdx--; myResetAndLayout(-1); });
+        } else {
+          myAnimateTo(0, null);
+        }
       });
     }
 

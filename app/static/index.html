@@ -181,6 +181,11 @@
   .tab { color: rgba(255,255,255,.55); font-size: 18px; display: flex; align-items: center; gap: 3px; }
   .tab.active { color: #fff; font-weight: 600; }
   .tab.active .caret { font-size: 12px; }
+  /* 非首页 tabbar 纯白（用户需求：除首页外其他 tab 页面导航栏变 #FFFFFF） */
+  .tabbar-light { background: #FFFFFF !important; border-top: 1px solid rgba(0,0,0,.08); }
+  .tabbar-light .tab { color: rgba(0,0,0,.5); }
+  .tabbar-light .tab.active { color: #000; }
+  .tabbar-light .caret { color: #000; }
   .tab.plus { width: 48px; height: 34px; background: #fff; color: #000; border-radius: 8px; font-size: 26px; display: flex; align-items: center; justify-content: center; font-weight: 300; line-height: 1; }
   .tab .badge { background: #FE2C55; color: #fff; font-size: 12px; padding: 1px 5px; border-radius: 8px; margin-left: 2px; font-weight: 600; }
 
@@ -394,7 +399,22 @@
   <div class="tab">朋友</div>
   <div class="tab plus">+</div>
   <div class="tab">消息<span class="badge">99+</span></div>
-  <div class="tab">我</div>
+  <div class="tab" id="tabMe">我</div>
+</div>
+
+<!-- 自定义"我"页图标选择弹窗（长按底部"我"tab 触发，选 PNG/WebP/JPG 作为新 APP 图标） -->
+<div id="iconPickerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:4000;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;width:300px;max-width:86vw;padding:22px 20px 16px;text-align:center;">
+    <div style="font-size:16px;font-weight:600;margin-bottom:14px;">自定义"我"页图标</div>
+    <img id="iconPickerPreview" src="" style="width:64px;height:64px;border-radius:12px;object-fit:cover;margin:0 auto 14px;background:#f2f2f2;display:none;">
+    <button id="iconPickBtn" style="width:100%;padding:10px;border-radius:10px;background:#0a66ff;color:#fff;border:none;font-size:14px;cursor:pointer;margin-bottom:6px;">从相册选择图片</button>
+    <div style="font-size:12px;color:#999;margin-bottom:14px;">支持 PNG / WebP / JPG</div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button id="iconCancelBtn" style="flex:1;padding:10px;border-radius:10px;background:#f2f2f2;color:#333;border:none;font-size:14px;cursor:pointer;">取消</button>
+      <button id="iconApplyBtn" style="flex:1;padding:10px;border-radius:10px;background:#0a66ff;color:#fff;border:none;font-size:14px;cursor:pointer;">确认使用</button>
+    </div>
+    <input id="iconFileInput" type="file" accept="image/png,image/webp,image/jpeg" style="display:none;">
+  </div>
 </div>
 
 <!-- 我页面：全屏竖滑消费播放器（照搬首页播放引擎，独立命名，互不干扰） -->
@@ -2480,6 +2500,9 @@
       else if (page === "profile") profilePageEl.classList.add("show");
     }
     currentPage = page;
+    // 非首页 tabbar 纯白（用户需求）；首页维持黑
+    var _tbEl = document.querySelector(".tabbar");
+    if (_tbEl) { _tbEl.classList.toggle("tabbar-light", page !== "home"); }
     // 更新tab的active状态
     document.querySelectorAll(".tabbar .tab").forEach(function (t) {
       t.classList.remove("active");
@@ -2487,7 +2510,7 @@
       if (page === "home" && text.indexOf("首页") === 0) t.classList.add("active");
       else if (page === "friends" && text.indexOf("朋友") === 0) t.classList.add("active");
       else if (page === "messages" && text.indexOf("消息") === 0) t.classList.add("active");
-      else if (page === "profile" && text.indexOf("我") === 0) t.classList.add("active");
+      else if (page === "profile" && (t.id === "tabMe" || text.indexOf("我") === 0)) t.classList.add("active");
     });
   }
 
@@ -2501,7 +2524,8 @@
         switchPage("friends");
       } else if (text.indexOf("消息") === 0) {
         switchPage("messages");
-      } else if (text.indexOf("我") === 0) {
+      } else if (tab.id === "tabMe" || text.indexOf("我") === 0) {
+        if (window.__iconPickerOpen) { e.stopPropagation(); e.preventDefault(); return; }
         switchPage("profile");
       } else if (text.indexOf("+") === 0) {
         // 加号：确认后清除所有本地数据并重启应用
@@ -2513,6 +2537,77 @@
       }
     });
   });
+
+    // ===== 自定义"我"页图标：长按底部"我"tab 弹窗选图（PNG/WebP/JPG 作为新 APP 图标）=====
+    function myIconPreviewData() { var d = null; try { d = localStorage.getItem("dy_tab_me_icon"); } catch(e){} return d; }
+    function myIconApplyToTab(dataUrl) {
+      var t = document.getElementById("tabMe");
+      if (!t) return;
+      if (dataUrl) t.innerHTML = '<img src="' + dataUrl + '" style="width:26px;height:26px;border-radius:8px;object-fit:cover;" alt="我">';
+      else t.innerHTML = "我";
+    }
+    function openIconPicker() {
+      var m = document.getElementById("iconPickerModal");
+      if (!m) return;
+      var prev = myIconPreviewData();
+      document.getElementById("iconPickerPreview").src = prev || "";
+      document.getElementById("iconPickerPreview").style.display = prev ? "block" : "none";
+      window.__iconPickerOpen = true;
+      m.style.display = "flex";
+      var fi = document.getElementById("iconFileInput");
+      fi.value = ""; fi.dataset.pending = "";
+    }
+    function closeIconPicker() {
+      var m = document.getElementById("iconPickerModal");
+      if (m) m.style.display = "none";
+      window.__iconPickerOpen = false;
+    }
+    document.getElementById("iconPickBtn").addEventListener("click", function (e) {
+      e.stopPropagation();
+      document.getElementById("iconFileInput").click();
+    });
+    document.getElementById("iconFileInput").addEventListener("change", function () {
+      var f = this.files && this.files[0];
+      if (!f) return;
+      if (!/image\/(png|webp|jpeg|jpg)/.test(f.type)) { showToast("仅支持 PNG/WebP/JPG 图片"); return; }
+      var rd = new FileReader(), inp = this;
+      rd.onload = function () {
+        document.getElementById("iconPickerPreview").src = rd.result;
+        document.getElementById("iconPickerPreview").style.display = "block";
+        inp.dataset.pending = rd.result;
+      };
+      rd.readAsDataURL(f);
+    });
+    document.getElementById("iconApplyBtn").addEventListener("click", function (e) {
+      e.stopPropagation();
+      var inp = document.getElementById("iconFileInput");
+      var data = inp.dataset.pending || "";
+      try { if (data) localStorage.setItem("dy_tab_me_icon", data); else localStorage.removeItem("dy_tab_me_icon"); } catch(_) {}
+      myIconApplyToTab(data || null);
+      closeIconPicker();
+      showToast(data ? "已设置新图标" : "已恢复默认图标");
+    });
+    document.getElementById("iconCancelBtn").addEventListener("click", function (e) { e.stopPropagation(); closeIconPicker(); });
+    document.getElementById("iconPickerModal").addEventListener("click", function (e) { if (e.target === this) closeIconPicker(); });
+    (function () {
+      var meTab = document.getElementById("tabMe");
+      if (!meTab) return;
+      var lpTimer = null, fired = false;
+      meTab.addEventListener("touchstart", function () {
+        fired = false;
+        lpTimer = setTimeout(function () { lpTimer = null; fired = true; try { navigator.vibrate && navigator.vibrate(30); } catch(_) {} openIconPicker(); }, 450);
+      }, { passive: true });
+      meTab.addEventListener("touchmove", function () { if (lpTimer) { clearTimeout(lpTimer); lpTimer = null; } }, { passive: true });
+      meTab.addEventListener("touchend", function (e) {
+        if (lpTimer) { clearTimeout(lpTimer); lpTimer = null; }
+        if (fired) { fired = false; e.preventDefault(); e.stopPropagation(); }
+      });
+      var mdT = null;
+      meTab.addEventListener("mousedown", function () { mdT = setTimeout(function () { mdT = null; openIconPicker(); }, 450); });
+      meTab.addEventListener("mouseup", function () { if (mdT) { clearTimeout(mdT); mdT = null; } });
+      var saved = myIconPreviewData();
+      if (saved) myIconApplyToTab(saved);
+    })();
 
   // ===== 博主主页 =====
   var profileEl = document.getElementById("profile");
@@ -5333,6 +5428,24 @@ document.addEventListener("click", function(e) {
       prevV.pause();
       if (prevV.currentTime > 0.1) prevV.currentTime = 0;
       myPlayCurrent();
+      myPreloadNext();
+    }
+
+    // 预加载下一个槽位（对齐首页 preloadNext：切换前先把下一个视频 load 起来，防切换黑屏/延迟出音频）
+    function myPreloadNext() {
+      var v = mySlideEls[2] ? mySlideEls[2].querySelector("video") : null;
+      if (!v || !v.src) return;
+      if (v.__preloaded && v.readyState >= 2) return;
+      v.__preloaded = true;
+      v.__ready = v.readyState >= 2;
+      if (v.readyState < 2) {
+        v.preload = "auto";
+        v.load();
+        v.addEventListener("loadeddata", function onLD() {
+          v.removeEventListener("loadeddata", onLD);
+          v.__ready = true;
+        }, { once: true });
+      }
     }
 
     function myPlayCurrent() {
@@ -5468,6 +5581,9 @@ document.addEventListener("click", function(e) {
       // 一劳永逸：提升所有 .lp-mask（长按菜单 + 跳转仪式方案窗）到播放器(z2000)之上
       var _lps = document.querySelectorAll(".lp-mask");
       for (var _i = 0; _i < _lps.length; _i++) { _lps[_i].style.zIndex = "2500"; }
+      // toast z100 也被播放器盖住（长按分享等提示看不到）→ 一并提到最顶
+      var _tst = document.querySelector(".toast");
+      if (_tst) { _tst.style.zIndex = "2600"; }
       var tabbar = document.querySelector(".tabbar");
       if (tabbar) tabbar.style.display = "none";
       myPlayer.style.display = "block";
@@ -5491,6 +5607,8 @@ document.addEventListener("click", function(e) {
       // 恢复长按菜单 z-index（回到 CSS 默认 100）
       var _lps = document.querySelectorAll(".lp-mask");
       for (var _i = 0; _i < _lps.length; _i++) { _lps[_i].style.zIndex = ""; }
+      var _tst = document.querySelector(".toast");
+      if (_tst) { _tst.style.zIndex = ""; }
       var tabbar = document.querySelector(".tabbar");
       if (tabbar) tabbar.style.display = "";
       for (var i = 0; i < mySlideEls.length; i++) {
@@ -5580,6 +5698,9 @@ document.addEventListener("click", function(e) {
           myAnimateTo(VH, function() { myIdx--; myResetAndLayout(-1); });
         } else {
           myAnimateTo(0, null);
+          // 未切换：手势 touchmove 暂停过当前视频，这里恢复播放（防回弹后黑屏）
+          var _cv = mySlideEls[1] ? mySlideEls[1].querySelector("video") : null;
+          if (_cv && _cv.paused && mySoundOn) { _cv.play().catch(function(){}); }
         }
       });
     }

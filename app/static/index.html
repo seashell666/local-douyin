@@ -198,7 +198,7 @@
   .loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; background: #000; z-index: 10; }
   .loading .dot { animation: blink 1s infinite; }
   @keyframes blink { 50% { opacity: .3; } }
-  .toast { position: fixed; left: 50%; top: 18%; transform: translateX(-50%); background: rgba(0,0,0,.7); color: #fff; font-size: 14px; padding: 8px 18px; border-radius: 18px; z-index: 40; opacity: 0; transition: opacity .3s ease; pointer-events: none; }
+  .toast { position: fixed; left: 50%; top: 18%; transform: translateX(-50%); background: rgba(0,0,0,.7); color: #fff; font-size: 14px; padding: 8px 18px; border-radius: 18px; z-index: 100; opacity: 0; transition: opacity .3s ease; pointer-events: none; }
 
   /* 分享底部面板 */
   .share-sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 110; display: none; }
@@ -249,80 +249,104 @@
   .page-empty-icon { font-size: 48px; margin-bottom: 16px; }
   .page-empty-text { font-size: 16px; color: #999; }
 
-  /* ===== 博主主页（像素级复刻抖音官方"我"页面） ===== */
-  #profile { position: fixed; inset: 0; background: #f5f5f5; z-index: 50; transform: translateX(100%); transition: transform .12s cubic-bezier(0.2, 0, 0.2, 1); }
-  .profile-content { position: absolute; top: 0; bottom: 0; left: 0; right: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
+  /* ===== 我页面 ===== */
+  #profilePage { background: #f5f5f5; }
+  .me-header { position: relative; height: 380px; overflow: hidden; }
+  .me-bg { position: absolute; inset: 0; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 320"><rect fill="%232a2a3e" width="400" height="320"/><circle cx="200" cy="120" r="100" fill="%23ff4d6d" opacity="0.3"/></svg>') center/cover; }
+  .me-topbar { position: absolute; top: calc(env(safe-area-inset-top) + 10px); left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; z-index: 5; }
+  .me-add-friend { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,.3); backdrop-filter: blur(8px); border-radius: 20px; padding: 8px 14px; color: #fff; font-size: 14px; }
+  .me-add-friend svg { width: 18px; height: 18px; }
+  .me-top-actions { display: flex; align-items: center; gap: 16px; }
+  .me-action-icon { position: relative; width: 24px; height: 24px; color: #fff; }
+  .me-action-icon svg { width: 24px; height: 24px; }
+  .me-badge { position: absolute; top: -4px; right: -6px; background: #FE2C55; color: #fff; font-size: 11px; padding: 1px 5px; border-radius: 8px; font-weight: 600; }
+  .me-profile-row { position: absolute; left: 20px; bottom: 20px; display: flex; align-items: flex-end; gap: 14px; z-index: 5; }
+  .me-avatar-wrap { position: relative; }
+  .me-avatar { width: 90px; height: 90px; border-radius: 50%; border: 2.5px solid #fff; object-fit: cover; background: #ddd; }
+  .me-avatar-plus { position: absolute; bottom: -2px; right: -2px; width: 28px; height: 28px; background: #00C800; border-radius: 50%; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; font-weight: 600; }
+  .me-name-area { padding-bottom: 8px; }
+  .me-nickname { font-size: 22px; font-weight: 700; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.4); }
+  .me-douyin-id { font-size: 13px; color: rgba(255,255,255,.85); margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+  .me-copy-icon { opacity: .7; cursor: pointer; }
+  .me-ai-create { margin-top: 8px; display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,.2); backdrop-filter: blur(8px); border-radius: 16px; padding: 6px 12px; color: #fff; font-size: 13px; }
+  .me-chevron { opacity: .7; }
+  .me-content { background: #fff; border-radius: 16px 16px 0 0; margin-top: -16px; position: relative; z-index: 10; padding-bottom: 80px; }
+  .me-stats { display: flex; gap: 20px; padding: 20px 20px 0; align-items: center; }
+  .me-stat { text-align: center; }
+  .me-stat-num { font-size: 20px; font-weight: 700; color: #161823; }
+  .me-stat-label { font-size: 13px; color: #999; margin-top: 2px; }
+  .me-edit-btn { margin-left: auto; padding: 10px 24px; background: #f5f5f5; border: none; border-radius: 8px; font-size: 15px; color: #161823; font-weight: 500; cursor: pointer; }
+  .me-bio { padding: 16px 20px 0; font-size: 14px; color: #161823; line-height: 1.6; }
+  .me-tags { padding: 12px 20px 0; display: flex; gap: 8px; }
+  .me-tag { background: #f5f5f5; border-radius: 14px; padding: 5px 12px; font-size: 13px; color: #666; }
+  .me-tag-add { color: #999; }
+  .me-features { display: flex; justify-content: space-around; padding: 24px 20px 20px; border-bottom: 8px solid #f5f5f5; }
+  .me-feature { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; color: #666; cursor: pointer; }
+  .me-feature svg { width: 26px; height: 26px; }
+  .me-tabs { display: flex; border-bottom: 1px solid #f0f0f0; padding: 0 20px; }
+  .me-tab { padding: 14px 16px; font-size: 15px; color: #999; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; }
+  .me-tab.active { color: #161823; font-weight: 700; border-bottom-color: #161823; }
+  .me-tab-caret { font-size: 10px; margin-left: 2px; }
+  .me-private-bar { display: flex; align-items: center; justify-content: space-between; margin: 12px 16px; padding: 12px 14px; background: #fafafa; border-radius: 8px; }
+  .me-private-left { display: flex; align-items: center; gap: 10px; }
+  .me-private-thumb { width: 32px; height: 32px; background: #eee; border-radius: 4px; }
+  .me-private-count { font-size: 14px; color: #999; }
+  .me-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 0 2px; }
+  .me-grid-item { position: relative; aspect-ratio: 3/4; background: #f0f0f0; cursor: pointer; overflow: hidden; }
+  .me-grid-item img, .me-grid-item video { width: 100%; height: 100%; object-fit: cover; }
+  .me-grid-play { position: absolute; bottom: 6px; left: 6px; display: flex; align-items: center; gap: 3px; color: #fff; font-size: 12px; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+  .me-grid-play svg { width: 14px; height: 14px; }
+  .me-avatar { cursor: pointer; }
+  .me-bg { cursor: pointer; }
+  .viewer-close { position: absolute; top: calc(env(safe-area-inset-top) + 16px); left: 16px; width: 40px; height: 40px; background: rgba(0,0,0,.4); border: none; border-radius: 50%; color: #fff; font-size: 20px; cursor: pointer; z-index: 10; }
+  .viewer-img-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .viewer-bottom-bar { position: absolute; bottom: calc(env(safe-area-inset-bottom) + 20px); left: 20px; right: 20px; display: flex; gap: 12px; }
+  .viewer-btn { flex: 1; padding: 14px; background: rgba(255,255,255,.15); border: none; border-radius: 24px; color: #fff; font-size: 15px; cursor: pointer; backdrop-filter: blur(8px); }
+
+  /* ===== 博主主页（像素级复刻抖音） ===== */
+  #profile { position: fixed; inset: 0; background: #fff; z-index: 50; transform: translateX(100%); transition: transform .12s cubic-bezier(0.2, 0, 0.2, 1); overflow-y: auto; -webkit-overflow-scrolling: touch; }
   #profile.show { transform: translateX(0); }
-
-  /* 顶部背景图区域 */
-  .profile-hero { position: relative; height: 420px; overflow: hidden; }
-  .profile-hero-bg { position: absolute; inset: 0; background-size: cover; background-position: center top; }
-  .profile-hero-topbar { position: absolute; top: calc(env(safe-area-inset-top) + 10px); left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; z-index: 5; }
-  .profile-add-friend { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,.35); backdrop-filter: blur(8px); color: #fff; border: none; border-radius: 20px; padding: 8px 16px; font-size: 14px; cursor: pointer; }
-  .profile-top-actions { display: flex; align-items: center; gap: 10px; }
-  .profile-top-actions .icon-btn { width: 36px; height: 36px; background: rgba(0,0,0,.35); backdrop-filter: blur(8px); border-radius: 50%; border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; }
-
-  /* 头像昵称区域（叠在背景图上） */
-  .profile-hero-info { position: absolute; left: 20px; bottom: 30px; display: flex; align-items: flex-end; gap: 14px; z-index: 5; }
-  .profile-avatar-wrap { position: relative; }
-  .profile-avatar { width: 90px; height: 90px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; background: #ddd; }
-  .profile-avatar-add { position: absolute; right: -4px; bottom: -4px; width: 28px; height: 28px; background: #06c660; border: 2px solid #fff; border-radius: 50%; color: #fff; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-  .profile-name-block { padding-bottom: 10px; }
-  .profile-name { font-size: 22px; font-weight: 700; color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,.5); display: flex; align-items: center; gap: 6px; }
-  .profile-name .dropdown { font-size: 14px; opacity: .9; }
-  .profile-id { font-size: 13px; color: rgba(255,255,255,.85); margin-top: 6px; text-shadow: 0 1px 3px rgba(0,0,0,.4); display: flex; align-items: center; gap: 4px; }
-  .profile-ai-btn { display: inline-flex; align-items: center; gap: 4px; background: rgba(0,0,0,.3); backdrop-filter: blur(8px); color: #fff; border: none; border-radius: 18px; padding: 6px 14px; font-size: 13px; margin-top: 10px; cursor: pointer; }
-
-  /* 白色卡片（浮在背景图上，顶部圆角） */
-  .profile-card { position: relative; background: #fff; border-radius: 20px 20px 0 0; margin-top: -20px; padding: 20px 16px 16px; z-index: 10; }
-
-  /* 统计数字 + 编辑主页 */
-  .profile-stats-row { display: flex; align-items: center; justify-content: space-between; }
+  .profile-header { position: relative; height: 200px; overflow: hidden; }
+  .profile-header-bg { position: absolute; inset: 0; background-size: cover; background-position: center; filter: blur(30px); transform: scale(1.3); }
+  .profile-header-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,.15), rgba(255,255,255,.3)); }
+  .profile-topbar { position: absolute; top: calc(env(safe-area-inset-top) + 10px); left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; z-index: 5; }
+  .profile-back { width: 36px; height: 36px; background: rgba(0,0,0,.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 22px; border: none; cursor: pointer; backdrop-filter: blur(4px); }
+  .profile-top-actions { display: flex; gap: 10px; }
+  .profile-top-actions button { width: 36px; height: 36px; background: rgba(0,0,0,.3); border-radius: 50%; border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px); font-size: 16px; }
+  .profile-header-info { position: absolute; left: 20px; bottom: 16px; display: flex; align-items: flex-end; gap: 14px; z-index: 5; }
+  .profile-avatar { width: 80px; height: 80px; border-radius: 50%; border: 2.5px solid #fff; object-fit: cover; background: #ddd; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+  .profile-header-name { padding-bottom: 8px; }
+  .profile-name { font-size: 20px; font-weight: 700; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.4); }
+  .profile-id-header { font-size: 12px; color: rgba(255,255,255,.85); margin-top: 3px; text-shadow: 0 1px 3px rgba(0,0,0,.3); }
+  .profile-body { padding: 12px 16px 16px; }
   .profile-stats { display: flex; gap: 24px; align-items: center; }
-  .profile-stats .stat { display: flex; flex-direction: column; }
-  .profile-stats .stat .num { font-weight: 700; font-size: 20px; color: #161823; }
-  .profile-stats .stat .label { color: #999; font-size: 13px; margin-top: 2px; }
-  .profile-edit-btn { background: #f5f5f5; color: #161823; border: none; border-radius: 8px; padding: 10px 24px; font-size: 15px; cursor: pointer; }
-
-  /* 简介 */
-  .profile-bio { font-size: 14px; color: #161823; line-height: 1.6; white-space: pre-wrap; margin-top: 16px; }
-  .profile-tags { display: flex; gap: 8px; margin-top: 12px; }
-  .profile-tag { background: #f5f5f5; color: #666; font-size: 13px; padding: 6px 12px; border-radius: 16px; }
-
-  /* 功能入口 */
-  .profile-features { display: flex; justify-content: space-around; margin-top: 24px; padding: 16px 0; }
-  .profile-feature { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
-  .profile-feature .icon { font-size: 24px; color: #161823; }
-  .profile-feature .label { font-size: 13px; color: #666; }
-
-  /* Tab栏 */
-  .profile-tabs { display: flex; border-bottom: 1px solid #f0f0f0; margin-top: 8px; position: sticky; top: 0; background: #fff; z-index: 3; }
-  .profile-tab { padding: 12px 0; margin-right: 24px; font-size: 15px; color: #999; cursor: pointer; border-bottom: 2px solid transparent; display: flex; align-items: center; gap: 4px; }
+  .profile-stats .stat { font-size: 14px; color: #161823; display: flex; align-items: baseline; }
+  .profile-stats .stat .num { font-weight: 700; font-size: 18px; margin-right: 4px; }
+  .profile-stats .stat .label { color: #999; font-size: 13px; }
+  .profile-stats .stat .load-more-btn { width: 18px; height: 18px; border: none; background: none; cursor: pointer; opacity: .15; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #999; padding: 0; margin-left: 2px; transition: opacity .2s; }
+  .profile-stats .stat .load-more-btn:hover { opacity: .5; }
+  .profile-bio-wrap { position: relative; margin-top: 10px; }
+  .profile-bio { font-size: 14px; color: #161823; line-height: 1.5; white-space: pre-wrap; max-height: 84px; overflow: hidden; position: relative; padding-right: 50px; }
+  .profile-bio.expanded { max-height: none; padding-right: 0; }
+  .profile-bio .at-link { color: #1269e0; cursor: pointer; }
+  .bio-more { display: none; position: absolute; bottom: 0; right: 0; font-size: 14px; color: #999; cursor: pointer; line-height: 1.5; background: #fff; padding-left: 4px; }
+  .profile-ip { font-size: 12px; color: #999; margin-top: 6px; }
+  .profile-buttons { display: flex; gap: 10px; margin-top: 14px; align-items: center; }
+  .profile-follow { flex: 1; height: 40px; background: #FE2C55; color: #fff; border: none; border-radius: 4px; font-size: 16px; font-weight: 600; cursor: pointer; }
+  .profile-follow.followed { background: #f0f0f0; color: #999; }
+  .profile-msg { width: 44px; height: 40px; background: #f0f0f0; color: #161823; border: none; border-radius: 4px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .profile-tabs { display: flex; border-bottom: 1px solid #f0f0f0; margin-top: 14px; position: sticky; top: 0; background: #fff; z-index: 3; }
+  .profile-tab { padding: 12px 16px; font-size: 15px; color: #999; cursor: pointer; border-bottom: 2px solid transparent; display: flex; align-items: center; gap: 4px; }
   .profile-tab.active { color: #161823; font-weight: 600; border-bottom-color: #161823; }
   .profile-tab .count { font-weight: 400; color: #999; font-size: 14px; }
   .profile-tab.active .count { color: #161823; }
-
-  /* 私密作品入口 */
-  .profile-private-entry { display: flex; align-items: center; justify-content: space-between; background: #fafafa; border-radius: 12px; padding: 12px 14px; margin-top: 12px; cursor: pointer; }
-  .profile-private-entry .left { display: flex; align-items: center; gap: 12px; }
-  .profile-private-entry .thumb { width: 40px; height: 40px; background: #eee; border-radius: 6px; }
-  .profile-private-entry .label { font-size: 15px; color: #161823; }
-  .profile-private-entry .count { font-size: 14px; color: #999; }
-
-  /* 九宫格 */
-  .profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 12px 0; }
+  .profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 2px 0; }
   .profile-grid-item { position: relative; aspect-ratio: 3/4; background: #f0f0f0; cursor: pointer; overflow: hidden; }
   .profile-grid-item video, .profile-grid-item img { width: 100%; height: 100%; object-fit: cover; }
   .profile-grid-item .play-count { position: absolute; bottom: 6px; left: 6px; color: #fff; font-size: 12px; text-shadow: 0 1px 3px rgba(0,0,0,.6); display: flex; align-items: center; gap: 3px; }
+  .profile-grid-item .time-tag { position: absolute; top: 6px; left: 6px; background: rgba(0,0,0,.45); color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 3px; }
   .profile-empty { text-align: center; padding: 60px 20px; color: #999; font-size: 14px; }
   .profile-loading { text-align: center; padding: 40px; color: #999; font-size: 14px; }
-
-  /* 顶部白色导航栏（视差滚动后显示） */
-  .profile-top-nav { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; z-index: 100; opacity: 0; transform: translateY(-100%); transition: all .2s ease; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
-  .profile-top-nav.show { opacity: 1; transform: translateY(0); }
-  .top-nav-name { font-size: 17px; font-weight: 600; color: #161823; }
-  .top-nav-actions { display: flex; gap: 16px; }
-  .top-nav-actions button { background: none; border: none; font-size: 18px; cursor: pointer; color: #161823; }
 
   /* ===== 音乐页 ===== */
   #musicPage { position: fixed; inset: 0; background: #fff; z-index: 51; transform: translateY(100%); transition: transform .12s cubic-bezier(0.2, 0, 0.2, 1); overflow-y: auto; -webkit-overflow-scrolling: touch; }
@@ -368,9 +392,47 @@
 <div class="tabbar">
   <div class="tab active">首页<span class="caret">⌄</span></div>
   <div class="tab">朋友</div>
-  <div class="tab plus" id="tabPlusBtn">+</div>
+  <div class="tab plus">+</div>
   <div class="tab">消息<span class="badge">99+</span></div>
   <div class="tab">我</div>
+</div>
+
+<!-- 我页面：全屏竖滑消费播放器（照搬首页播放引擎，独立命名，互不干扰） -->
+<div id="myPlayer" style="display:none;position:fixed;inset:0;z-index:2000;background:#000;">
+  <div id="mySlider" style="position:absolute;top:0;left:0;width:100%;height:100%;will-change:transform;"></div>
+  <!-- 底部黑色导航栏（进入播放后替代原tabbar） -->
+  <div style="position:absolute;left:0;right:0;bottom:0;height:calc(56px + env(safe-area-inset-bottom));background:#000;border-top:1px solid rgba(255,255,255,.08);z-index:6;display:flex;align-items:center;justify-content:space-between;padding:0 16px;">
+    <div style="display:flex;align-items:center;gap:6px;color:#fff;font-size:14px;">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="5" width="14" height="12" rx="2"></rect><polygon points="16,9 22,6 22,16 16,13" fill="#fff" stroke="none"></polygon></svg>
+      <span id="myViewsNum" style="font-size:13px;color:#e5e5e5;">浏览 0</span>
+    </div>
+    <button id="myPublicBtn" style="padding:5px 16px;border-radius:16px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:13px;cursor:pointer;">公开</button>
+  </div>
+</div>
+
+<!-- 我的播放器：音乐界面（独立版，复用首页音乐页结构与样式，数据用我的作品） -->
+<div id="myMusicPage" style="position:fixed;inset:0;background:#fff;z-index:2100;transform:translateY(100%);transition:transform .12s cubic-bezier(0.2,0,0.2,1);overflow-y:auto;-webkit-overflow-scrolling:touch;">
+  <div class="music-page-bg"></div>
+  <div class="music-page-tint"></div>
+  <div class="music-topbar">
+    <button class="music-back" id="myMusicBack">‹</button>
+    <button class="music-share" id="myMusicShare">↗</button>
+  </div>
+  <div class="music-hero">
+    <div class="music-disc-wrap">
+      <div class="music-disc" id="myMusicDisc"><img id="myMusicDiscImg" src="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%"></div>
+      <div class="music-pause-icon" id="myMusicPauseIcon"><svg viewBox="0 0 24 24" fill="white"><path d="M8 5.5c0-.83.9-1.33 1.6-.83l8.5 5c.67.4.67 1.43 0 1.83l-8.5 5c-.7.5-1.6 0-1.6-.83V5.5z"/></svg></div>
+      <div class="music-tonearm"></div>
+    </div>
+    <div class="music-title" id="myMusicTitle"></div>
+    <div class="music-sub" id="myMusicSub"></div>
+    <div class="music-actions">
+      <button class="music-action-btn" id="myMusicCollect"><span class="icon">☆</span>收藏</button>
+    </div>
+  </div>
+  <div class="music-section-title">使用该音乐的视频</div>
+  <div class="music-video-grid" id="myMusicVideoGrid"></div>
+  <div class="music-empty" id="myMusicEmpty" style="display:none">暂无相关视频</div>
 </div>
 
 <!-- 朋友页面 -->
@@ -415,256 +477,193 @@
   </div>
 </div>
 
-<!-- 我页面（底部tab） -->
+<!-- 我页面 -->
 <div id="profilePage">
-  <!-- 顶部背景图区域 -->
-  <div class="profile-hero">
-    <div class="profile-hero-bg" id="myProfileHeaderBg"></div>
-    <div class="profile-hero-topbar">
-      <button class="profile-add-friend">
-        <span>👤</span><span>添加好友</span>
-      </button>
-      <div class="profile-top-actions">
-        <button class="icon-btn">✍️</button>
-        <button class="icon-btn">
-          <span>👥</span><span style="position:absolute;top:-2px;right:-2px;background:#fe2c55;color:#fff;font-size:10px;border-radius:10px;padding:1px 4px;">2</span>
-        </button>
-        <button class="icon-btn">🔍</button>
-        <button class="icon-btn">☰</button>
+  <!-- 顶部背景区 -->
+  <div class="me-header">
+    <div class="me-bg" id="meBg"></div>
+    <div class="me-topbar">
+      <div class="me-add-friend">
+        <svg viewBox="0 0 24 24" fill="white"><path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        <span>添加好友</span>
+      </div>
+      <div class="me-top-actions">
+        <div class="me-action-icon">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3 3.1-3s3.1 1.29 3.1 3v2z"/></svg>
+        </div>
+        <div class="me-action-icon">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+          <span class="me-badge">2</span>
+        </div>
+        <div class="me-action-icon">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.5 16 10.5 16 8 14 6 11.5 6S7 8 7 10.5 9 15 11.5 15c1 0 2.09-.59 2.73-1.37l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-4 0C9.01 14 7 11.99 7 9.5S9.01 5 11.5 5 16 7.01 16 9.5 13.99 14 11.5 14z"/></svg>
+        </div>
+        <div class="me-action-icon">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+        </div>
       </div>
     </div>
-    <div class="profile-hero-info">
-      <div class="profile-avatar-wrap">
-        <img class="profile-avatar" id="myProfileAvatar" src="" alt="">
-        <div class="profile-avatar-add">+</div>
+    <!-- 头像和昵称 -->
+    <div class="me-profile-row">
+      <div class="me-avatar-wrap">
+        <img class="me-avatar" id="meAvatar" src="" alt="">
+        <div class="me-avatar-plus">+</div>
       </div>
-      <div class="profile-name-block">
-        <div class="profile-name">
-          <span id="myProfileNameText">主角只看精彩瞬间</span>
-          <span class="dropdown">▼</span>
-        </div>
-        <div class="profile-id">
-          <span>抖音号: shellhappyhappyhappy</span>
-          <span>ⓘ</span>
-        </div>
-        <button class="profile-ai-btn">
+      <div class="me-name-area">
+        <div class="me-nickname" id="meNickname">主角只看精彩瞬间</div>
+        <div class="me-douyin-id">抖音号：shellhappyhappyhappy <span class="me-copy-icon">⧉</span></div>
+        <div class="me-ai-create">
           <span>创建 AI 形象</span>
-          <span>›</span>
-        </button>
+          <span class="me-chevron">›</span>
+        </div>
       </div>
     </div>
   </div>
-
-  <!-- 白色卡片 -->
-  <div class="profile-card">
-    <!-- 统计 + 编辑主页 -->
-    <div class="profile-stats-row">
-      <div class="profile-stats">
-        <div class="stat">
-          <span class="num">1.4万</span>
-          <span class="label">获赞</span>
-        </div>
-        <div class="stat">
-          <span class="num">25</span>
-          <span class="label">互关</span>
-        </div>
-        <div class="stat">
-          <span class="num">133</span>
-          <span class="label">关注</span>
-        </div>
-        <div class="stat">
-          <span class="num">877</span>
-          <span class="label">粉丝</span>
-        </div>
+  <!-- 白色内容区 -->
+  <div class="me-content">
+    <!-- 数据栏 -->
+    <div class="me-stats">
+      <div class="me-stat">
+        <div class="me-stat-num">1.4万</div>
+        <div class="me-stat-label">获赞</div>
       </div>
-      <button class="profile-edit-btn">编辑主页</button>
+      <div class="me-stat">
+        <div class="me-stat-num">25</div>
+        <div class="me-stat-label">互关</div>
+      </div>
+      <div class="me-stat">
+        <div class="me-stat-num">133</div>
+        <div class="me-stat-label">关注</div>
+      </div>
+      <div class="me-stat">
+        <div class="me-stat-num">877</div>
+        <div class="me-stat-label">粉丝</div>
+      </div>
+      <button class="me-edit-btn">编辑主页</button>
     </div>
-
     <!-- 简介 -->
-    <div class="profile-bio">
-      day12<br>
-      没有天赋，只有重复<br>
-      他的目光如磐石般坚硬，他的心中只剩下坚持<br>
-      日更主角高光时刻 | 只看最美好的精彩瞬间
+    <div class="me-bio">
+      <div>day12</div>
+      <div>没有天赋，只有重复</div>
+      <div>他的目光如磐石般坚硬，他的心中只剩下坚持</div>
+      <div>日更主角高光时刻 | 只看最美好的精彩瞬间</div>
     </div>
-    <div class="profile-tags">
-      <div class="profile-tag">17岁</div>
-      <div class="profile-tag">+ 添加性别等标签</div>
+    <div class="me-tags">
+      <span class="me-tag">17岁</span>
+      <span class="me-tag me-tag-add">+ 添加性别等标签</span>
     </div>
-
-    <!-- 功能入口 -->
-    <div class="profile-features">
-      <div class="profile-feature">
-        <div class="icon">🎵</div>
-        <div class="label">我的音乐</div>
+    <!-- 功能入口行 -->
+    <div class="me-features">
+      <div class="me-feature">
+        <svg viewBox="0 0 24 24" fill="#161823"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+        <span>我的音乐</span>
       </div>
-      <div class="profile-feature">
-        <div class="icon">🕐</div>
-        <div class="label">观看历史</div>
+      <div class="me-feature">
+        <svg viewBox="0 0 24 24" fill="#161823"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+        <span>观看历史</span>
       </div>
-      <div class="profile-feature">
-        <div class="icon">👤</div>
-        <div class="label">常访问的人</div>
+      <div class="me-feature">
+        <svg viewBox="0 0 24 24" fill="#161823"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        <span>常访问的人</span>
       </div>
-      <div class="profile-feature">
-        <div class="icon">▶️</div>
-        <div class="label">稍后再看</div>
+      <div class="me-feature">
+        <svg viewBox="0 0 24 24" fill="#161823"><path d="M10 8v8l5-4-5-4zm9-5H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>
+        <span>稍后再看</span>
       </div>
-      <div class="profile-feature">
-        <div class="icon">⊞</div>
-        <div class="label">全部功能</div>
+      <div class="me-feature">
+        <svg viewBox="0 0 24 24" fill="#161823"><path d="M4 11h5V5H4v6zm0 8h5v-6H4v6zm7 0h5v-6h-5v6zm0-8h5V5h-5v6z"/></svg>
+        <span>全部功能</span>
       </div>
     </div>
-
-    <!-- Tab栏 -->
-    <div class="profile-tabs">
-      <div class="profile-tab active">
-        <span>作品</span>
-        <span class="dropdown">▼</span>
-      </div>
-      <div class="profile-tab">日常</div>
-      <div class="profile-tab">推荐</div>
-      <div class="profile-tab">收藏</div>
-      <div class="profile-tab">喜欢</div>
+    <!-- Tab切换 -->
+    <div class="me-tabs">
+      <div class="me-tab active">作品 <span class="me-tab-caret">▼</span></div>
+      <div class="me-tab">日常</div>
+      <div class="me-tab">推荐</div>
+      <div class="me-tab">收藏</div>
+      <div class="me-tab">喜欢</div>
     </div>
-
-    <!-- 私密作品入口 -->
-    <div class="profile-private-entry">
-      <div class="left">
-        <div class="thumb"></div>
-        <div class="label">私密作品</div>
+    <!-- 私密作品条 -->
+    <div class="me-private-bar">
+      <div class="me-private-left">
+        <div class="me-private-thumb"></div>
+        <span>私密作品</span>
       </div>
-      <div class="count">87 ›</div>
+      <span class="me-private-count">87 ›</span>
     </div>
-
-    <!-- 九宫格作品 -->
-    <div class="profile-grid" id="myProfileGrid"></div>
+    <!-- 作品九宫格 -->
+    <div class="me-grid" id="meGrid"></div>
   </div>
 </div>
 
-<!-- 博主主页（复刻官方"我"页面） -->
+<!-- 头像全屏查看 -->
+<div id="avatarViewer" style="display:none;position:fixed;inset:0;background:#000;z-index:1000;z-index:1000;">
+  <button class="viewer-close" id="avatarClose">✕</button>
+  <div class="viewer-img-wrap">
+    <img id="avatarViewerImg" src="" style="width:100%;height:100%;object-fit:contain;">
+  </div>
+  <div class="viewer-bottom-bar">
+    <button class="viewer-btn">更换头像</button>
+    <button class="viewer-btn">抖音码</button>
+    <button class="viewer-btn viewer-more">···</button>
+  </div>
+</div>
+
+<!-- 背景全屏查看 -->
+<div id="bgViewer" style="display:none;position:fixed;inset:0;background:#8b3a3a;z-index:1000;z-index:1000;">
+  <button class="viewer-close" id="bgClose">✕</button>
+  <div class="viewer-img-wrap">
+    <img id="bgViewerImg" src="" style="width:100%;height:100%;object-fit:contain;">
+  </div>
+  <div class="viewer-bottom-bar">
+    <button class="viewer-btn">更换背景</button>
+    <button class="viewer-btn">下载</button>
+  </div>
+</div>
+
+<!-- 博主主页 -->
 <div id="profile">
-  <div class="profile-content">
-  <!-- 顶部背景图区域 -->
-  <div class="profile-hero">
-    <div class="profile-hero-bg" id="profileHeaderBg"></div>
-    <div class="profile-hero-topbar">
-      <button class="profile-add-friend" id="profileAddFriend">
-        <span>👤</span><span>添加好友</span>
-      </button>
+  <div class="profile-header">
+    <div class="profile-header-bg" id="profileHeaderBg"></div>
+    <div class="profile-header-overlay"></div>
+    <div class="profile-topbar">
+      <button class="profile-back" id="profileBack">‹</button>
       <div class="profile-top-actions">
-        <button class="icon-btn" id="profileHandwrite">✍️</button>
-        <button class="icon-btn" id="profileVisitors">
-          <span>👥</span><span style="position:absolute;top:-2px;right:-2px;background:#fe2c55;color:#fff;font-size:10px;border-radius:10px;padding:1px 4px;">2</span>
-        </button>
-        <button class="icon-btn" id="profileSearch">🔍</button>
-        <button class="icon-btn" id="profileMore">☰</button>
+        <button id="profileSearch" title="加载更多">↻</button>
+        <button id="profileMore">⋯</button>
       </div>
     </div>
-    <div class="profile-hero-info">
-      <div class="profile-avatar-wrap">
-        <img class="profile-avatar" id="profileAvatar" src="" alt="">
-        <div class="profile-avatar-add" id="profileAvatarAdd">+</div>
-      </div>
-      <div class="profile-name-block">
-        <div class="profile-name" id="profileName">
-          <span id="profileNameText"></span>
-          <span class="dropdown">▼</span>
-        </div>
-        <div class="profile-id" id="profileIdHeader">
-          <span id="profileIdText"></span>
-          <span>ⓘ</span>
-        </div>
-        <button class="profile-ai-btn">
-          <span>创建 AI 形象</span>
-          <span>›</span>
-        </button>
+    <div class="profile-header-info">
+      <img class="profile-avatar" id="profileAvatar" src="" alt="">
+      <div class="profile-header-name">
+        <div class="profile-name" id="profileName"></div>
+        <div class="profile-id-header" id="profileIdHeader"></div>
       </div>
     </div>
   </div>
-
-  <!-- 白色卡片 -->
-  <div class="profile-card">
-    <!-- 统计 + 编辑主页 -->
-    <div class="profile-stats-row">
-      <div class="profile-stats">
-        <div class="stat">
-          <span class="num" id="profileFavorited">0</span>
-          <span class="label">获赞</span>
-        </div>
-        <div class="stat">
-          <span class="num" id="profileMutual">0</span>
-          <span class="label">互关</span>
-        </div>
-        <div class="stat">
-          <span class="num" id="profileFollowing">0</span>
-          <span class="label">关注</span>
-        </div>
-        <div class="stat">
-          <span class="num" id="profileFollowers">0</span>
-          <span class="label">粉丝</span>
-        </div>
-      </div>
-      <button class="profile-edit-btn" id="profileEdit">编辑主页</button>
+  <div class="profile-body">
+    <div class="profile-stats">
+      <div class="stat"><span class="num" id="profileFavorited">0</span><span class="label">获赞</span></div>
+      <div class="stat"><span class="num" id="profileFollowing">0</span><span class="label">关注</span></div>
+      <div class="stat"><span class="num" id="profileFollowers">0</span><span class="label">粉丝</span></div>
     </div>
-
-    <!-- 简介 -->
-    <div class="profile-bio" id="profileBio"></div>
-    <div class="profile-tags">
-      <div class="profile-tag">17岁</div>
-      <div class="profile-tag">+ 添加性别等标签</div>
+    <div class="profile-bio-wrap">
+      <div class="profile-bio" id="profileBio"></div>
+      <span class="bio-more" id="bioMore">更多</span>
     </div>
-
-    <!-- 功能入口 -->
-    <div class="profile-features">
-      <div class="profile-feature">
-        <div class="icon">🎵</div>
-        <div class="label">我的音乐</div>
-      </div>
-      <div class="profile-feature">
-        <div class="icon">🕐</div>
-        <div class="label">观看历史</div>
-      </div>
-      <div class="profile-feature">
-        <div class="icon">👤</div>
-        <div class="label">常访问的人</div>
-      </div>
-      <div class="profile-feature">
-        <div class="icon">▶️</div>
-        <div class="label">稍后再看</div>
-      </div>
-      <div class="profile-feature">
-        <div class="icon">⊞</div>
-        <div class="label">全部功能</div>
-      </div>
+    <div class="profile-ip" id="profileIp"></div>
+    <div class="profile-buttons">
+      <button class="profile-follow" id="profileFollow">+ 关注</button>
+      <button class="profile-msg" id="profileMsg">✈</button>
     </div>
-
-    <!-- Tab栏 -->
     <div class="profile-tabs" id="profileTabs">
-      <div class="profile-tab active" data-tab="works">
-        <span>作品</span>
-        <span class="dropdown">▼</span>
-      </div>
-      <div class="profile-tab" data-tab="daily">日常</div>
-      <div class="profile-tab" data-tab="recommend">推荐</div>
-      <div class="profile-tab" data-tab="collect">收藏</div>
+      <div class="profile-tab active" data-tab="works">作品 <span class="count" id="worksCount"></span></div>
       <div class="profile-tab" data-tab="likes">喜欢</div>
+      <div class="profile-tab" data-tab="collect">收藏</div>
     </div>
-
-    <!-- 私密作品入口 -->
-    <div class="profile-private-entry" id="profilePrivateEntry">
-      <div class="left">
-        <div class="thumb"></div>
-        <div class="label">私密作品</div>
-      </div>
-      <div class="count" id="profilePrivateCount">87 ›</div>
-    </div>
-
-    <!-- 九宫格作品 -->
     <div class="profile-grid" id="profileGrid"></div>
     <div class="profile-empty" id="profileEmpty" style="display:none">暂无作品</div>
     <div class="profile-loading" id="profileLoading" style="display:none">加载中…</div>
-  </div>
   </div>
 </div>
 
@@ -819,7 +818,7 @@
 
   var videos = [];
   // 版本标识：A/B 对比版 = v9.1.9 黑屏回滚（prerender/撤封面时机回滚到 v9.1.9：loadeddata/loadedmetadata 撤封面、无预热、归零保留视频进度恢复；功能全集保留）
-  window.__VER = "v9.1.16";
+  window.__VER = "v9.1.22";
   // feed 模式：默认"客户展示1"排序（加权随机+3视频夹1音频/图集，录展示视频用）；URL 带 ?mode=normal 回原测试排序
   try { window.__feedMode = new URLSearchParams(location.search).get("mode") || "customer1"; }
   catch (e) { window.__feedMode = "customer1"; }
@@ -927,6 +926,9 @@
   var ICON_HEART = '<svg viewBox="0 0 24 24"><path d="M7.5 2.25C10.5 2.25 12 4.25 12 4.25C12 4.25 13.5 2.25 16.5 2.25C20 2.25 22.5 4.99999 22.5 8.5C22.5 12.5 19.2311 16.0657 16.25 18.75C14.4095 20.4072 13 21.5 12 21.5C11 21.5 9.55051 20.3989 7.75 18.75C4.81949 16.0662 1.5 12.5 1.5 8.5C1.5 4.99999 4 2.25 7.5 2.25Z"/></svg>';
   var ICON_COMMENT = '<svg viewBox="0 0 48 48"><path fill-rule="evenodd" d="M2 21.5c0-10.22 9.88-18 22-18s22 7.78 22 18c0 5.63-3.19 10.74-7.32 14.8a43.6 43.6 0 0 1-14.14 9.1A1.5 1.5 0 0 1 22.5 44v-5.04C11.13 38.4 2 31.34 2 21.5M14 25a3 3 0 1 0 0-6 3 3 0 0 0 0 6m10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6m13-3a3 3 0 1 1-6 0 3 3 0 0 1 6 0" clip-rule="evenodd"/></svg>';
   var ICON_STAR = '<svg viewBox="0 0 24 24"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd"/></svg>';
+  window.ICON_HEART = ICON_HEART;
+  window.ICON_COMMENT = ICON_COMMENT;
+  window.ICON_STAR = ICON_STAR;
 
   var AVATAR_COLORS = ["#E74C3C","#3498DB","#2ECC71","#F39C12","#9B59B6","#1ABC9C","#E67E22","#34495E"];
   function avatarColor(name) {
@@ -1091,6 +1093,8 @@
         slide.__note_vel = 0;
         slide.__note_lastX = e.touches[0].clientX;
         slide.__note_lastT = Date.now();
+        // 预热vibrator服务连接：vibrate(0)不产生震动，但触发WebView建立连接，避免第一次长按被忽略
+        if (navigator.vibrate) navigator.vibrate(0);
         // 长按检测：300ms
         slide.__lpTimer = setTimeout(function () {
           slide.__lpTimer = null;
@@ -2156,7 +2160,7 @@
 
   var __vbCount = 0;
   function playVibrate() {
-    if (navigator.vibrate) navigator.vibrate([80]);
+    if (navigator.vibrate) navigator.vibrate([50]);
   }
 
   function showToast(msg) {
@@ -2226,19 +2230,21 @@
   function closeShareSheet() {
     document.getElementById("shareSheet").classList.remove("show");
   }
-  // 单击分享：复制口令 + 调起官方抖音
+  // 单击分享：复制口令 + 调起官方抖音（跳转定时器存句柄，双击时可取消，避免残留跳转）
+  var sharePasswordTimer = null;
   function doSharePassword() {
     var v = videos[current];
     if (!v) return;
     var ok = copyToClipboard(buildShareText(v));
-    setTimeout(function () { openDouyinApp(deepLink(v)); }, 350);
+    if (sharePasswordTimer) { clearTimeout(sharePasswordTimer); sharePasswordTimer = null; }
+    sharePasswordTimer = setTimeout(function () { sharePasswordTimer = null; openDouyinApp(deepLink(v)); }, 350);
   }
-  // 长按分享：只复制链接
+  // 长按/双击分享：只复制链接（Web 不弹 toast，统一由 APK 原生提示"链接已复制"）
   function doShareLink() {
     var v = videos[current];
     if (!v) return;
     var ok = copyToClipboard(contentLink(v));
-    showToast(ok ? "链接已复制" : "复制失败");
+    if (sharePasswordTimer) { clearTimeout(sharePasswordTimer); sharePasswordTimer = null; }
   }
   // v9.1.3：跳转到散人同好（视频来源节点）主页——fetch /api/videos/{vid}/peers，
   // 取权重最高且有 sec_uid 的同好，用 snssdk1128 scheme 唤起抖音进其主页。
@@ -2488,16 +2494,6 @@
   // 底部导航tab点击
   document.querySelectorAll(".tabbar .tab").forEach(function (tab) {
     tab.addEventListener("click", function () {
-      // 用class判断是否是加号按钮，更可靠
-      if (tab.classList.contains("plus")) {
-        // 点击加号：清除所有数据，然后重启应用
-        if (confirm("确定要清除所有数据并重启吗？")) {
-          localStorage.clear();
-          sessionStorage.clear();
-          location.reload();
-        }
-        return;
-      }
       var text = tab.textContent.trim();
       if (text.indexOf("首页") === 0) {
         switchPage("home");
@@ -2507,23 +2503,16 @@
         switchPage("messages");
       } else if (text.indexOf("我") === 0) {
         switchPage("profile");
+      } else if (text.indexOf("+") === 0) {
+        // 加号：确认后清除所有本地数据并重启应用
+        if (confirm("确定要清除所有本地数据并重启应用吗？")) {
+          try { localStorage.clear(); } catch(e) {}
+          try { sessionStorage.clear(); } catch(e) {}
+          location.reload();
+        }
       }
     });
   });
-
-  // 单独绑定加号按钮的点击事件（用ID，最可靠）
-  var tabPlusBtn = document.getElementById("tabPlusBtn");
-  if (tabPlusBtn) {
-    tabPlusBtn.addEventListener("click", function (e) {
-      e.stopPropagation();
-      e.preventDefault();
-      if (confirm("确定要清除所有数据并重启吗？")) {
-        localStorage.clear();
-        sessionStorage.clear();
-        location.reload();
-      }
-    });
-  }
 
   // ===== 博主主页 =====
   var profileEl = document.getElementById("profile");
@@ -2563,42 +2552,17 @@
     if (currentPage === "home") resumeCurrentVideo();
   }
 
+  document.getElementById("profileBack").addEventListener("click", closeProfile);
   document.getElementById("profileMore").addEventListener("click", function () { showToast("更多功能开发中"); });
   document.getElementById("profileSearch").addEventListener("click", function () {
     if (currentProfileSecUid) loadProfileLower(currentProfileSecUid);
   });
-  document.getElementById("profileEdit").addEventListener("click", function () { showToast("编辑主页功能开发中"); });
-  document.getElementById("profileAddFriend").addEventListener("click", function () { showToast("添加好友功能开发中"); });
-
-  // 视差滚动效果：先注释掉，测试滑动问题
-  // var profileEl = document.getElementById("profile");
-  // var profileHero = document.querySelector(".profile-hero");
-  // var profileHeroBg = document.querySelector(".profile-hero-bg");
-
-  // // 顶部白色导航栏（滑到底时显示）
-  // var profileTopNav = document.createElement("div");
-  // profileTopNav.className = "profile-top-nav";
-  // profileTopNav.innerHTML = '<div class="top-nav-name" id="topNavName"></div><div class="top-nav-actions"><button>🔍</button><button>☰</button></div>';
-  // profileEl.appendChild(profileTopNav);
-
-  // profileEl.addEventListener("scroll", function() {
-  //   var scrollTop = profileEl.scrollTop;
-  //   var heroHeight = 420; // 背景图高度
-
-  //   // 背景图视差：滚动时背景图向上移动，速度是内容的0.5倍
-  //   if (scrollTop < heroHeight) {
-  //     var parallax = scrollTop * 0.5;
-  //     profileHeroBg.style.transform = "translateY(" + parallax + "px)";
-  //     profileHero.style.opacity = 1 - (scrollTop / heroHeight);
-  //   }
-
-  //   // 顶部白色导航栏：滚动超过一定程度时显示
-  //   if (scrollTop > 200) {
-  //     profileTopNav.classList.add("show");
-  //   } else {
-  //     profileTopNav.classList.remove("show");
-  //   }
-  // });
+  document.getElementById("profileMsg").addEventListener("click", function () { showToast("私信功能开发中"); });
+  document.getElementById("bioMore").addEventListener("click", function () {
+    var bioEl = document.getElementById("profileBio");
+    var isExp = bioEl.classList.toggle("expanded");
+    this.textContent = isExp ? "收起" : "更多";
+  });
 
   document.querySelectorAll(".profile-tab").forEach(function(tab) {
     tab.addEventListener("click", function() {
@@ -2660,96 +2624,64 @@
   function loadProfileVideos(secUid) {
     document.getElementById("profileLoading").style.display = "block";
     document.getElementById("profileEmpty").style.display = "none";
-
-    // 深采的51条作品ID列表
-    var deepCollectedIds = [
-      "7673485528179690804", "7673451371315744019", "7673336064626412842",
-      "7673130333134540066", "7673080573962816803", "7672992655047118080",
-      "7672769480845528335", "7672649325712772403", "7672613661826944271",
-      "7672374684356300051"
-    ];
-
-    // 先尝试加载本地我的作品数据（个人节点深采数据）
-    fetch("/my_posts.json")
-      .then(function (r) {
-        if (!r.ok) {
-          showToast("加载my_posts失败: HTTP " + r.status);
-          throw new Error("HTTP " + r.status);
-        }
-        return r.text();
-      })
-      .then(function (text) {
-        var myPosts;
-        try {
-          myPosts = JSON.parse(text);
-        } catch (e) {
-          showToast("JSON解析失败: " + e.message + "，长度: " + text.length);
-          throw e;
-        }
-        showToast("my_posts加载成功: " + myPosts.length + "条");
-        // 过滤出深采的作品（只保留前51条）
-        var filtered = myPosts.slice(0, 51);
-        // 转换数据格式
-        var items = filtered.map(function (v) {
-          return {
-            aweme_id: v.aweme_id,
-            cover: v.cover,
-            like_count: v.stats ? v.stats.digg : 0,
-            comment_count: v.stats ? v.stats.comment : 0,
-            desc: v.desc,
-            duration: v.duration,
-            isRemote: true
-          };
-        });
-        renderProfileVideos({ items: items, total: items.length });
-      })
-      .catch(function (err) {
-        showToast("加载失败: " + err.message);
-        // 如果本地数据加载失败，走原来的逻辑
-        // 如果本地数据加载失败，走原来的逻辑
-        fetch("/api/authors/" + encodeURIComponent(secUid) + "/videos?source=local&limit=50")
-          .then(function (r) { return r.json(); })
-          .then(function (localData) {
-            var localItems = localData.items || [];
-            if (localItems.length < 9) {
-              var controller = new AbortController();
-              var timeoutId = setTimeout(function() { controller.abort(); }, 15000);
-              fetch("/api/authors/" + encodeURIComponent(secUid) + "/videos?source=remote&limit=20", { signal: controller.signal })
-                .then(function (r) { clearTimeout(timeoutId); return r.json(); })
-                .then(function (remoteData) {
-                  var remoteItems = remoteData.items || [];
-                  var localIds = {};
-                  localItems.forEach(function(v) { if (v.aweme_id) localIds[v.aweme_id] = true; });
-                  var merged = localItems.concat(remoteItems.filter(function(v) {
-                    return !localIds[v.aweme_id];
-                  }));
-                  renderProfileVideos({ items: merged, total: merged.length });
-                })
-                .catch(function () {
-                  clearTimeout(timeoutId);
-                  renderProfileVideos(localData);
-                });
-            } else {
+    // 先获取本地视频
+    fetch("/api/authors/" + encodeURIComponent(secUid) + "/videos?source=local&limit=50")
+      .then(function (r) { return r.json(); })
+      .then(function (localData) {
+        var localItems = localData.items || [];
+        // 本地不足9条时，从抖音远程补充（15秒超时）
+        if (localItems.length < 9) {
+          var controller = new AbortController();
+          var timeoutId = setTimeout(function() { controller.abort(); }, 15000);
+          fetch("/api/authors/" + encodeURIComponent(secUid) + "/videos?source=remote&limit=20", { signal: controller.signal })
+            .then(function (r) { clearTimeout(timeoutId); return r.json(); })
+            .then(function (remoteData) {
+              var remoteItems = remoteData.items || [];
+              var localIds = {};
+              localItems.forEach(function(v) { if (v.aweme_id) localIds[v.aweme_id] = true; });
+              var merged = localItems.concat(remoteItems.filter(function(v) {
+                return !localIds[v.aweme_id];
+              }));
+              renderProfileVideos({ items: merged, total: merged.length });
+            })
+            .catch(function () {
+              clearTimeout(timeoutId);
               renderProfileVideos(localData);
-            }
-          })
-          .catch(function () { document.getElementById("profileLoading").style.display = "none"; });
-      });
+            });
+        } else {
+          renderProfileVideos(localData);
+        }
+      })
+      .catch(function () { document.getElementById("profileLoading").style.display = "none"; });
   }
 
   function renderProfileInfo(data, secUid) {
-    document.getElementById("profileNameText").textContent = data.nickname || "";
-    document.getElementById("profileIdText").textContent = data.unique_id ? "抖音号：" + data.unique_id : "";
+    document.getElementById("profileName").textContent = data.nickname || "";
+    document.getElementById("profileIdHeader").textContent = data.unique_id ? "抖音号：" + data.unique_id : "";
     document.getElementById("profileFavorited").textContent = fmtNumWan(data.total_favorited || 0);
     document.getElementById("profileFollowing").textContent = fmtNumWan(data.following_count || 0);
     document.getElementById("profileFollowers").textContent = fmtNumWan(data.follower_count || 0);
     var bioEl = document.getElementById("profileBio");
+    var bioMore = document.getElementById("bioMore");
     var sig = data.signature || "";
+    bioEl.classList.remove("expanded");
     if (sig) {
       bioEl.innerHTML = sig.replace(/@([\w\u4e00-\u9fa5^_]+)/g, '<span class="at-link">@$1</span>');
+      // 检测是否超过4行（bioMore 是 bioEl 的兄弟节点，不会被 innerHTML 销毁）
+      setTimeout(function() {
+        if (!bioMore) return;
+        if (bioEl.scrollHeight > bioEl.clientHeight + 2) {
+          bioMore.style.display = "block";
+          bioMore.textContent = "更多";
+        } else {
+          bioMore.style.display = "none";
+        }
+      }, 50);
     } else {
       bioEl.textContent = "";
+      if (bioMore) bioMore.style.display = "none";
     }
+    document.getElementById("profileIp").textContent = data.ip_location ? "IP属地：" + data.ip_location : "";
     var av = document.getElementById("profileAvatar");
     var headerBg = document.getElementById("profileHeaderBg");
     // 主页头像三级兜底：接口头像 → 本博主 feed 头像 → 隐藏
@@ -2818,10 +2750,10 @@
       return;
     }
     grid.innerHTML = "";
-    items.forEach(function (v, i) {
+    items.forEach(function (v) {
       var div = document.createElement("div");
       div.className = "profile-grid-item";
-      var isRemote = !v.url && v.cover;
+      var isRemote = !v.id && v.cover;
       var likeCount = v.like_count || v.digg_count || 0;
 
       if (isRemote) {
@@ -2858,27 +2790,13 @@
       div.appendChild(pc);
 
       div.addEventListener("click", function () {
-        // 独立全屏播放：用九宫格的作品列表，按顺序播放
-        var myVideos = items.map(function(v, idx) {
-          return {
-            id: v.aweme_id || v.id,
-            cover: v.cover,
-            url: v.play_url || v.url || "",
-            desc: v.desc || "",
-            like_count: v.like_count || 0
-          };
-        });
-        // 保存当前播放列表和起始位置
-        window.profilePlaylist = myVideos;
-        window.profileStartIdx = i;
-        // 跳转到首页播放模式
+        if (isRemote) {
+          showToast("该视频未下载，点击下载后可播放");
+          return;
+        }
         closeProfile();
-        // 切换到首页播放
-        currentPage = "home";
-        videos = myVideos;
-        current = i;
-        layout();
-        showToast("从第" + (i+1) + "条开始播放，共" + myVideos.length + "条");
+        var idx = videos.findIndex(function (vv) { return vv.id === v.id; });
+        if (idx >= 0) { current = idx; layout(); }
       });
       grid.appendChild(div);
     });
@@ -3125,7 +3043,7 @@
   // 跟手滑动
   var startY = 0, startX = 0, startTime = 0, dragging = false, dy = 0;
   document.addEventListener("touchstart", function (e) {
-    if (e.target.closest && (e.target.closest(".progress-wrap") || e.target.closest("#profile") || e.target.closest("#musicPage"))) return;
+    if (e.target.closest && (e.target.closest(".progress-wrap") || e.target.closest("#profile") || e.target.closest("#musicPage") || e.target.closest("#profilePage") || e.target.closest("#friendsPage") || e.target.closest("#messagesPage") || e.target.closest("#myPlayer"))) return;
     startY = e.touches[0].clientY;
     startX = e.touches[0].clientX;
     startTime = Date.now();
@@ -3136,6 +3054,7 @@
 
   document.addEventListener("touchmove", function (e) {
     if (!dragging) return;
+    if (e.target.closest && (e.target.closest("#profilePage") || e.target.closest("#friendsPage") || e.target.closest("#messagesPage") || e.target.closest("#myPlayer"))) return;
     dy = e.touches[0].clientY - startY;
     var dx = e.touches[0].clientX - startX;
     // 判断是否是图文的左右滑动（轴已锁定横向，或目标在note-images内，或水平移动大于垂直移动）
@@ -3337,6 +3256,7 @@
   document.addEventListener("touchstart", function (e) {
     var t = e.touches[0];
     var w = window.innerWidth;
+    if (e.target.closest && (e.target.closest("#profilePage") || e.target.closest("#friendsPage") || e.target.closest("#messagesPage") || e.target.closest("#myPlayer"))) { edgeSwipe.active = false; return; }
     // 边缘触发（首页和非首页都只在边缘25px触发）
     if (t.clientX < 25) {
       edgeSwipe.active = true; edgeSwipe.side = "left";
@@ -3957,7 +3877,9 @@ document.addEventListener("click", function(e) {
       if (!mask) return;
       var id = item.id;
       if (id !== "lpNotInterested" && id !== "lpPuzzle" && id !== "lpSecretLike" && id !== "lpSuperLike") return;
-      var vid = currentVid();
+      // 优先走 window.__currentVid（我页面播放器打开时被临时替换为 my 版钩子，返回我的作品 id；
+      // 首页正常时 window.__currentVid 就是 currentVid 本身，行为不变）
+      var vid = (typeof window.__currentVid === "function") ? window.__currentVid() : currentVid();
       e.stopPropagation();
 
       // 修复(2026-10-14)：原代码引用未定义的 label 变量导致 ReferenceError，
@@ -4401,10 +4323,1292 @@ document.addEventListener("click", function(e) {
     } catch(e) {}
   }
 
+  // 初始化"我"页面
+  function initMePage() {
+    // 设置背景图和头像
+    var bg = document.getElementById("meBg");
+    if (bg) bg.style.background = "url('/assets/me_bg.png') center/cover";
+    var avatar = document.getElementById("meAvatar");
+    if (avatar) avatar.src = "/assets/me_avatar.jpg";
+
+    // 从/my_posts.json加载真实作品数据
+    var grid = document.getElementById("meGrid");
+    if (grid) {
+      // 事件委托：绑定在容器上，动态子节点点击也能响应
+      grid.addEventListener("click", function(e) {
+        var item = e.target;
+        while (item && item !== grid && !(item.className && item.className.indexOf("me-grid-item") === 0)) {
+          item = item.parentNode;
+        }
+        if (item && item !== grid) {
+          // 点击封面：进入全屏竖滑消费模式（从点击位置开始）
+          var idx = item.getAttribute("data-idx");
+          if (idx !== null && window.__myPosts && window.__myPosts.length) {
+            openMyPlayer(parseInt(idx, 10));
+          } else {
+            var t = document.getElementById("toast");
+            if (t) {
+              t.textContent = "数据未就绪";
+              t.classList.add("show");
+              setTimeout(function() { t.classList.remove("show"); }, 1500);
+            }
+          }
+        }
+      });
+      fetch("/my_posts.json")
+        .then(function(r) { return r.json(); })
+        .then(function(items) {
+          if (!items || items.length === 0) {
+            grid.innerHTML = '<div style="padding:40px;text-align:center;color:#999;">暂无作品</div>';
+            return;
+          }
+          window.__myPosts = items;
+          grid.innerHTML = "";
+          items.forEach(function(v, idx) {
+            var div = document.createElement("div");
+            div.className = "me-grid-item";
+            div.setAttribute("data-idx", idx);
+            div.style.cssText = "position:relative;aspect-ratio:9/12;overflow:hidden;cursor:pointer;background:#f0f0f0";
+            var img = document.createElement("img");
+            img.src = v.cover;
+            img.style.cssText = "width:100%;height:100%;object-fit:cover;display:block;pointer-events:none";
+            img.loading = "lazy";
+            div.appendChild(img);
+            var digg = v.digg || 0;
+            if (digg > 0) {
+              var badge = document.createElement("div");
+              badge.style.cssText = "position:absolute;bottom:4px;left:4px;color:#fff;font-size:11px;text-shadow:0 1px 2px rgba(0,0,0,.8);pointer-events:none";
+              badge.textContent = "♥ " + digg;
+              div.appendChild(badge);
+            }
+            grid.appendChild(div);
+          });
+        })
+        .catch(function(e) {
+          grid.innerHTML = '<div style="padding:40px;text-align:center;color:#f00;">加载失败: ' + e.message + '</div>';
+        });
+    }
+
+    // ===== 我页面：全屏竖滑消费播放器（照搬首页引擎，独立命名，互不干扰） =====
+    var myPlayer = document.getElementById("myPlayer");
+    var mySlider = document.getElementById("mySlider");
+    var myIdx = 0;                 // 当前播放位置（在 __myPosts 中的索引）
+    var mySwiping = false;         // 滑动切换锁
+    var mySlideEls = [];           // 三槽位
+    var myVideoPositions = {};     // 播放进度记忆
+    var myAnimating = false;       // 动画锁
+    var myEase = "cubic-bezier(0.22,1,0.36,1)";
+
+    // ===== my 引擎自给自足基础函数（复制自首页，避免跨IIFE作用域引用崩溃） =====
+    var mySoundOn = false;
+    var myLiked = myLoadSet("dy_liked");
+    var myCollected = myLoadSet("dy_collected");
+    var MY_AVATAR_COLORS = window.__myAvatarColors || ["#ff4d6a","#ff8f1f","#ffcd3c","#6bcb77","#4d96ff","#b07cff","#ff6b9d","#00c2a8"];
+    function myLoadSet(k) { try { return JSON.parse(localStorage.getItem(k) || "{}"); } catch (e) { return {}; } }
+    function mySaveSet(k, s) { try { localStorage.setItem(k, JSON.stringify(s)); } catch (e) {} }
+    function myAvatarColor(name) {
+      var h = 0;
+      for (var i = 0; i < (name || "?").length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffffffff;
+      return MY_AVATAR_COLORS[Math.abs(h) % MY_AVATAR_COLORS.length];
+    }
+    function myFmtNum(n) {
+      n = Number(n) || 0;
+      if (n >= 10000) return (n / 10000).toFixed(1).replace(/\.0$/, "") + "w";
+      return String(n);
+    }
+    function myFmtTime(sec) {
+      sec = Math.max(0, Math.floor(sec || 0));
+      var m = Math.floor(sec / 60);
+      var s = sec % 60;
+      return (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+    }
+    function myApplyVideoLayout(video, slide) {
+      if (!video || !slide) return;
+      if (video.videoWidth === 0 || video.videoHeight === 0) {
+        video.style.objectFit = "cover";
+        video.style.objectPosition = "center";
+        setTimeout(function() { myApplyVideoLayout(video, slide); }, 500);
+        return;
+      }
+      if (!video.duration || isNaN(video.duration) || !isFinite(video.duration)) return;
+      var ratio = video.videoHeight / video.videoWidth;
+      var containerH = slide.clientHeight;
+      if (!containerH) return;
+      var videoH = video.videoHeight * (slide.clientWidth / video.videoWidth);
+      var bottomSafe = 142;
+      if (ratio >= 1.77 || videoH >= containerH) {
+        video.style.objectFit = "cover";
+        video.style.objectPosition = "center";
+      } else if (videoH >= containerH - bottomSafe) {
+        video.style.objectFit = "contain";
+        var topPos = containerH - videoH - bottomSafe;
+        video.style.objectPosition = "center " + topPos + "px";
+      } else {
+        video.style.objectFit = "contain";
+        video.style.objectPosition = "center";
+      }
+    }
+    function mySyncMusic(slide) {
+      var m = slide.querySelector(".music"), v = slide.querySelector("video");
+      if (!m || !v) return;
+      var muted = v.muted;
+      var paused = v.paused;
+      m.classList.toggle("on", !muted);
+      m.classList.toggle("off", muted);
+      m.classList.toggle("playing", !paused && !muted);
+      // 静音提示胶囊：与静音状态同步（有声→移除，静音→保留）
+      m.classList.toggle("prompt", muted);
+    }
+    function mySetDiscPlaying(slide, playing) {
+      var dw = slide.querySelector(".disc-wrap");
+      if (dw) { dw.classList.toggle("paused", !playing); }
+    }
+    function myHideUnmutePrompt() {
+      var ms = document.querySelectorAll("#myPlayer .music");
+      for (var i = 0; i < ms.length; i++) ms[i].classList.remove("prompt");
+    }
+    function myPlayVibrate() {
+      if (navigator.vibrate) navigator.vibrate([50]);
+    }
+    function myContentLink(v) {
+      var id = v.aweme_id || v.id || "";
+      return "https://www.douyin.com/video/" + id;
+    }
+    function myBuildShareText(v) {
+      var author = v.author || "";
+      var title = String(v.title || "").replace(/[\r\n#]+/g, " ").slice(0, 80);
+      var head = (Math.random() * 9 + 0.1).toFixed(2);
+      return head + " 复制打开抖音，看看【" + author + "的作品】" + title + " " + myContentLink(v) + " 复制此链接，打开Dou音搜索，直接观看视频！";
+    }
+    function myCopyToClipboard(text) {
+      if (window.AndroidBridge && window.AndroidBridge.copyText) {
+        try { window.AndroidBridge.copyText(text); return true; } catch (e) {}
+      }
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text);
+          return true;
+        }
+      } catch (e) {}
+      try {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {}
+      return false;
+    }
+    function myDeepLink(v) {
+      var id = v.aweme_id || v.id || "";
+      return "snssdk1128://aweme/detail/" + id + "?refer=web&needlaunchlog=1";
+    }
+    function myOpenDouyinApp(deepLinkUrl) {
+      var dl = deepLinkUrl || "snssdk1128://";
+      if (window.AndroidBridge && window.AndroidBridge.openDouyin) {
+        try { window.AndroidBridge.openDouyin(dl); return true; } catch (e) {}
+      }
+      try { window.location.href = dl; return true; } catch (e) {}
+      return false;
+    }
+    // 生成视频帧预览（进度条精准调节用）
+    function myGenerateFrames(video, container) {
+      container.innerHTML = '';
+      if (!video.duration) return;
+      var count = 6, canvas = document.createElement('canvas');
+      canvas.width = 90; canvas.height = 160;
+      var ctx = canvas.getContext('2d'), origTime = video.currentTime, i = 0;
+      function next() {
+        if (i >= count) { video.currentTime = origTime; return; }
+        var t = (i / (count - 1)) * video.duration, done = false;
+        function onSeeked() {
+          if (done) return; done = true;
+          video.removeEventListener('seeked', onSeeked);
+          try {
+            ctx.drawImage(video, 0, 0, 90, 160);
+            var img = document.createElement('img');
+            img.src = canvas.toDataURL();
+            img.style.cssText = 'height:64px;border-radius:5px;flex-shrink:0;';
+            container.appendChild(img);
+          } catch (e) {}
+          i++; setTimeout(next, 60);
+        }
+        video.addEventListener('seeked', onSeeked);
+        video.currentTime = t;
+        setTimeout(onSeeked, 800);
+      }
+      next();
+    }
+
+    // ===== 全局长按菜单（v9.1.23）：完整逻辑提升为 window.openLongPressMenu =====
+    // 首页与"我的"播放器共用同一份菜单逻辑。菜单项点击走 document 级 capture 委托
+    // （已读取 window.__currentVid 钩子：我的播放器打开时指向我的作品，首页时指向首页视频），
+    // 反馈数据 _feedbackSet 全局共享——以后优化/加功能/debug 只改这一处，全局生效。
+    window.openLongPressMenu = function () {
+      var mask = document.getElementById("longPressMask");
+      if (!mask) return;
+      var csw = document.getElementById("lpCleanSwitch");
+      // cleanMode 开关样式：优先保持 DOM 当前状态（运行时可能被 setCleanMode 更新过，
+      // 如"点赞7次进清屏"），无 .on 类时回退 localStorage dy_default_clean
+      if (csw && !csw.classList.contains("on") && localStorage.getItem("dy_default_clean") === "1") {
+        csw.classList.add("on");
+      }
+      // 开启时默认不静音：dy_default_mute=0（不默认静音）→ 开关 on
+      var dm = document.getElementById("lpDefaultMuteSwitch");
+      if (dm) { try { if (localStorage.getItem("dy_default_mute") !== "1") dm.classList.add("on"); else dm.classList.remove("on"); } catch(e) {} }
+      var da = document.getElementById("lpDefaultAutoPlaySwitch");
+      if (da) { try { if (localStorage.getItem("dy_default_autoplay") === "1") da.classList.add("on"); else da.classList.remove("on"); } catch(e) {} }
+      // 跳转仪式开关视觉跟随所选方案：方案一(s1)=关，方案二/三(s2/s3)=开
+      try {
+        var ritualNow = localStorage.getItem("dy_jump_ritual") || "s3";
+        var rsw = document.getElementById("lpDefaultCleanSwitch");
+        if (rsw) rsw.classList.toggle("on", ritualNow !== "s1");
+      } catch(e) {}
+      // 按当前视频的真实反馈状态重置四个反馈图标（不残留跨视频填色）
+      try {
+        var _cv2 = (typeof window.__currentVid === "function") ? window.__currentVid() : null;
+        var _st = (typeof window.__getFeedbackState === "function") ? window.__getFeedbackState(_cv2) : {};
+        var niIc = document.getElementById("lpNotInterestedIcon");
+        if (niIc) niIc.style.color = _st.not_interested ? "#fe2c55" : "";
+        var slIc = document.getElementById("lpSuperLikeIcon");
+        if (slIc) { slIc.style.color = _st.super_like ? "#8B008B" : ""; var slSv = slIc.querySelector("svg"); if (slSv) slSv.setAttribute("fill", _st.super_like ? "#8B008B" : "none"); }
+        var scIc = document.getElementById("lpSecretLikeIcon");
+        if (scIc) { scIc.style.color = _st.secret_like ? "#ffc107" : ""; var scSv = scIc.querySelector("svg"); if (scSv) scSv.setAttribute("fill", _st.secret_like ? "#ffc107" : "none"); }
+        var pz = document.getElementById("lpPuzzleIcon");
+        if (pz) {
+          if (_st.puzzle) { pz.style.color = "#fff"; pz.style.background = "#34c759"; pz.style.borderRadius = "4px"; }
+          else { pz.style.color = ""; pz.style.background = ""; pz.style.borderRadius = ""; }
+        }
+      } catch(e) {}
+      // 不感兴趣行的状态指示：当前视频是否已反馈
+      try {
+        var niArrow = document.getElementById("lpNotInterestedArrow");
+        if (niArrow) {
+          var _cv = (typeof window.__currentVid === "function") ? window.__currentVid() : null;
+          var _hasFb = _cv && (typeof window.__hasAnyFeedback === "function") ? window.__hasAnyFeedback(_cv) : false;
+          niArrow.textContent = _hasFb ? "已反馈 \u203a" : "\u203a";
+        }
+      } catch(e) {}
+      mask.style.display = "flex";
+    };
+
+    // 创建三槽位 slide（结构与首页完全一致，CSS class 复用）
+    function myCreateSlides() {
+      var IC = window.ICON_HEART || "";
+      var IC2 = window.ICON_COMMENT || "";
+      var IC3 = window.ICON_STAR || "";
+      for (var k = 0; k < 3; k++) {
+        var s = document.createElement("div");
+        s.className = "slide";
+        s.innerHTML =
+          '<video muted playsinline preload="auto" webkit-playsinline></video>' +
+          '<div class="video-mask"></div>' +
+          '<div class="tap-layer"></div>' +
+          '<div class="pause-icon"><svg viewBox="0 0 24 24" fill="white"><path d="M8 5.5c0-.83.9-1.33 1.6-.83l8.5 5c.67.4.67 1.43 0 1.83l-8.5 5c-.7.5-1.6 0-1.6-.83V5.5z"/></svg></div>' +
+          '<div class="note-view" style="display:none"><div class="note-images"></div><div class="note-progress"></div></div>' +
+          '<div class="audio-view" style="display:none"><div class="audio-bg"></div><div class="disc-wrap paused"><img class="disc-img" src=""><div class="disc-fallback" style="display:none">♫</div></div><div class="disc-hint"></div><div class="audio-music-title"></div><div class="audio-music-author"></div><div class="audio-progress-wrap"><span class="audio-cur">00:00</span><div class="audio-progress"><div class="audio-bar"></div></div><span class="audio-dur">00:00</span></div></div>' +
+          '<audio class="audio-el"></audio>' +
+          '<audio class="note-audio" loop></audio>' +
+          '<div class="meta"><div class="author"></div><div class="title"></div></div>' +
+          '<div class="actions">' +
+            '<div class="avatar-wrap"><div class="avatar"><img src="" style="display:none"><span class="fallback"></span></div><button class="follow-btn">+</button></div>' +
+            '<button class="act like">' + IC + '<span class="num"></span></button>' +
+            '<button class="act comment">' + IC2 + '<span class="num"></span></button>' +
+            '<button class="act collect">' + IC3 + '<span class="num"></span></button>' +
+            '<button class="act share"><img src="/icons/share/share.png" alt="分享"><span class="num"></span></button>' +
+          '</div>' +
+          '<button class="music off prompt"><span class="disc"><img src="" style="display:none"></span><span class="mute-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg></span><span class="prompt-text">取消静音</span></button>' +
+          '<div class="progress-wrap">' +
+            '<div class="frames"></div>' +
+            '<div class="time-label">00:00 / 00:00</div>' +
+            '<div class="hint">∧ 上滑可精准调节进度</div>' +
+            '<div class="progress"><div class="bar"></div><div class="thumb"></div></div>' +
+          '</div>';
+        mySlider.appendChild(s);
+        mySlideEls.push(s);
+      }
+      // 绑定交互：使用独立的 myBindSlide（不污染首页的 videos/current/slideEls）
+      for (var i = 0; i < mySlideEls.length; i++) {
+        myBindSlide(mySlideEls[i]);
+      }
+    }
+
+    // ===== myBindSlide：复制首页 bindSlide 的交互逻辑，替换所有首页全局引用为 my 独立版 =====
+    function myBindSlide(slide) {
+      var video = slide.querySelector("video");
+      var pWrap = slide.querySelector(".progress-wrap");
+      var pauseIcon = slide.querySelector(".pause-icon");
+      pauseIcon.classList.remove("show");
+      var tapLayer = slide.querySelector(".tap-layer");
+
+      function mySetPauseIcon(show) {
+        if (show) pauseIcon.classList.add("show");
+        else pauseIcon.classList.remove("show");
+      }
+
+      // 单击暂停/继续、双击点赞、长按菜单
+      (function () {
+        var lastTap = 0, lastX = 0, lastY = 0;
+        var singleTapTimer = null;
+        var rapidTapMode = false;
+        var rapidTapTimer = null;
+        var rapidTapCount = 0;
+        function enterRapidTap() {
+          rapidTapMode = true;
+          if (rapidTapTimer) clearTimeout(rapidTapTimer);
+          rapidTapTimer = setTimeout(function () {
+            rapidTapMode = false;
+            rapidTapTimer = null;
+            rapidTapCount = 0;
+          }, 350);
+        }
+        function doRapidLike(slide, cx, cy) {
+          myDoLike(slide, true, cx, cy);
+          rapidTapCount++;
+        }
+        tapLayer.addEventListener("touchstart", function (e) {
+          tapLayer.__tsX = e.touches[0].clientX;
+          tapLayer.__tsY = e.touches[0].clientY;
+          tapLayer.__tsT = Date.now();
+          if (navigator.vibrate) navigator.vibrate(0);
+          slide.__lpTimer = setTimeout(function () {
+            slide.__lpTimer = null;
+            myPlayVibrate();
+            myLongPress();
+          }, 300);
+        }, { passive: true });
+        tapLayer.addEventListener("touchmove", function (e) {
+          var dx = e.touches[0].clientX - tapLayer.__tsX;
+          var dy = e.touches[0].clientY - tapLayer.__tsY;
+          if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+            if (slide.__lpTimer) { clearTimeout(slide.__lpTimer); slide.__lpTimer = null; }
+            if (singleTapTimer) { clearTimeout(singleTapTimer); singleTapTimer = null; }
+          }
+        }, { passive: true });
+        function doSingleTap(cx, cy) {
+          if (slide.__is_audio) {
+            var ae = slide.querySelector(".audio-el");
+            if (ae) {
+              if (ae.paused) { ae.play().catch(function () {}); mySetPauseIcon(false); mySetDiscPlaying(slide, true); }
+              else { ae.pause(); mySetPauseIcon(true); mySetDiscPlaying(slide, false); }
+            }
+            mySyncMusic(slide);
+          } else if (slide.__note_images > 0) {
+            var na = slide.querySelector(".note-audio");
+            if (!slide.__note_paused) {
+              slide.__note_paused = true;
+              if (slide.__note_timer) { clearInterval(slide.__note_timer); slide.__note_timer = null; }
+              if (na && na.src) { na.pause(); }
+              mySetPauseIcon(true);
+            } else {
+              slide.__note_paused = false;
+              if (na && na.src) { na.play().catch(function () {}); }
+              mySetPauseIcon(false);
+            }
+            mySyncMusic(slide);
+          } else {
+            if (video.paused) {
+              video.play().catch(function () {});
+              mySetPauseIcon(false);
+            } else {
+              video.pause();
+              mySetPauseIcon(true);
+            }
+            mySyncMusic(slide);
+          }
+        }
+        tapLayer.addEventListener("touchend", function (e) {
+          if (slide.__lpTimer) { clearTimeout(slide.__lpTimer); slide.__lpTimer = null; }
+          var dx = e.changedTouches[0].clientX - tapLayer.__tsX;
+          var dy = e.changedTouches[0].clientY - tapLayer.__tsY;
+          var dt = Date.now() - tapLayer.__tsT;
+          if (Math.abs(dx) > 12 || Math.abs(dy) > 12 || dt > 400) return;
+          var now = Date.now();
+          var cx = e.changedTouches[0].clientX, cy = e.changedTouches[0].clientY;
+          var isQuickTap = (now - lastTap < 280 && Math.abs(cx - lastX) < 60);
+          if (rapidTapMode) {
+            enterRapidTap();
+            if (isQuickTap) doRapidLike(slide, cx, cy);
+            lastTap = now; lastX = cx; lastY = cy;
+            return;
+          }
+          if (isQuickTap) {
+            if (singleTapTimer) { clearTimeout(singleTapTimer); singleTapTimer = null; }
+            enterRapidTap();
+            lastTap = now; lastX = cx; lastY = cy;
+            doRapidLike(slide, cx, cy);
+            return;
+          }
+          lastTap = now; lastX = cx; lastY = cy;
+          if (singleTapTimer) clearTimeout(singleTapTimer);
+          singleTapTimer = setTimeout(function () {
+            singleTapTimer = null;
+            doSingleTap(cx, cy);
+          }, 180);
+        }, { passive: true });
+      })();
+
+      // 播放结束 → 自动下一个
+      video.addEventListener("ended", function () {
+        if (slide.__id) myVideoPositions[slide.__id] = 0;
+        myGoNext();
+      });
+      video.addEventListener("play", function () { mySyncMusic(slide); });
+      video.addEventListener("pause", function () { mySyncMusic(slide); });
+
+      var mask = slide.querySelector(".video-mask");
+      video.addEventListener("error", function () { if (mask) mask.classList.remove("hide"); });
+      function onVideoMeta() {
+        var isAudioOnly = (video.videoWidth === 0 && video.videoHeight === 0);
+        var isInvalid = (!video.duration || isNaN(video.duration) || !isFinite(video.duration) || video.duration === 0);
+        if (isAudioOnly || isInvalid) {
+          if (mask) mask.classList.remove("hide");
+        } else {
+          if (mask) mask.classList.add("hide");
+          myApplyVideoLayout(video, slide);
+        }
+      }
+      video.addEventListener("loadedmetadata", onVideoMeta);
+      if (video.readyState >= 1) { onVideoMeta(); }
+      else { setTimeout(onVideoMeta, 300); setTimeout(onVideoMeta, 800); }
+
+      // 进度条
+      var progress = slide.querySelector(".progress");
+      var bar = slide.querySelector(".progress .bar");
+      var thumb = slide.querySelector(".progress .thumb");
+      var timeLabel = slide.querySelector(".time-label");
+      var hint = slide.querySelector(".hint");
+      var framesEl = slide.querySelector(".frames");
+      video.addEventListener("timeupdate", function () {
+        if (video.duration) {
+          var pct = video.currentTime / video.duration;
+          bar.style.width = (pct * 100) + "%";
+          thumb.style.left = (pct * 100) + "%";
+        }
+      });
+      var seeking = false, precise = false, startX = 0, startY = 0, basePct = 0, framesGenerated = false;
+      pWrap.addEventListener("touchstart", function (e) {
+        var t = e.touches[0];
+        var w = window.innerWidth;
+        if (t.clientX < 25 || t.clientX > w - 25) return;
+        e.stopPropagation(); e.preventDefault();
+        if (!video.duration) return;
+        seeking = true; precise = false; framesGenerated = false;
+        startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+        var rect = pWrap.getBoundingClientRect();
+        basePct = Math.max(0, Math.min(1, (startX - rect.left) / rect.width));
+        pWrap.classList.add("seeking"); pWrap.classList.remove("precise");
+        hint.textContent = "∧ 上滑可精准调节进度";
+        myApplySeek(basePct); video.pause();
+      }, { passive: false });
+      pWrap.addEventListener("touchmove", function (e) {
+        if (!seeking) return;
+        e.stopPropagation(); e.preventDefault();
+        var dx = e.touches[0].clientX - startX, dy = e.touches[0].clientY - startY;
+        var rect = pWrap.getBoundingClientRect();
+        if (!precise && dy < -50) {
+          precise = true; pWrap.classList.add("precise");
+          hint.textContent = "精准调节进度中";
+          if (!framesGenerated) { myGenerateFrames(video, framesEl); framesGenerated = true; }
+        }
+        var sensitivity = precise ? rect.width * 2 : rect.width;
+        var pct = Math.max(0, Math.min(1, basePct + dx / sensitivity));
+        myApplySeek(pct);
+      }, { passive: false });
+      pWrap.addEventListener("touchend", function (e) {
+        if (!seeking) return;
+        e.stopPropagation(); seeking = false; precise = false;
+        pWrap.classList.remove("seeking", "precise", "paused");
+        if (slide.__id) myVideoPositions[slide.__id] = video.currentTime;
+        video.play().catch(function () {});
+      });
+      pWrap.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (!video.duration) return;
+        var rect = pWrap.getBoundingClientRect();
+        video.currentTime = video.duration * Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      });
+      function myApplySeek(pct) {
+        if (!video.duration) return;
+        video.currentTime = video.duration * pct;
+        bar.style.width = (pct * 100) + "%";
+        thumb.style.left = (pct * 100) + "%";
+        timeLabel.textContent = myFmtTime(video.currentTime) + " / " + myFmtTime(video.duration);
+      }
+
+      // 按钮交互（独立版，不跳首页博主主页）
+      slide.querySelector(".act.like").addEventListener("click", function (e) { e.stopPropagation(); myDoLike(slide, false); });
+      slide.querySelector(".act.collect").addEventListener("click", function (e) { e.stopPropagation(); myToggleCollect(slide); });
+      slide.querySelector(".act.comment").addEventListener("click", function (e) { e.stopPropagation(); myPlayerToast("评论功能开发中"); });
+      slide.querySelector(".act.share").addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (this.__lpFired) { this.__lpFired = false; return; }
+        myDoSharePassword();
+      });
+      // 分享长按/双击
+      (function () {
+        var sBtn = slide.querySelector(".act.share");
+        var sLP = null;
+        var lastTap = 0;
+        var singleTimer = null;
+        sBtn.addEventListener("touchstart", function (e) {
+          e.stopPropagation();
+          if (slide.__lpTimer) { clearTimeout(slide.__lpTimer); slide.__lpTimer = null; }
+          sBtn.__lpFired = false;
+          sLP = setTimeout(function () {
+            sLP = null; sBtn.__lpFired = true;
+            myPlayVibrate();
+            if (singleTimer) { clearTimeout(singleTimer); singleTimer = null; }
+            myJumpToSourcePeer();
+          }, 300);
+        }, { passive: true });
+        sBtn.addEventListener("touchmove", function (e) { e.stopPropagation(); if (sLP) { clearTimeout(sLP); sLP = null; } });
+        sBtn.addEventListener("touchend", function (e) {
+          e.stopPropagation();
+          if (sLP) { clearTimeout(sLP); sLP = null; }
+          if (sBtn.__lpFired) { sBtn.__lpFired = false; e.preventDefault(); return; }
+          e.preventDefault();
+          // 触摸路径已处理：置标记阻止合成 click 再执行一次（APK WebView 部分会同时触发 click）
+          sBtn.__lpFired = true;
+          var now = Date.now();
+          if (now - lastTap < 320) {
+            if (singleTimer) { clearTimeout(singleTimer); singleTimer = null; }
+            lastTap = 0;
+            myDoShareLink();
+          } else {
+            lastTap = now;
+            singleTimer = setTimeout(function () { singleTimer = null; myDoSharePassword(); }, 330);
+          }
+        });
+      })();
+      // 音乐按钮：单击静音切换
+      var musicBtn = slide.querySelector(".music");
+      var isLongPress = false;
+      function handleMusicTap() {
+        if (isLongPress) { isLongPress = false; return; }
+        if (musicBtn.classList.contains("prompt")) { myHideUnmutePrompt(); if (!mySoundOn) myToggleMusic(); }
+        else { myToggleMusic(); }
+      }
+      musicBtn.addEventListener("touchend", function (e) {
+        e.stopPropagation(); e.preventDefault();
+        if (slide.__musicLpTimer) { clearTimeout(slide.__musicLpTimer); slide.__musicLpTimer = null; }
+        handleMusicTap();
+      });
+      musicBtn.addEventListener("touchstart", function (e) {
+        e.stopPropagation();
+        if (slide.__lpTimer) { clearTimeout(slide.__lpTimer); slide.__lpTimer = null; }
+        isLongPress = false;
+        if (!musicBtn.classList.contains("prompt")) {
+          // 与首页一致：27ms 判定长按 → 进入音乐界面
+          slide.__musicLpTimer = setTimeout(function () { isLongPress = true; slide.__musicLpTimer = null; myPlayVibrate(); myOpenMusicPage(slide); }, 27);
+        }
+      }, { passive: true });
+      musicBtn.addEventListener("touchmove", function (e) {
+        if (slide.__musicLpTimer) { clearTimeout(slide.__musicLpTimer); slide.__musicLpTimer = null; }
+      }, { passive: true });
+      musicBtn.addEventListener("touchcancel", function (e) {
+        if (slide.__musicLpTimer) { clearTimeout(slide.__musicLpTimer); slide.__musicLpTimer = null; }
+      });
+      musicBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if ('ontouchstart' in window) return;
+        handleMusicTap();
+      });
+      // 桌面端长按 → 音乐界面
+      var myDesktopMusicLp = null;
+      musicBtn.addEventListener("mousedown", function (e) {
+        if ('ontouchstart' in window) return;
+        if (!musicBtn.classList.contains("prompt")) {
+          myDesktopMusicLp = setTimeout(function () { myDesktopMusicLp = null; myPlayVibrate(); myOpenMusicPage(slide); }, 27);
+        }
+      });
+      musicBtn.addEventListener("mouseup", function (e) {
+        if (myDesktopMusicLp) { clearTimeout(myDesktopMusicLp); myDesktopMusicLp = null; }
+      });
+      musicBtn.addEventListener("mouseleave", function (e) {
+        if (myDesktopMusicLp) { clearTimeout(myDesktopMusicLp); myDesktopMusicLp = null; }
+      });
+
+      // 头像/名称交互（我的场景）：单击头像或名称 = 退出当前播放，回到我的主页
+      // （博主就是自己，点自己主页入口自然退出；长按=尝试跳抖音个人主页）
+      var avWrap = slide.querySelector(".avatar-wrap");
+      var authorEl = slide.querySelector(".meta .author");
+      function myExitToProfile() {
+        if (typeof closeMyPlayer === "function") { closeMyPlayer(); }
+        else { myPlayerToast("正在返回主页…"); }
+      }
+      if (avWrap) {
+        avWrap.addEventListener("click", function (e) {
+          e.stopPropagation();
+          if (this.__myLpFired) { this.__myLpFired = false; return; }
+          myExitToProfile();
+        });
+      }
+      if (authorEl) {
+        authorEl.addEventListener("click", function (e) {
+          e.stopPropagation();
+          e.preventDefault();
+          if (this.__myLpFired) { this.__myLpFired = false; return; }
+          myExitToProfile();
+        });
+      }
+      [avWrap, authorEl].forEach(function (el) {
+        if (!el) return;
+        var lpMyT = null;
+        el.addEventListener("touchstart", function (e) {
+          e.stopPropagation();
+          if (slide.__lpTimer) { clearTimeout(slide.__lpTimer); slide.__lpTimer = null; }
+          el.__myLpFired = false;
+          lpMyT = setTimeout(function () {
+            lpMyT = null;
+            el.__myLpFired = true;
+            myPlayVibrate();
+            myPlayerToast("正在打开抖音…");
+            myOpenDouyinApp("snssdk1128://user/profile?sec_uid=" + encodeURIComponent("my_local") + "&refer=web&needlaunchlog=1");
+          }, 300);
+        }, { passive: true });
+        el.addEventListener("touchmove", function (e) { e.stopPropagation(); if (lpMyT) { clearTimeout(lpMyT); lpMyT = null; } });
+        el.addEventListener("touchend", function (e) {
+          e.stopPropagation();
+          if (lpMyT) { clearTimeout(lpMyT); lpMyT = null; }
+        });
+      });
+    }
+
+    // myDoLike：点赞（数字用我的作品数据）
+    function myDoLike(slide, forceOn, x, y) {
+      var b = slide.querySelector(".act.like"), id = slide.__vid;
+      if (!id) { myPlayerToast("作品数据未就绪"); return; }
+      var on = forceOn ? true : !b.classList.contains("on");
+      b.classList.toggle("on", on);
+      if (on) myLiked[id] = 1; else delete myLiked[id];
+      mySaveSet("dy_liked", myLiked);
+      if (on && window.reportBehavior) window.reportBehavior("like", id, 0);
+      var list = window.__myPosts, cur = list[myIdx] || {};
+      var likeNum = (cur.digg != null) ? cur.digg : (cur.like_count || 0);
+      b.querySelector(".num").textContent = myFmtNum((on ? 1 : 0) + (Number(likeNum) || 0));
+      if (on && x !== undefined) {
+        var h = document.createElement("div");
+        h.className = "burst-heart show";
+        h.style.left = x + "px"; h.style.top = y + "px";
+        h.innerHTML = window.ICON_HEART || "";
+        document.body.appendChild(h);
+        setTimeout(function () { h.remove(); }, 850);
+      }
+    }
+
+    // myToggleCollect：收藏（数字用我的作品数据）
+    function myToggleCollect(slide) {
+      var b = slide.querySelector(".act.collect"), id = slide.__vid;
+      var on = !b.classList.contains("on");
+      if (!id) { myPlayerToast("作品数据未就绪"); return; }
+      b.classList.toggle("on", on);
+      if (on) myCollected[id] = 1; else delete myCollected[id];
+      mySaveSet("dy_collected", myCollected);
+      if (on && window.reportBehavior) window.reportBehavior("collect", id, 0);
+      var list = window.__myPosts, cur = list[myIdx] || {};
+      var colNum = (cur.collect != null) ? cur.collect : (cur.collect_count || 0);
+      b.querySelector(".num").textContent = myFmtNum((on ? 1 : 0) + (Number(colNum) || 0));
+    }
+
+    // 分享（独立版，用我的作品数据；与首页同一套交互：单击=口令+跳抖音、双击/长按=复制链接）
+    var mySharePasswordTimer = null;
+    function myDoSharePassword() {
+      var list = window.__myPosts, v = list[myIdx];
+      if (!v) return;
+      var fake = { aweme_id: v.aweme_id, author: "主角只看精彩瞬间", title: v.desc || "", media_type: "video" };
+      var ok = myCopyToClipboard(myBuildShareText(fake));
+      if (mySharePasswordTimer) { clearTimeout(mySharePasswordTimer); mySharePasswordTimer = null; }
+      mySharePasswordTimer = setTimeout(function () { mySharePasswordTimer = null; myOpenDouyinApp(myDeepLink(fake)); }, 350);
+    }
+    function myDoShareLink() {
+      var list = window.__myPosts, v = list[myIdx];
+      if (!v) return;
+      var fake = { aweme_id: v.aweme_id, media_type: "video" };
+      var ok = myCopyToClipboard(myContentLink(fake));
+      if (mySharePasswordTimer) { clearTimeout(mySharePasswordTimer); mySharePasswordTimer = null; }
+      // 不弹 Web toast：统一由 APK 原生提示"链接已复制"
+    }
+
+    // 长按分享：跳转来源同好（与首页 jumpToSourcePeer 一致；无同好也要弹正确提示）
+    function myJumpToSourcePeer() {
+      var list = window.__myPosts, v = list[myIdx];
+      if (!v) { myPlayerToast("视频信息不存在"); return; }
+      myPlayerToast("正在查询来源同好…");
+      var authorSecUid = "my_local";
+      fetch("/api/videos/" + v.aweme_id + "/peers")
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          var items = data.items || [];
+          var peer = null;
+          for (var i = 0; i < items.length; i++) {
+            if (items[i].sec_uid && items[i].sec_uid !== authorSecUid) { peer = items[i]; break; }
+          }
+          if (!peer) { myPlayerToast(items.length ? "来源同好缺少主页信息" : "该视频暂无来源同好"); return; }
+          myPlayerToast("跳转同好：" + (peer.nickname || "未知"));
+          setTimeout(function () {
+            myOpenDouyinApp("snssdk1128://user/profile?sec_uid=" + encodeURIComponent(peer.sec_uid) + "&refer=web&needlaunchlog=1");
+          }, 350);
+        })
+        .catch(function () { myPlayerToast("查询来源同好失败"); });
+    }
+
+    // 静音切换（独立版：只切换我的三槽位；并同步全局"默认不静音"开关状态）
+    function myToggleMusic() {
+      mySoundOn = !mySoundOn;
+      for (var i = 0; i < mySlideEls.length; i++) {
+        var v = mySlideEls[i].querySelector("video");
+        if (v) v.muted = !mySoundOn;
+        mySyncMusic(mySlideEls[i]);
+      }
+      if (mySoundOn) {
+        var curSlide = mySlideEls[1];
+        var v = curSlide.querySelector("video");
+        if (v && v.paused) v.play().catch(function () {});
+        myHideUnmutePrompt();
+      } else {
+        myShowUnmutePrompt();
+      }
+      // 同步全局：写 localStorage dy_default_mute（0=不默认静音→有声）+ 菜单开关视觉
+      try {
+        localStorage.setItem("dy_default_mute", mySoundOn ? "0" : "1");
+        var dm = document.getElementById("lpDefaultMuteSwitch");
+        if (dm) dm.classList.toggle("on", mySoundOn);
+      } catch(e) {}
+    }
+
+    // 音乐界面（独立版）：复用首页 #musicPage 结构与样式，数据用我的作品
+    var myMusicPageEl = null;
+    var myMusicPlaying = false;
+    var myMusicPausedTime = 0;
+    function myOpenMusicPage(slide) {
+      var list = window.__myPosts;
+      var v = (list && list[myIdx]) ? list[myIdx] : null;
+      if (!v) { myPlayerToast("作品数据未就绪"); return; }
+      if (!myMusicPageEl) myMusicPageEl = document.getElementById("myMusicPage");
+      if (!myMusicPageEl) { myPlayerToast("音乐界面不可用"); return; }
+      // 封面图（cover → 头像兜底）
+      var discImg = document.getElementById("myMusicDiscImg");
+      var discList = [v.cover || ""];
+      var mBg = myMusicPageEl.querySelector(".music-page-bg");
+      (function setBg() {
+        var bi = 0;
+        (function tryBg() {
+          while (bi < discList.length) {
+            var bs = discList[bi++];
+            if (bs) {
+              var probe = new Image();
+              probe.onload = function () { mBg.style.backgroundImage = "url('" + bs + "')"; };
+              probe.onerror = function () { tryBg(); };
+              probe.src = bs;
+              return;
+            }
+          }
+          mBg.style.backgroundImage = "";
+        })();
+      })();
+      if (discImg) {
+        discImg.style.display = "block";
+        discImg.src = v.cover || "";
+      }
+      document.getElementById("myMusicTitle").textContent = "主角只看精彩瞬间创作的原声";
+      document.getElementById("myMusicSub").textContent = "主角只看精彩瞬间 | 本地收录";
+      document.getElementById("myMusicVideoGrid").innerHTML = "";
+      document.getElementById("myMusicEmpty").style.display = "none";
+      // 进入音乐页：暂停当前视频并记录位置（退出时恢复）
+      var curSlide = mySlideEls[1];
+      var curV = curSlide ? curSlide.querySelector("video") : null;
+      if (curV) { myMusicPausedTime = curV.currentTime || 0; curV.pause(); }
+      // 唱盘默认暂停状态
+      var disc = document.getElementById("myMusicDisc");
+      disc.classList.add("playing");
+      disc.classList.add("paused");
+      document.getElementById("myMusicPauseIcon").classList.add("show");
+      myMusicPageEl.style.transform = "translateY(0)";
+    }
+    function myCloseMusicPage() {
+      if (!myMusicPageEl) myMusicPageEl = document.getElementById("myMusicPage");
+      if (myMusicPageEl) myMusicPageEl.style.transform = "translateY(100%)";
+      // 返回播放器：从进入音乐页前的位置继续播放（有声才续）
+      var curSlide = mySlideEls[1];
+      var curV = curSlide ? curSlide.querySelector("video") : null;
+      if (curV && mySoundOn) {
+        try { curV.currentTime = myMusicPausedTime || 0; } catch(e) {}
+        curV.muted = false;
+        curV.play().catch(function() {});
+      }
+      // 唱片恢复正常（停止暂停态）
+      var disc = document.getElementById("myMusicDisc");
+      if (disc) disc.classList.remove("paused");
+      myMusicPlaying = false;
+    }
+    // 音乐界面按钮（初始化一次）
+    (function () {
+      var mmp = document.getElementById("myMusicPage");
+      if (!mmp) return;
+      var back = document.getElementById("myMusicBack");
+      if (back) back.addEventListener("click", function (e) { e.stopPropagation(); myCloseMusicPage(); });
+      var share = document.getElementById("myMusicShare");
+      if (share) share.addEventListener("click", function (e) { e.stopPropagation(); myDoSharePassword(); });
+      var collect = document.getElementById("myMusicCollect");
+      if (collect) collect.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var curSlide = mySlideEls[1];
+        if (curSlide) myToggleCollect(curSlide);
+        var on = collect.classList.contains("on");
+        collect.classList.toggle("on", on);
+        collect.querySelector(".icon").textContent = on ? "★" : "☆";
+      });
+      // 点击大唱片：切换播放/暂停（复用当前 my 播放器视频，与首页音乐页一致）
+      var discWrap = mmp.querySelector(".music-disc-wrap");
+      if (discWrap) discWrap.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var curSlide = mySlideEls[1];
+        var curV = curSlide ? curSlide.querySelector("video") : null;
+        if (!curV) return;
+        var disc = document.getElementById("myMusicDisc");
+        var pauseIcon = document.getElementById("myMusicPauseIcon");
+        if (myMusicPlaying) {
+          myMusicPausedTime = curV.currentTime;
+          curV.pause();
+          myMusicPlaying = false;
+          disc.classList.add("paused");
+          pauseIcon.classList.add("show");
+        } else {
+          try { curV.currentTime = myMusicPausedTime; } catch(e) {}
+          curV.muted = false;
+          curV.play().catch(function() {});
+          myMusicPlaying = true;
+          disc.classList.remove("paused");
+          pauseIcon.classList.remove("show");
+        }
+      });
+    })();
+
+    // 长按菜单：调全局版（完整逻辑：状态刷新 + 显示面板；菜单项点击走 document 委托 + window.__currentVid 钩子，全局生效）
+    function myLongPress() {
+      if (typeof window.openLongPressMenu === "function") {
+        window.openLongPressMenu();
+      } else {
+        var mask = document.getElementById("longPressMask");
+        if (!mask) { myPlayerToast("菜单不可用"); return; }
+        mask.style.display = "flex";
+      }
+    }
+
+    // 我页面数据字段 → 首页slide字段映射
+    function myMap(v) {
+      return {
+        id: v.aweme_id,
+        url: v.file_path || ("/api/my/works/" + v.aweme_id + "/stream"),
+        cover_url: v.cover || "",
+        author: "主角只看精彩瞬间",
+        title: v.desc || "",
+        avatar_url: "",
+        sec_uid: "my_local",
+        is_following: true,
+        like_count: v.digg || 0,
+        comment_count: v.comment || 0,
+        collect_count: v.collect || 0,
+        music_cover: "",
+        media_type: "video",
+        is_note: false,
+        _my_orig: v
+      };
+    }
+
+    // 填充一个槽位（复用首页 fillSlide，数据源换成我的作品）
+    function myFillSlide(slide, idx) {
+      var list = window.__myPosts;
+      if (idx < 0 || idx >= list.length) { slide.style.display = "none"; return; }
+      slide.style.display = "";
+      var v = myMap(list[idx]);
+      slide.__idx = idx;
+      slide.__sec_uid = v.sec_uid;
+      // 视频源 —— 核心守卫：只有内容真正变化才重新设 src 重载视频
+      // （与首页 fillSlide 对齐。根治黑屏/卡顿/双音：此前每次 myLayout 都对三槽位
+      //  无条件 vid.src=重新加载，已加载好的视频被反复重置；myGoNext 先 play 下一个
+      //  又被重置 → 黑屏 + 上一个音频残留。）
+      var vid = slide.querySelector("video");
+      var mask = slide.querySelector(".video-mask");
+      if (slide.__id !== v.id) {
+        if (mask) { mask.classList.add("hide"); mask.style.background = ""; }
+        vid.style.visibility = "";
+        vid.src = v.url;
+        if (v.cover_url) { vid.poster = v.cover_url; } else { vid.removeAttribute("poster"); }
+        vid.__preloaded = false;
+        vid.__ready = false;
+        vid.muted = !mySoundOn;
+        // 清理备用音源
+        var cleanAE = slide.querySelector(".audio-el");
+        var cleanNA = slide.querySelector(".note-audio");
+        if (cleanAE) { cleanAE.pause(); cleanAE.removeAttribute("src"); cleanAE.load(); }
+        if (cleanNA) { cleanNA.pause(); cleanNA.removeAttribute("src"); cleanNA.load(); }
+        if (vid.readyState >= 1) {
+          requestAnimationFrame(function() { myApplyVideoLayout(vid, slide); });
+        } else {
+          setTimeout(function() { myApplyVideoLayout(vid, slide); }, 300);
+          setTimeout(function() { myApplyVideoLayout(vid, slide); }, 800);
+        }
+        slide.querySelector(".progress .bar").style.width = "0%";
+        slide.__id = v.id;
+        var pi = slide.querySelector(".pause-icon");
+        if (pi) pi.classList.remove("show");
+      }
+      // 隐藏图文/音频区域（纯视频）
+      var noteView = slide.querySelector(".note-view");
+      var noteImages = slide.querySelector(".note-images");
+      var noteProgress = slide.querySelector(".note-progress");
+      var noteAudio = slide.querySelector(".note-audio");
+      var audioView = slide.querySelector(".audio-view");
+      var audioEl = slide.querySelector(".audio-el");
+      noteView.style.display = "none";
+      audioView.style.display = "none";
+      vid.style.display = "";
+      noteImages.innerHTML = "";
+      noteProgress.innerHTML = "";
+      noteAudio.src = "";
+      audioEl.src = "";
+      slide.__note_images = 0;
+      slide.__is_audio = false;
+      if (slide.__note_timer) { clearInterval(slide.__note_timer); slide.__note_timer = null; }
+      // 作者/标题
+      slide.querySelector(".author").textContent = "@" + v.author;
+      slide.querySelector(".title").textContent = v.title || "(无标题)";
+      slide.__author = v.author;
+      // 头像（无真实头像 → 首字兜底）
+      var av = slide.querySelector(".avatar");
+      var avImg = av.querySelector("img");
+      var avFb = av.querySelector(".fallback");
+      avImg.src = "/assets/me_avatar.jpg";
+      avImg.style.display = "block";
+      avFb.style.display = "none";
+      avImg.onerror = function () {
+        avImg.style.display = "none";
+        avFb.style.display = "flex";
+        avFb.textContent = (v.author || "?").charAt(0).toUpperCase();
+        av.style.background = myAvatarColor(v.author);
+      };
+      av.style.background = "";
+      // 关注按钮：自己的主页 → 直接显示已关注
+      var fb = slide.querySelector(".follow-btn");
+      fb.textContent = "✓"; fb.classList.add("followed");
+      // 音乐唱片（无音乐数据 → 隐藏disc图，显示默认）
+      var discImg = slide.querySelector(".music .disc img");
+      discImg.src = v.cover_url || "";
+      if (v.cover_url) { discImg.style.display = "block"; }
+      // 点赞/收藏/评论
+      var isLiked = !!myLiked[v.id], lb = slide.querySelector(".act.like");
+      lb.classList.toggle("on", isLiked);
+      lb.querySelector(".num").textContent = myFmtNum((isLiked ? 1 : 0) + (Number(v.like_count) || 0));
+      var isCol = !!myCollected[v.id], cb = slide.querySelector(".act.collect");
+      cb.classList.toggle("on", isCol);
+      cb.querySelector(".num").textContent = myFmtNum((isCol ? 1 : 0) + (Number(v.collect_count) || 0));
+      slide.querySelector(".act.comment .num").textContent = myFmtNum(v.comment_count);
+      slide.__vid = v.id;
+      // 浏览量（底部黑栏）
+      var mv = document.getElementById("myViewsNum");
+      if (mv) mv.textContent = "浏览 " + myFmtNum((v.like_count || 0) * 4 + 1580);
+    }
+
+    // 我页面布局（对应首页 layout）
+    function myLayout() {
+      mySlideEls[0].style.transform = "translateY(-100%)";
+      mySlideEls[1].style.transform = "translateY(0)";
+      mySlideEls[2].style.transform = "translateY(100%)";
+      myFillSlide(mySlideEls[0], myIdx - 1);
+      myFillSlide(mySlideEls[1], myIdx);
+      myFillSlide(mySlideEls[2], myIdx + 1);
+      var prevV = mySlideEls[0].querySelector("video");
+      if (mySlideEls[0].__id) {
+        var isFinished = prevV.duration && prevV.currentTime > prevV.duration - 0.5;
+        myVideoPositions[mySlideEls[0].__id] = isFinished ? 0 : prevV.currentTime;
+      }
+      prevV.pause();
+      if (prevV.currentTime > 0.1) prevV.currentTime = 0;
+      myPlayCurrent();
+    }
+
+    function myPlayCurrent() {
+      var curSlide = mySlideEls[1];
+      if (!curSlide) return;
+      var v = curSlide.querySelector("video");
+      var pos = myVideoPositions[curSlide.__id];
+      if (pos && pos > 0.5 && v.currentTime < 0.1 && v.duration) {
+        v.currentTime = Math.min(pos, v.duration - 0.5);
+      }
+      v.muted = !mySoundOn;
+      if (v.paused) {
+        if (v.readyState >= 2) {
+          v.play().catch(function() {});
+        } else {
+          v.addEventListener("loadeddata", function onLD() {
+            v.removeEventListener("loadeddata", onLD);
+            v.play().catch(function() {});
+          }, { once: true });
+        }
+      }
+      mySyncMusic(curSlide);
+      mySlideEls[2].querySelector("video").pause();
+      mySlideEls[0].querySelector("video").pause();
+    }
+
+    function myResetAndLayout(direction) {
+      mySwiping = true;
+      setTimeout(function() { mySwiping = false; }, 300);
+      mySlider.style.transition = "none";
+      mySlider.style.transform = "translateY(0)";
+      if (direction === 1) mySlider.appendChild(mySlideEls[0]);
+      else if (direction === -1) mySlider.insertBefore(mySlideEls[2], mySlideEls[0]);
+      mySlideEls = Array.from(mySlider.children);
+      myLayout();
+    }
+
+    function myGoNext() {
+      var list = window.__myPosts;
+      if (myIdx >= list.length - 1) { myPlayerToast("已是最后一个作品"); return false; }
+      if (myAnimating) return false;
+      myAnimating = true;
+      var curV = mySlideEls[1].querySelector("video");
+      if (curV) curV.pause();
+      var tv = mySlideEls[2].querySelector("video");
+      var pos = myVideoPositions[mySlideEls[2].__id];
+      if (pos && pos > 0.5 && tv.currentTime < 0.1 && tv.duration) tv.currentTime = Math.min(pos, tv.duration - 0.5);
+      tv.muted = !mySoundOn; tv.play().catch(function() {});
+      mySlider.style.transition = "transform .3s " + myEase;
+      mySlider.style.transform = "translateY(-100%)";
+      myIdx++;
+      setTimeout(function() { myResetAndLayout(1); myAnimating = false; }, 300);
+      return true;
+    }
+
+    function myGoPrev() {
+      if (myIdx <= 0) { myPlayerToast("已是第一个作品"); return false; }
+      if (myAnimating) return false;
+      myAnimating = true;
+      var curV = mySlideEls[1].querySelector("video");
+      if (curV) curV.pause();
+      var tv = mySlideEls[0].querySelector("video");
+      var pos = myVideoPositions[mySlideEls[0].__id];
+      if (pos && pos > 0.5 && tv.currentTime < 0.1 && tv.duration) tv.currentTime = Math.min(pos, tv.duration - 0.5);
+      tv.muted = !mySoundOn; tv.play().catch(function() {});
+      mySlider.style.transition = "transform .3s " + myEase;
+      mySlider.style.transform = "translateY(100%)";
+      myIdx--;
+      setTimeout(function() { myResetAndLayout(-1); myAnimating = false; }, 300);
+      return true;
+    }
+
+    // 打开/关闭播放器
+    var __mySavedCurrentVid = null;
+    var __mySavedGoNext = null;
+    var __mySavedUnmute = null;
+    var __mySavedSetSoundOn = null;
+    function myPlayerToast(msg) {
+      var t = document.getElementById("toast");
+      if (t) {
+        t.textContent = msg;
+        t.classList.add("show");
+        setTimeout(function() { t.classList.remove("show"); }, 1500);
+      }
+    }
+    function __myVidHook() {
+      var list = window.__myPosts;
+      return (list && list[myIdx]) ? list[myIdx].aweme_id : null;
+    }
+    // my 播放器的全局静音钩子（打开播放器期间临时接管 window.unmute / window.setSoundOn）：
+    // 音量键（APK 调 window.unmute）与菜单"默认不静音"开关（调 window.setSoundOn）
+    // 在 my 播放器打开时作用于 my 引擎，不串到首页；关闭时恢复首页原钩子。
+    function __myUnmuteHook() {
+      if (!mySoundOn) myToggleMusic();
+    }
+    function __mySetSoundOnHook(on) {
+      mySoundOn = !!on;
+      for (var i = 0; i < mySlideEls.length; i++) {
+        var v = mySlideEls[i].querySelector("video");
+        if (v) v.muted = !mySoundOn;
+        mySyncMusic(mySlideEls[i]);
+      }
+      if (mySoundOn) { myHideUnmutePrompt(); }
+      else { myShowUnmutePrompt(); }
+      // 同步菜单"默认不静音"开关视觉（dy_default_mute=0 → 开关 on）
+      var dm = document.getElementById("lpDefaultMuteSwitch");
+      if (dm) { dm.classList.toggle("on", mySoundOn); }
+    }
+    function myShowUnmutePrompt() {
+      var m = document.querySelectorAll("#myPlayer .music");
+      for (var i = 0; i < m.length; i++) m[i].classList.add("prompt");
+      setTimeout(myHideUnmutePrompt, 3000);
+    }
+    function openMyPlayer(idx) {
+      if (!window.__myPosts || !window.__myPosts.length) return;
+      if (!mySlideEls.length) myCreateSlides();
+      myIdx = idx;
+      // 暂停首页媒体，避免双音重叠
+      if (typeof pauseAllMedia === "function") pauseAllMedia();
+      // 临时接管首页全局钩子，防止长按菜单反馈项串号首页
+      __mySavedCurrentVid = window.__currentVid;
+      __mySavedGoNext = window.goNextSlide;
+      window.__currentVid = __myVidHook;
+      window.goNextSlide = myGoNext;
+      // 静音钩子接管：音量键/菜单开关在本播放器期间作用到 my 引擎
+      __mySavedUnmute = window.unmute;
+      __mySavedSetSoundOn = window.setSoundOn;
+      window.unmute = __myUnmuteHook;
+      window.setSoundOn = __mySetSoundOnHook;
+      // 初始声音状态跟随全局"默认不静音"开关：dy_default_mute=0（不默认静音）→ 有声
+      mySoundOn = localStorage.getItem("dy_default_mute") !== "1";
+      // 长按菜单提到播放器之上：播放器 z-index 2000，菜单默认 100 会被盖住（唤出却看不到）
+      var _lpMask = document.getElementById("longPressMask");
+      if (_lpMask) { _lpMask.style.zIndex = "2500"; }
+      var tabbar = document.querySelector(".tabbar");
+      if (tabbar) tabbar.style.display = "none";
+      myPlayer.style.display = "block";
+      mySlider.style.transition = "none";
+      mySlider.style.transform = "translateY(0)";
+      myLayout();
+    }
+
+    function closeMyPlayer() {
+      myPlayer.style.display = "none";
+      // 恢复首页全局钩子
+      if (__mySavedCurrentVid) window.__currentVid = __mySavedCurrentVid;
+      if (__mySavedGoNext) window.goNextSlide = __mySavedGoNext;
+      __mySavedCurrentVid = null;
+      __mySavedGoNext = null;
+      // 恢复静音钩子
+      if (typeof __mySavedUnmute === "function") window.unmute = __mySavedUnmute;
+      if (typeof __mySavedSetSoundOn === "function") window.setSoundOn = __mySavedSetSoundOn;
+      __mySavedUnmute = null;
+      __mySavedSetSoundOn = null;
+      // 恢复长按菜单 z-index（回到 CSS 默认 100）
+      var _lpMask = document.getElementById("longPressMask");
+      if (_lpMask) { _lpMask.style.zIndex = ""; }
+      var tabbar = document.querySelector(".tabbar");
+      if (tabbar) tabbar.style.display = "";
+      for (var i = 0; i < mySlideEls.length; i++) {
+        var v = mySlideEls[i].querySelector("video");
+        if (v) { v.pause(); v.removeAttribute("src"); v.load(); }
+        if (mySlideEls[i].__note_timer) { clearInterval(mySlideEls[i].__note_timer); mySlideEls[i].__note_timer = null; }
+      }
+    }
+
+    // 边缘横滑退出：从屏幕左右"带状区"向内侧横滑退出。
+    // 注意：不能贴物理边缘(0~30px)触发——APK/手机上那里是系统手势导航区，
+    // 会被系统当成"返回手势"直接退应用。改为 40~110px 带状区，
+    // 手感仍是"从左边缘向右滑 / 从右边缘向左滑"，但避开系统手势。
+    var myEdge = { active: false, side: "", startX: 0, startY: 0 };
+    if (myPlayer) {
+      myPlayer.addEventListener("touchstart", function(e) {
+        var t = e.touches[0];
+        var w = window.innerWidth;
+        if (t.clientX >= 40 && t.clientX <= 110) { myEdge.active = true; myEdge.side = "left"; myEdge.startX = t.clientX; myEdge.startY = t.clientY; }
+        else if (t.clientX >= w - 110 && t.clientX <= w - 40) { myEdge.active = true; myEdge.side = "right"; myEdge.startX = t.clientX; myEdge.startY = t.clientY; }
+        else { myEdge.active = false; }
+      }, { passive: true });
+      myPlayer.addEventListener("touchmove", function(e) {
+        if (!myEdge.active || mySwiping) return;
+        var t = e.touches[0];
+        var dx = t.clientX - myEdge.startX;
+        var dy = t.clientY - myEdge.startY;
+        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 12) {
+          if (myEdge.side === "left" && dx > 0) e.preventDefault();
+          else if (myEdge.side === "right" && dx < 0) e.preventDefault();
+        }
+      }, { passive: false });
+      myPlayer.addEventListener("touchend", function(e) {
+        if (!myEdge.active) return;
+        myEdge.active = false;
+        var t = e.changedTouches[0];
+        var dx = t.clientX - myEdge.startX;
+        var dy = t.clientY - myEdge.startY;
+        if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+          if (myEdge.side === "left" && dx > 0) closeMyPlayer();
+          else if (myEdge.side === "right" && dx < 0) closeMyPlayer();
+        }
+      });
+    }
+
+    // 竖滑切换：上滑=下一个，下滑=上一个（从点击位置开始）
+    var myStartY = 0, myDragging = false, myDy = 0;
+    if (myPlayer) {
+      myPlayer.addEventListener("touchstart", function(e) {
+        // 左右带状区（40~110px）交给 myEdge 横滑退出；竖滑只在中间区域工作
+        var t = e.touches[0];
+        if (t.clientX < 110 || t.clientX > window.innerWidth - 110) return;
+        myStartY = t.clientY;
+        myDragging = true;
+        myDy = 0;
+      }, { passive: true });
+      myPlayer.addEventListener("touchmove", function(e) {
+        if (!myDragging || mySwiping) return;
+        myDy = e.touches[0].clientY - myStartY;
+        if (Math.abs(myDy) > 8) e.preventDefault();
+      }, { passive: false });
+      myPlayer.addEventListener("touchend", function() {
+        if (!myDragging) return;
+        myDragging = false;
+        if (mySwiping || Math.abs(myDy) < 50) return;
+        if (myDy < 0) myGoNext();
+        else myGoPrev();
+      });
+    }
+
+    // Tab切换
+    document.querySelectorAll(".me-tab").forEach(function(tab) {
+      tab.addEventListener("click", function() {
+        document.querySelectorAll(".me-tab").forEach(function(t) { t.classList.remove("active"); });
+        tab.classList.add("active");
+      });
+    });
+
+    // 头像点击放大
+    var avatar = document.getElementById("meAvatar");
+    if (avatar) {
+      avatar.addEventListener("click", function() {
+        var viewer = document.getElementById("avatarViewer");
+        var viewerImg = document.getElementById("avatarViewerImg");
+        viewerImg.src = avatar.src;
+        viewer.style.display = "block";
+      });
+    }
+    var avatarClose = document.getElementById("avatarClose");
+    if (avatarClose) {
+      avatarClose.addEventListener("click", function() {
+        document.getElementById("avatarViewer").style.display = "none";
+      });
+    }
+
+    // 背景点击放大
+    var bg = document.getElementById("meBg");
+    if (bg) {
+      bg.addEventListener("click", function() {
+        var viewer = document.getElementById("bgViewer");
+        var viewerImg = document.getElementById("bgViewerImg");
+        viewerImg.src = bg.style.backgroundImage.replace(/url\(['"]?/, '').replace(/['"]?\)/, '');
+        viewer.style.display = "block";
+      });
+    }
+    var bgClose = document.getElementById("bgClose");
+    if (bgClose) {
+      bgClose.addEventListener("click", function() {
+        document.getElementById("bgViewer").style.display = "none";
+      });
+    }
+  }
+
   // 页面加载完成后从服务器拉取设置
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", loadSettingsFromServer);
+    document.addEventListener("DOMContentLoaded", function() {
+      initMePage();
+      loadSettingsFromServer();
+    });
   } else {
+    initMePage();
     loadSettingsFromServer();
   }
 

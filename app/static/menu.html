@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,maximum-scale=1">
+<title>local枭枭 · 长按菜单</title>
+<style>
+  html,body{margin:0;padding:0;height:100%;background:transparent;overflow:hidden;}
+  .lp-mask{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);z-index:100;display:flex;align-items:flex-end;}
+  .lp-panel{width:100%;background:rgba(38,38,38,.72);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border-radius:18px 18px 0 0;padding:6px 14px calc(24px + env(safe-area-inset-bottom));animation:lpSlideUp .38s cubic-bezier(0.16,1,0.3,1);will-change:transform;}
+  @keyframes lpSlideUp{from{transform:translateY(100%) scale(0.96);}to{transform:translateY(0) scale(1);}}
+  .lp-handle{width:38px;height:4px;background:rgba(255,255,255,.28);border-radius:2px;margin:6px auto 14px;}
+  .lp-group{background:rgba(255,255,255,.06);border-radius:14px;overflow:hidden;margin-bottom:14px;}
+  .lp-group:last-child{margin-bottom:0;}
+  .lp-item{display:flex;align-items:center;padding:15px 16px;color:#fff;font-size:16px;position:relative;}
+  .lp-item:not(:last-child)::after{content:'';position:absolute;left:56px;right:0;bottom:0;height:1px;background:rgba(255,255,255,.08);}
+  .lp-item:active{background:rgba(255,255,255,.06);}
+  .lp-icon{width:26px;height:26px;display:flex;align-items:center;justify-content:center;margin-right:16px;color:#fff;flex-shrink:0;}
+  .lp-icon svg{width:24px;height:24px;}
+  .lp-text{flex:1;font-weight:400;}
+  .lp-arrow{color:rgba(255,255,255,.5);font-size:15px;flex-shrink:0;}
+  .lp-switch{width:52px;height:30px;background:rgba(255,255,255,.22);border-radius:15px;position:relative;transition:background .2s;flex-shrink:0;}
+  .lp-switch.on{background:#fe2c55;}
+  .lp-switch .lp-dot{position:absolute;top:2px;left:2px;width:26px;height:26px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.25);}
+  .lp-switch.on .lp-dot{transform:translateX(22px);}
+  .lp-ritual-item{cursor:pointer;}
+  .lp-cancel-item .lp-text{text-align:center;}
+  .lp-sub{font-size:12px;color:rgba(255,255,255,.35);width:56px;text-align:right;flex-shrink:0;margin-right:8px;font-weight:400;}
+  .lp-mask.custom-on .lp-sub{color:#fff;}
+  #jumpRitualCustom .lp-text{flex:1;}
+  .lp-ritual-check{width:22px;height:22px;border:2px solid rgba(255,255,255,.5);border-radius:50%;margin-left:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:transparent;font-size:14px;font-weight:700;transition:all .2s;}
+  .lp-ritual-check.on{background:#fe2c55;border-color:#fe2c55;color:#fff;}
+</style>
+</head>
+<body>
+
+<!-- 长按菜单（三组） -->
+<div id="longPressMask" class="lp-mask" style="display:none">
+  <div class="lp-panel">
+    <div class="lp-handle"></div>
+    <!-- 第一组 -->
+    <div class="lp-group">
+      <div class="lp-item" id="lpDownload">
+        <span class="lp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+        <span class="lp-text">下载视频</span>
+      </div>
+      <div class="lp-item" id="lpSuperLike">
+        <span class="lp-icon" id="lpSuperLikeIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>
+        <span class="lp-text">超级喜欢</span>
+      </div>
+      <div class="lp-item" id="lpPuzzle">
+        <span class="lp-icon" id="lpPuzzleIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/></svg></span>
+        <span class="lp-text">迷惑视频</span>
+      </div>
+    </div>
+    <!-- 第二组 -->
+    <div class="lp-group">
+      <div class="lp-item" id="lpDefaultMute">
+        <span class="lp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg></span>
+        <span class="lp-text">开启时默认不静音</span>
+        <span class="lp-switch" id="lpDefaultMuteSwitch"><span class="lp-dot"></span></span>
+      </div>
+      <div class="lp-item" id="lpDefaultAutoPlay">
+        <span class="lp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></span>
+        <span class="lp-text">启动时默认自动连播</span>
+        <span class="lp-switch" id="lpDefaultAutoPlaySwitch"><span class="lp-dot"></span></span>
+      </div>
+      <div class="lp-item" id="lpAutoPlay">
+        <span class="lp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></span>
+        <span class="lp-text">功能待开发</span>
+        <span class="lp-switch" id="lpSwitch"><span class="lp-dot"></span></span>
+      </div>
+      <div class="lp-item" id="lpDefaultCleanMode">
+        <span class="lp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></span>
+        <span class="lp-text">跳转仪式</span>
+        <span class="lp-switch" id="lpDefaultCleanSwitch"><span class="lp-dot"></span></span>
+      </div>
+      <div class="lp-item" id="lpCleanMode">
+        <span class="lp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="18" x2="12" y2="21"/></svg></span>
+        <span class="lp-text">开启时默认清屏播放</span>
+        <span class="lp-switch" id="lpCleanSwitch"><span class="lp-dot"></span></span>
+      </div>
+      <div class="lp-item" id="lpNotInterested">
+        <span class="lp-icon" id="lpNotInterestedIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/><path d="M12 5.67 9.9 8.9l3.1 2.1-2.4 3.1 3.3 2.2"/></svg></span>
+        <span class="lp-text">不感兴趣</span>
+        <span class="lp-arrow" id="lpNotInterestedArrow">&rsaquo;</span>
+      </div>
+    </div>
+    <!-- 第三组 -->
+    <div class="lp-group">
+      <div class="lp-item" id="lpSecretLike">
+        <span class="lp-icon" id="lpSecretLikeIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span>
+        <span class="lp-text">偷偷喜欢</span>
+        <span class="lp-arrow">&rsaquo;</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 跳转仪式方案窗 -->
+<div id="jumpRitualMask" class="lp-mask" style="display:none">
+  <div class="lp-panel">
+    <div class="lp-handle"></div>
+    <div class="lp-group">
+      <div class="lp-item lp-ritual-item" data-ritual="s1">
+        <span class="lp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+        <span class="lp-text">方案一 · 无动画直切</span>
+        <span class="lp-sub">兴趣迷惑</span>
+        <span class="lp-ritual-check" data-check="s1"></span>
+      </div>
+      <div class="lp-item lp-ritual-item" data-ritual="s2">
+        <span class="lp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c4 0 5-8 9-8s5 8 9 8"/></svg></span>
+        <span class="lp-text">方案二 · 0.7s 直接了当</span>
+        <span class="lp-sub">偷偷喜欢</span>
+        <span class="lp-ritual-check" data-check="s2"></span>
+      </div>
+      <div class="lp-item lp-ritual-item" data-ritual="s3">
+        <span class="lp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c3 0 6-9 9-9s6 9 9 9"/></svg></span>
+        <span class="lp-text">方案三 · 0.7s 粘稠柔和</span>
+        <span class="lp-sub">超级喜欢</span>
+        <span class="lp-ritual-check" data-check="s3"></span>
+      </div>
+    </div>
+    <div class="lp-group">
+      <div class="lp-item" id="jumpRitualCustom">
+        <span class="lp-text">各自专用自定义</span>
+        <span class="lp-switch" id="jumpRitualCustomSwitch"><span class="lp-dot"></span></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== 方案B：iframe 独立菜单（menu.html）=====
+   职责：纯 UI + 状态显示 + 点击上报。
+   - 主文件 → 本 iframe: {type:'open', payload:{feedbackState, hasFeedback}} 显示长按菜单并刷新状态
+   - 主文件 → 本 iframe: {type:'close'} 关闭长按菜单
+   - 主文件 → 本 iframe: {type:'state', payload} 动作后刷新反馈图标
+   - 本 iframe → 主文件: {action:'click', selector:'#id'} 菜单项点击（主文件触发内联隐藏DOM的click复用现有逻辑）
+   - 本 iframe → 主文件: {action:'ritual', s:'s2'} 跳转仪式方案选择
+   - 本 iframe → 主文件: {action:'ritual_custom'} 各自专用自定义开关
+   ================================================ */
+var __payload = {};
+function getLS(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function refreshRitual(){
+  var customOn = getLS('dy_jump_ritual_custom') === 'on';
+  var jm = document.getElementById('jumpRitualMask');
+  if (jm) jm.classList.toggle('custom-on', customOn);
+  var sw = document.getElementById('jumpRitualCustomSwitch');
+  if (sw) sw.classList.toggle('on', customOn);
+  var curR = getLS('dy_jump_ritual') || 's3';
+  var checks = document.querySelectorAll('.lp-ritual-check');
+  for (var i = 0; i < checks.length; i++) {
+    var ck = checks[i].getAttribute('data-check');
+    var on = customOn ? true : (ck === curR);
+    checks[i].classList.toggle('on', on);
+    checks[i].textContent = on ? '✓' : '';
+  }
+}
+function applyOpen(payload){
+  __payload = payload || {};
+  var st = payload.feedbackState || {};
+  // 开关（读 localStorage 同源，主文件逻辑会写这里）
+  var dm = document.getElementById('lpDefaultMuteSwitch');
+  if (dm) dm.classList.toggle('on', getLS('dy_default_mute') !== '1');
+  var da = document.getElementById('lpDefaultAutoPlaySwitch');
+  if (da) da.classList.toggle('on', getLS('dy_default_autoplay') === '1');
+  var rsw = document.getElementById('lpDefaultCleanSwitch');
+  if (rsw) rsw.classList.toggle('on', (getLS('dy_jump_ritual') || 's3') !== 's1');
+  var csw = document.getElementById('lpCleanSwitch');
+  if (csw) csw.classList.toggle('on', getLS('dy_default_clean') === '1');
+  // 反馈图标
+  var ni = document.getElementById('lpNotInterestedIcon');
+  if (ni) ni.style.color = st.not_interested ? '#fe2c55' : '';
+  var sl = document.getElementById('lpSuperLikeIcon');
+  if (sl) { sl.style.color = st.super_like ? '#8B008B' : ''; var ssv = sl.querySelector('svg'); if (ssv) ssv.setAttribute('fill', st.super_like ? '#8B008B' : 'none'); }
+  var sc = document.getElementById('lpSecretLikeIcon');
+  if (sc) { sc.style.color = st.secret_like ? '#ffc107' : ''; var scv = sc.querySelector('svg'); if (scv) scv.setAttribute('fill', st.secret_like ? '#ffc107' : 'none'); }
+  var pz = document.getElementById('lpPuzzleIcon');
+  if (pz) { if (st.puzzle) { pz.style.color = '#fff'; pz.style.background = '#34c759'; pz.style.borderRadius = '4px'; } else { pz.style.color = ''; pz.style.background = ''; pz.style.borderRadius = ''; } }
+  var na = document.getElementById('lpNotInterestedArrow');
+  if (na) na.textContent = (payload.hasFeedback ? '已反馈 ›' : '›');
+  refreshRitual();
+  document.getElementById('jumpRitualMask').style.display = 'none';
+  document.getElementById('longPressMask').style.display = 'flex';
+}
+function send(action, extra){
+  try { window.parent.postMessage(Object.assign({action: action}, extra || {}), '*'); } catch(e) {}
+}
+// 菜单项点击 → 上报主文件（跳转仪式行除外：本 iframe 自己弹方案窗）
+document.addEventListener('click', function (e) {
+  var item = e.target.closest('.lp-item');
+  if (!item) return;
+  if (item.id === 'lpDefaultCleanMode') {
+    // 自己弹跳转仪式方案窗（不报主文件，主文件内联也会弹但这里用 iframe 的）
+    refreshRitual();
+    document.getElementById('jumpRitualMask').style.display = 'flex';
+    return;
+  }
+  if (item.classList.contains('lp-ritual-item')) {
+    var s = item.getAttribute('data-ritual');
+    if (s) send('ritual', { s: s });
+    return;
+  }
+  if (item.id === 'jumpRitualCustom') {
+    send('ritual_custom', {});
+    return;
+  }
+  if (item.id) {
+    // 反馈/下载类点击后主文件会关菜单（内联 closeLP 只隐藏内联mask，不隐藏 iframe）→ 标注 close
+    var closeOnClick = ['lpDownload','lpSuperLike','lpSecretLike','lpPuzzle','lpNotInterested'].indexOf(item.id) >= 0;
+    send('click', { selector: '#' + item.id, close: closeOnClick });
+  }
+});
+// 点击空处关闭当前层
+document.getElementById('longPressMask').addEventListener('click', function (e) {
+  if (e.target === this) send('close');
+});
+document.getElementById('jumpRitualMask').addEventListener('click', function (e) {
+  if (e.target === this) { this.style.display = 'none'; document.getElementById('longPressMask').style.display = 'flex'; }
+});
+// 主文件消息
+window.addEventListener('message', function (e) {
+  var d = e.data || {};
+  if (d.type === 'open') { applyOpen(d.payload || {}); }
+  else if (d.type === 'close') { document.getElementById('longPressMask').style.display = 'none'; document.getElementById('jumpRitualMask').style.display = 'none'; }
+  else if (d.type === 'state') { applyOpen(Object.assign({}, __payload, d.payload || {})); }
+  else if (d.type === 'close_ritual') { document.getElementById('jumpRitualMask').style.display = 'none'; document.getElementById('longPressMask').style.display = 'flex'; }
+  else if (d.type === 'open_ritual') { refreshRitual(); document.getElementById('jumpRitualMask').style.display = 'flex'; }
+});
+</script>
+</body>
+</html>

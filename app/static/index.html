@@ -186,6 +186,13 @@
   .tabbar-light .tab { color: rgba(0,0,0,.5); }
   .tabbar-light .tab.active { color: #000; }
   .tabbar-light .caret { color: #000; }
+  /* 加号：CSS 画 4px 加号，颜色随 .tab 文字色（首页黑底=白带灰 rgba(255,255,255,.55)，
+     非首页 .tabbar-light=深色 rgba(0,0,0,.5)）自动适配 */
+  .tab.plus { position: relative; width: 34px; height: 34px; font-size: 0; color: rgba(255,255,255,.55); }
+  .tab.plus::before, .tab.plus::after { content: ""; position: absolute; left: 50%; top: 50%; background: currentColor; border-radius: 2px; transform: translate(-50%, -50%); }
+  .tab.plus::before { width: 4px; height: 26px; }
+  .tab.plus::after  { width: 26px; height: 4px; }
+  .tabbar-light .tab.plus { color: rgba(0,0,0,.5); }
   .tab.plus { width: 48px; height: 34px; background: #fff; color: #000; border-radius: 8px; font-size: 26px; display: flex; align-items: center; justify-content: center; font-weight: 300; line-height: 1; }
   .tab .badge { background: #FE2C55; color: #fff; font-size: 12px; padding: 1px 5px; border-radius: 8px; margin-left: 2px; font-weight: 600; }
 
@@ -810,6 +817,9 @@
     </div>
   </div>
 </div>
+
+<!-- 方案B：独立长按菜单 iframe（menu.html）——层级与播放器彻底隔离，根治 z-index 遮蔽 -->
+<iframe id="menuFrame" src="menu.html" style="display:none;position:fixed;inset:0;width:100%;height:100%;border:none;z-index:2700;pointer-events:auto;"></iframe>
 
 <!-- 分享底部面板 -->
 <div id="shareSheet" class="share-sheet">
@@ -2342,6 +2352,10 @@
   }
   function closeLongPressMenu() {
     document.getElementById("longPressMask").style.display = "none";
+    var _jm2 = document.getElementById("jumpRitualMask");
+    if (_jm2) _jm2.style.display = "none";
+    var _f2 = document.getElementById("menuFrame");
+    if (_f2) { _f2.style.display = "none"; try { _f2.contentWindow.postMessage({ type: "close" }, "*"); } catch(e) {} }
   }
 
   function fmtNum(n) {
@@ -3757,6 +3771,10 @@ document.addEventListener("click", function(e) {
   var jm = document.getElementById("jumpRitualMask");
   if (!jm) return;
   function closeRitual() { jm.style.display = "none"; }
+  // v9.1.25: 跳转仪式方案/各自专用自定义需持久化到服务器（此前只写 localStorage，跨设备不生效）
+  function saveRitualServer(k, v) {
+    try { var b = {}; b[k] = v; fetch("/api/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b) }).catch(function(){}); } catch(e) {}
+  }
   function toastR(msg) {
     var t = document.getElementById("toast");
     if (t) { t.textContent = msg; t.style.opacity = "1"; setTimeout(function(){ t.style.opacity = "0"; }, 1500); }
@@ -3785,6 +3803,7 @@ document.addEventListener("click", function(e) {
       try { now = localStorage.getItem("dy_jump_ritual_custom") === "on"; } catch (e2) {}
       var next = !now;
       try { localStorage.setItem("dy_jump_ritual_custom", next ? "on" : "off"); } catch (e3) {}
+      saveRitualServer("dy_jump_ritual_custom", next ? "on" : "off");
       // 开=外层跳转仪式开关强制开；关=恢复单选逻辑（外层开关按所选方案决定）
       var outerSw = document.getElementById("lpDefaultCleanSwitch");
       if (outerSw) {
@@ -3808,6 +3827,7 @@ document.addEventListener("click", function(e) {
       if (customOn) { toastR("各自专用自定义开启中：三方案同时生效"); return; }
       localStorage.setItem("dy_jump_ritual", s);
       if (s !== "s1") localStorage.setItem("dy_jump_ritual_last", s);
+      saveRitualServer("dy_jump_ritual", s);
       var sw = document.getElementById("lpDefaultCleanSwitch");
       if (sw) sw.classList.toggle("on", s !== "s1");
       refreshCustomUI();
@@ -4385,7 +4405,7 @@ document.addEventListener("click", function(e) {
         .then(function(r) { return r.json(); })
         .then(function(data) {
           if (!data || typeof data !== "object") return;
-          var keys = ["dy_default_mute", "dy_default_autoplay", "dy_default_clean"];
+          var keys = ["dy_default_mute", "dy_default_autoplay", "dy_default_clean", "dy_jump_ritual", "dy_jump_ritual_custom"];
           var changed = false;
           var prevAutoPlay = localStorage.getItem("dy_default_autoplay");
           var prevMute = localStorage.getItem("dy_default_mute");
@@ -4404,6 +4424,9 @@ document.addEventListener("click", function(e) {
             if (dm) { if (localStorage.getItem("dy_default_mute") !== "1") dm.classList.add("on"); else dm.classList.remove("on"); }
             if (da) { if (localStorage.getItem("dy_default_autoplay") === "1") da.classList.add("on"); else da.classList.remove("on"); }
             if (dc) { if (localStorage.getItem("dy_default_clean") === "1") dc.classList.add("on"); else dc.classList.remove("on"); }
+            // v9.1.26：跳转仪式方案从服务器回灌后，同步外层开关（s1=关，其他=开）
+            var rsw = document.getElementById("lpDefaultCleanSwitch");
+            if (rsw) { var _rv = localStorage.getItem("dy_jump_ritual"); rsw.classList.toggle("on", _rv !== null && _rv !== "s1"); }
             // v9.1.5：回灌改为无条件执行（服务器值即真值）。
             // 原条件 `!== prevXXX` 让"localStorage 已与服务器一致"时跳过回灌——
             // 但启动时 defaultAutoPlay/defaultCleanMode 是错的（loadDefaults 从未调用），
@@ -4646,52 +4669,78 @@ document.addEventListener("click", function(e) {
     // （已读取 window.__currentVid 钩子：我的播放器打开时指向我的作品，首页时指向首页视频），
     // 反馈数据 _feedbackSet 全局共享——以后优化/加功能/debug 只改这一处，全局生效。
     window.openLongPressMenu = function () {
+      // 方案B：优先用 iframe 独立菜单（menu.html，层级与播放器隔离）
+      var f = document.getElementById("menuFrame");
+      var cv = (typeof window.__currentVid === "function") ? window.__currentVid() : null;
+      var st = (typeof window.__getFeedbackState === "function") ? window.__getFeedbackState(cv) : {};
+      var hf = cv && (typeof window.__hasAnyFeedback === "function") ? window.__hasAnyFeedback(cv) : false;
+      if (f && f.contentWindow) {
+        f.style.display = "block";
+        try { f.contentWindow.postMessage({ type: "open", payload: { currentId: cv, feedbackState: st, hasFeedback: !!hf } }, "*"); return; } catch(e) {}
+      }
+      // 兜底：无 iframe 或通信失败 → 内联菜单（逻辑执行器 DOM 也在此）
       var mask = document.getElementById("longPressMask");
       if (!mask) return;
       var csw = document.getElementById("lpCleanSwitch");
-      // cleanMode 开关样式：优先保持 DOM 当前状态（运行时可能被 setCleanMode 更新过，
-      // 如"点赞7次进清屏"），无 .on 类时回退 localStorage dy_default_clean
-      if (csw && !csw.classList.contains("on") && localStorage.getItem("dy_default_clean") === "1") {
-        csw.classList.add("on");
-      }
-      // 开启时默认不静音：dy_default_mute=0（不默认静音）→ 开关 on
+      if (csw && !csw.classList.contains("on") && localStorage.getItem("dy_default_clean") === "1") csw.classList.add("on");
       var dm = document.getElementById("lpDefaultMuteSwitch");
       if (dm) { try { if (localStorage.getItem("dy_default_mute") !== "1") dm.classList.add("on"); else dm.classList.remove("on"); } catch(e) {} }
       var da = document.getElementById("lpDefaultAutoPlaySwitch");
       if (da) { try { if (localStorage.getItem("dy_default_autoplay") === "1") da.classList.add("on"); else da.classList.remove("on"); } catch(e) {} }
-      // 跳转仪式开关视觉跟随所选方案：方案一(s1)=关，方案二/三(s2/s3)=开
+      try { var ritualNow = localStorage.getItem("dy_jump_ritual") || "s3"; var rsw = document.getElementById("lpDefaultCleanSwitch"); if (rsw) rsw.classList.toggle("on", ritualNow !== "s1"); } catch(e) {}
       try {
-        var ritualNow = localStorage.getItem("dy_jump_ritual") || "s3";
-        var rsw = document.getElementById("lpDefaultCleanSwitch");
-        if (rsw) rsw.classList.toggle("on", ritualNow !== "s1");
+        var niIc = document.getElementById("lpNotInterestedIcon"); if (niIc) niIc.style.color = st.not_interested ? "#fe2c55" : "";
+        var slIc = document.getElementById("lpSuperLikeIcon"); if (slIc) { slIc.style.color = st.super_like ? "#8B008B" : ""; var slSv = slIc.querySelector("svg"); if (slSv) slSv.setAttribute("fill", st.super_like ? "#8B008B" : "none"); }
+        var scIc = document.getElementById("lpSecretLikeIcon"); if (scIc) { scIc.style.color = st.secret_like ? "#ffc107" : ""; var scSv = scIc.querySelector("svg"); if (scSv) scSv.setAttribute("fill", st.secret_like ? "#ffc107" : "none"); }
+        var pz = document.getElementById("lpPuzzleIcon"); if (pz) { if (st.puzzle) { pz.style.color = "#fff"; pz.style.background = "#34c759"; pz.style.borderRadius = "4px"; } else { pz.style.color = ""; pz.style.background = ""; pz.style.borderRadius = ""; } }
       } catch(e) {}
-      // 按当前视频的真实反馈状态重置四个反馈图标（不残留跨视频填色）
-      try {
-        var _cv2 = (typeof window.__currentVid === "function") ? window.__currentVid() : null;
-        var _st = (typeof window.__getFeedbackState === "function") ? window.__getFeedbackState(_cv2) : {};
-        var niIc = document.getElementById("lpNotInterestedIcon");
-        if (niIc) niIc.style.color = _st.not_interested ? "#fe2c55" : "";
-        var slIc = document.getElementById("lpSuperLikeIcon");
-        if (slIc) { slIc.style.color = _st.super_like ? "#8B008B" : ""; var slSv = slIc.querySelector("svg"); if (slSv) slSv.setAttribute("fill", _st.super_like ? "#8B008B" : "none"); }
-        var scIc = document.getElementById("lpSecretLikeIcon");
-        if (scIc) { scIc.style.color = _st.secret_like ? "#ffc107" : ""; var scSv = scIc.querySelector("svg"); if (scSv) scSv.setAttribute("fill", _st.secret_like ? "#ffc107" : "none"); }
-        var pz = document.getElementById("lpPuzzleIcon");
-        if (pz) {
-          if (_st.puzzle) { pz.style.color = "#fff"; pz.style.background = "#34c759"; pz.style.borderRadius = "4px"; }
-          else { pz.style.color = ""; pz.style.background = ""; pz.style.borderRadius = ""; }
-        }
-      } catch(e) {}
-      // 不感兴趣行的状态指示：当前视频是否已反馈
-      try {
-        var niArrow = document.getElementById("lpNotInterestedArrow");
-        if (niArrow) {
-          var _cv = (typeof window.__currentVid === "function") ? window.__currentVid() : null;
-          var _hasFb = _cv && (typeof window.__hasAnyFeedback === "function") ? window.__hasAnyFeedback(_cv) : false;
-          niArrow.textContent = _hasFb ? "已反馈 \u203a" : "\u203a";
-        }
-      } catch(e) {}
+      try { var niArrow = document.getElementById("lpNotInterestedArrow"); if (niArrow) { var _cv = cv; var _hasFb = _cv && (typeof window.__hasAnyFeedback === "function") ? window.__hasAnyFeedback(_cv) : false; niArrow.textContent = _hasFb ? "已反馈 \u203a" : "\u203a"; } } catch(e) {}
       mask.style.display = "flex";
     };
+
+    // 方案B：iframe 菜单点击分发（复用内联隐藏 DOM 的 click，逻辑零改动）+ 刷新回传
+    function refreshMenuFrame() {
+      var f = document.getElementById("menuFrame");
+      if (!f || !f.contentWindow) return;
+      var _cv = (typeof window.__currentVid === "function") ? window.__currentVid() : null;
+      var _st = (typeof window.__getFeedbackState === "function") ? window.__getFeedbackState(_cv) : {};
+      var _hf = _cv && (typeof window.__hasAnyFeedback === "function") ? window.__hasAnyFeedback(_cv) : false;
+      try { f.contentWindow.postMessage({ type: "state", payload: { feedbackState: _st, hasFeedback: !!_hf } }, "*"); } catch(e) {}
+    }
+    window.addEventListener("message", function (e) {
+      var d = e.data || {};
+      if (!d.action) return;
+      if (d.action === "click" && d.selector) {
+        var el = document.querySelector(d.selector);
+        if (el) el.click();
+        refreshMenuFrame();
+        // 反馈/下载类（menu.html 已标注 close=true）：内联逻辑仅隐藏内联mask，须同步隐藏 iframe
+        if (d.close) {
+          var _fc = document.getElementById("menuFrame");
+          if (_fc) { _fc.style.display = "none"; try { _fc.contentWindow.postMessage({ type: "close" }, "*"); } catch(e2) {} }
+          var _mc = document.getElementById("longPressMask");
+          if (_mc) _mc.style.display = "none";
+          var _jc = document.getElementById("jumpRitualMask");
+          if (_jc) _jc.style.display = "none";
+        }
+      } else if (d.action === "ritual" && d.s) {
+        var it = document.querySelector('#jumpRitualMask [data-ritual="' + d.s + '"]');
+        if (it) it.click();
+        refreshMenuFrame();
+      } else if (d.action === "ritual_custom") {
+        var cu = document.querySelector("#jumpRitualCustom");
+        if (cu) cu.click();
+        refreshMenuFrame();
+      } else if (d.action === "close") {
+        // 注意：此处不可调 closeLongPressMenu（它在首页主 IIFE，本 message 监听在 my IIFE，作用域不可见）
+        var _fc = document.getElementById("menuFrame");
+        if (_fc) { _fc.style.display = "none"; try { _fc.contentWindow.postMessage({ type: "close" }, "*"); } catch(e2) {} }
+        var _mc = document.getElementById("longPressMask");
+        if (_mc) _mc.style.display = "none";
+        var _jc = document.getElementById("jumpRitualMask");
+        if (_jc) _jc.style.display = "none";
+      }
+    });
 
     // 创建三槽位 slide（结构与首页完全一致，CSS class 复用）
     function myCreateSlides() {

@@ -322,6 +322,19 @@ def stream_video(vid: int):
     return FileResponse(video_path, media_type="video/mp4")
 
 
+# ── 我页（个人节点）专属：作品视频流，与首页视频库物理隔离但共用同一文件目录 ──
+@app.get("/api/my/works/{aweme_id}/stream")
+def stream_my_work(aweme_id: str):
+    """我页作品视频流（FileResponse 自动支持 Range）。
+    数据来源是 my_posts.json 里的 50 条个人作品，与首页 /api/videos 不混用。"""
+    # aweme_id 只允许数字，防止路径穿越
+    if not aweme_id.isdigit():
+        return JSONResponse({"error": "无效的作品 id"}, status_code=400)
+    video_path = VIDEO_DIR / f"{aweme_id}.mp4"
+    if not video_path.exists():
+        return JSONResponse({"error": "作品视频缺失"}, status_code=404)
+    return FileResponse(video_path, media_type="video/mp4")
+
 # ── 头像/音乐封面（本地文件代理）──────────────────────────────────────────
 @app.get("/api/avatar/{filename}")
 def get_avatar(filename: str):
@@ -1165,6 +1178,12 @@ def api_get_setting(key: str):
 @app.get("/", include_in_schema=False)
 def _serve_index():
     return FileResponse(STATIC_DIR / "index.html",
+                        headers={"Cache-Control": "no-store, no-cache, must-revalidate"})
+
+# 我页显式路由（独立 HTML，与首页分开）：同样强制 no-store，保证 APK WebView 每次拉最新
+@app.get("/my_page", include_in_schema=False)
+def _serve_my_page():
+    return FileResponse(STATIC_DIR / "my.html",
                         headers={"Cache-Control": "no-store, no-cache, must-revalidate"})
 
 app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")

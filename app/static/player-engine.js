@@ -5,12 +5,14 @@ window.createPlayerEngine = function (opts) {
   "use strict";
   opts = opts || {};
   var variant = opts.variant === "my" ? "my" : "home";
+  var playMode = "home";  // 单页引擎：当前播放模式（home/my），随数据源动态切换
   var rootEl = opts.rootEl;            // 引擎根容器（home=#stage / my=#myPlayer）
   var slider = opts.sliderEl;          // 滑动容器（home=#slider / my=#mySlider）
   var loading = opts.loadingEl;
   var toast = opts.toastEl;
   var musicPageEl = opts.musicPageEl;  // 音乐页（home=#musicPage / my=#myMusicPage）
   var dataSource = opts.dataSource;
+  var myDataSource = opts.myDataSource || null;  // 单页引擎：我页数据源（与 home 数据隔离）
   var autoStart = opts.autoStart !== false;
   var showSplash = opts.showSplash === true;
   var onOpen = opts.onOpen || function () {};
@@ -730,7 +732,7 @@ window.createPlayerEngine = function (opts) {
     // 点头像：my 变体 → 博主就是自己，关闭播放器；home → 进入博主主页
     slide.querySelector(".avatar-wrap").addEventListener("click", function (e) {
       e.stopPropagation();
-      if (variant === "my") { closeMyPlayer(); return; }
+      if (playMode === "my") { closeMyPlayer(); return; }
       // 视觉权威身份（touch 动画期间 __visualIdx 已预写目标内容，避免取到上一屏博主导致串号）
       var secUid = visualSecUid();
       if (!secUid) { showToast("暂无博主信息"); return; }
@@ -742,7 +744,7 @@ window.createPlayerEngine = function (opts) {
       authorEl.addEventListener("click", function (e) {
         e.stopPropagation();
         e.preventDefault();
-        if (variant === "my") { closeMyPlayer(); return; }
+        if (playMode === "my") { closeMyPlayer(); return; }
         var secUid = visualSecUid();
         if (!secUid) { showToast("暂无博主信息"); return; }
         openProfile(secUid);
@@ -941,6 +943,8 @@ window.createPlayerEngine = function (opts) {
   }
 
   function fillSlide(slide, idx) {
+    window.__fillLog = window.__fillLog || [];
+    window.__fillLog.push({idx: idx, n: videos.length, same: slide.__id === (videos[idx]||{}).id});
     if (idx < 0 || idx >= videos.length) { slide.style.display = "none"; return; }
     slide.style.display = "";
     var v = videos[idx];
@@ -1217,6 +1221,7 @@ window.createPlayerEngine = function (opts) {
     cb.querySelector(".num").textContent = fmtNum((isCol ? 1 : 0) + (Number(v.collect_count) || 0));
     slide.querySelector(".act.comment .num").textContent = fmtNum(v.comment_count);
     slide.__vid = v.id;
+    window.__fillLog.push({done: idx, id: v.id});
   }
 
   function layout() {
@@ -1647,6 +1652,27 @@ window.createPlayerEngine = function (opts) {
     if (_f2) { _f2.style.display = "none"; try { _f2.contentWindow.postMessage({ type: "close" }, "*"); } catch(e) {} }
   }
 
+  // 反馈类菜单（超级喜欢/迷惑视频/不感兴趣/偷偷喜欢）：
+  // 记录反馈 → 关菜单 → 按"跳转仪式"方案切下一个视频。
+  // 之前这四个内联元素只画了 UI、没绑事件，iframe 点击最终 el.click() 无任何反应 → 功能失效。
+  function handleFeedback(kind) {
+    var vid = getCurrentVidSafe();
+    if (!vid) { showToast("视频信息不存在"); return; }
+    try { markFeedback(vid, kind); } catch (e) {}
+    window.__lastFeedbackKind = kind;
+    try { if (window.reportBehavior) window.reportBehavior("feedback_" + kind, vid, 0); } catch (e) {}
+    closeLongPressMenu();
+    if (window.goNextSlide) window.goNextSlide();
+  }
+  function bindFeedbackBtn(id, kind) {
+    var b = document.getElementById(id);
+    if (b) b.addEventListener("click", function () { handleFeedback(kind); });
+  }
+  bindFeedbackBtn("lpSuperLike", "super_like");
+  bindFeedbackBtn("lpPuzzle", "puzzle");
+  bindFeedbackBtn("lpNotInterested", "not_interested");
+  bindFeedbackBtn("lpSecretLike", "secret_like");
+
   // 方案B：iframe 菜单点击分发（复用内联隐藏 DOM 的 click，逻辑零改动）
   window.addEventListener("message", function (e) {
     var d = e.data || {};
@@ -1825,22 +1851,7 @@ window.createPlayerEngine = function (opts) {
     }
   }
 
-  function switchPage(page) {
-    if (currentPage === page) return;
-    closeAllPages();
-    if (page === "home") {
-      resumeCurrentVideo();
-    } else {
-      pauseAllMedia();
-      if (page === "friends") openFriendsPage();
-      else if (page === "messages") messagesPageEl.classList.add("show");
-      else if (page === "profile") profilePageEl.classList.add("show");
-    }
-    currentPage = page;
-    // 非首页 tabbar 纯白（用户需求）；首页维持黑
-    var _tbEl = document.querySelector(".tabbar");
-    if (_tbEl) { _tbEl.classList.toggle("tabbar-light", page !== "home"); }
-    // 更新tab的active状态
+  function updateTabActive(page) {
     document.querySelectorAll(".tabbar .tab").forEach(function (t) {
       t.classList.remove("active");
       var text = t.textContent.trim();
@@ -1849,6 +1860,33 @@ window.createPlayerEngine = function (opts) {
       else if (page === "messages" && text.indexOf("消息") === 0) t.classList.add("active");
       else if (page === "profile" && (t.id === "tabMe" || text.indexOf("我") === 0)) t.classList.add("active");
     });
+  }
+
+  function switchPage(page) {
+    if (currentPage === page) return;
+    if (page === "home") {
+      // 必须先关闭朋友/消息/我页，否则它们的 .show 层会盖在首页播放器之上
+      // （现象：从朋友/消息点首页，画面仍停留在朋友/消息页）
+      closeAllPages();
+      if (profilePageEl) { profilePageEl.style.display = ""; }
+      // enterHomePlayer 处理 my→home 数据源切换 + 视图 + 播放
+      enterHomePlayer();
+      currentPage = "home";
+      var _tb0 = document.querySelector(".tabbar");
+      if (_tb0) _tb0.classList.remove("tabbar-light");
+      updateTabActive("home");
+      return;
+    }
+    closeAllPages();
+    pauseAllMedia();
+    if (page === "friends") openFriendsPage();
+    else if (page === "messages") messagesPageEl.classList.add("show");
+    else if (page === "profile") profilePageEl.classList.add("show");
+    currentPage = page;
+    // 非首页 tabbar 纯白（用户需求）
+    var _tbEl = document.querySelector(".tabbar");
+    if (_tbEl) { _tbEl.classList.add("tabbar-light"); }
+    updateTabActive(page);
   }
 
   // 加号：确认后清除所有本地数据并重启
@@ -1860,24 +1898,10 @@ window.createPlayerEngine = function (opts) {
     }
   }
 
-  // 底部导航tab点击
+  // 底部导航tab点击（单页：全部页面内切换，不刷新、URL 不变）
   document.querySelectorAll(".tabbar .tab").forEach(function (tab) {
     tab.addEventListener("click", function (e) {
       var text = tab.textContent.trim();
-      // 我页（my.html）：除"我"外，其余 tab 整页跳转回首页
-      if (variant === "my") {
-        if (tab.id === "tabMe" || text.indexOf("我") === 0) {
-          if (window.__iconPickerOpen) { e.stopPropagation(); e.preventDefault(); return; }
-          if (myPlayerOpen) closeMyPlayer();
-          return;
-        }
-        if (text.indexOf("首页") === 0) { location.href = "/"; return; }
-        if (text.indexOf("朋友") === 0) { location.href = "/?page=friends"; return; }
-        if (text.indexOf("消息") === 0) { location.href = "/?page=messages"; return; }
-        if (text.indexOf("+") === 0) { doClearData(); }
-        return;
-      }
-      // 首页（index.html）
       if (text.indexOf("首页") === 0) {
         switchPage("home");
       } else if (text.indexOf("朋友") === 0) {
@@ -1886,7 +1910,9 @@ window.createPlayerEngine = function (opts) {
         switchPage("messages");
       } else if (tab.id === "tabMe" || text.indexOf("我") === 0) {
         if (window.__iconPickerOpen) { e.stopPropagation(); e.preventDefault(); return; }
-        location.href = "/my_page";
+        // 若当前在我的播放器，先关闭回九宫格
+        if (myPlayerOpen) { closeMyPlayer(); return; }
+        switchPage("profile");
       } else if (text.indexOf("+") === 0) {
         doClearData();
       }
@@ -2500,15 +2526,11 @@ window.createPlayerEngine = function (opts) {
     if (!e.target.closest) return false;
     var t = e.target;
     if (t.closest(".progress-wrap")) return true;
-    if (variant === "my") {
-      return !!(t.closest("#profilePage") || t.closest("#musicPage"));
-    }
     return !!(t.closest("#profile") || t.closest("#musicPage") || t.closest("#friendsPage") || t.closest("#messagesPage") || t.closest("#profilePage") || t.closest("#myPlayer"));
   }
   function touchMoveBlocked(e) {
     if (!e.target.closest) return false;
     var t = e.target;
-    if (variant === "my") { return !!t.closest("#profilePage"); }
     return !!(t.closest("#profilePage") || t.closest("#friendsPage") || t.closest("#messagesPage") || t.closest("#myPlayer"));
   }
   var startY = 0, startX = 0, startTime = 0, dragging = false, dy = 0;
@@ -2726,10 +2748,8 @@ window.createPlayerEngine = function (opts) {
   document.addEventListener("touchstart", function (e) {
     var t = e.touches[0];
     var w = window.innerWidth;
-    // my 变体：只排除我页（播放器内边缘触摸允许，交给上下滑/横滑判定）
-    if (variant === "my") {
-      if (e.target.closest && e.target.closest("#profilePage")) { edgeSwipe.active = false; return; }
-    } else if (e.target.closest && (e.target.closest("#profilePage") || e.target.closest("#friendsPage") || e.target.closest("#messagesPage") || e.target.closest("#myPlayer"))) {
+    // 单页引擎：非播放页面（我页九宫格/朋友/消息）不触发边缘手势
+    if (e.target.closest && (e.target.closest("#profilePage") || e.target.closest("#friendsPage") || e.target.closest("#messagesPage") || e.target.closest("#myPlayer"))) {
       edgeSwipe.active = false; return;
     }
     // 边缘触发（首页和非首页都只在边缘25px触发）
@@ -2768,8 +2788,8 @@ window.createPlayerEngine = function (opts) {
     var dx = t.clientX - edgeSwipe.startX;
     var side = edgeSwipe.side;
     edgeSwipe.active = false;
-    // my 变体：边缘横滑退出已废止（WebView 被系统手势抢占），退出靠点头像/名称
-    if (variant === "my") { return; }
+    // 我页播放：边缘横滑退出已废止（WebView 被系统手势抢占），退出靠点头像/名称
+    if (playMode === "my") { return; }
     // 非首页时：边缘左右滑动切换相邻导航栏页面
     if (currentPage !== "home" && !profileEl.classList.contains("show") && !musicPageEl.classList.contains("show")) {
       if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
@@ -3088,24 +3108,65 @@ window.createPlayerEngine = function (opts) {
   }
 
   // ===== my 播放器：打开 / 关闭 =====
+  // ===== 单页引擎：home / my 两套播放上下文，切换数据源不重新拉已缓存数据 =====
+  var homeCtx = { ds: opts.dataSource, videos: [], offset: 0, hasMore: true, current: 0, loaded: false };
+  var myCtx = { ds: myDataSource, videos: [], offset: 0, hasMore: true, current: 0, loaded: false };
+  function snapshotCtx(c) { c.videos = videos; c.offset = offset; c.hasMore = hasMore; c.current = current; }
+  function restoreCtx(c) { dataSource = c.ds; videos = c.videos; offset = c.offset; hasMore = c.hasMore; current = c.current; }
+  function myPlayerBarEl() { return document.getElementById("myPlayerBar"); }
+
   var myBooted = false;
+  var myPreloading = null;
+  // 预热 my 数据（不显示播放器、不切全局、不污染首页）：九宫格渲染完就调用。
+  // 目的：让首次点封面时 myCtx.loaded 已为 true，openMyPlayer 走同步路径，
+  // play() 落在用户真实点击手势内。否则首次进入要 await fetchPage，非静音 autoplay
+  // 在异步回调里脱离手势被 WebView 拦截（NotAllowedError）→ 视频加载好却停在封面。
+  function preloadMy() {
+    if (myCtx.loaded) return Promise.resolve();
+    if (myPreloading) return myPreloading;
+    myPreloading = myDataSource.fetch(0, PAGE).then(function (res) {
+      var items = res.items || [];
+      myCtx.videos = items;
+      myCtx.offset = (res.nextOffset != null) ? res.nextOffset : items.length;
+      myCtx.hasMore = !!res.hasMore;
+      myCtx.current = 0;
+      myCtx.loaded = true;
+      myPreloading = null;
+    }).catch(function (e) {
+      myPreloading = null;
+      console.error("preloadMy error", e);
+    });
+    return myPreloading;
+  }
   function openMyPlayer(idx) {
     myPlayerOpen = true;
+    // 首次从我页九宫格进入（当前还是 home 数据），先快照 home
+    if (playMode === "home" && !myCtx.loaded) { snapshotCtx(homeCtx); }
     var go = function () {
+      restoreCtx(myCtx);
       current = idx;
       if (profilePageEl) { profilePageEl.classList.remove("show"); profilePageEl.style.display = "none"; }
       var tb = document.querySelector(".tabbar");
       if (tb) tb.style.display = "none";
+      var mb = myPlayerBarEl();
+      if (mb) mb.style.display = "flex";
       rootEl.style.display = "block";
+      playMode = "my";
       try { layout(); } catch (e) { console.error("layout error", e); }
       playCurrent();
       onOpen();
     };
-    if (myBooted) { go(); }
+    // 数据已预热（九宫格渲染时 preloadMy）：整条路径在真实点击手势内同步执行，
+    // 非静音 play() 合法，一点封面直接开播。
+    if (myCtx.loaded) {
+      if (!myBooted) { try { applyDefaultSettings(); loadSettingsFromServer(); } catch (e) {} myBooted = true; }
+      go();
+    }
     else {
+      // 兜底：极端情况下预热未完成（首次进入），仍异步加载后再进
       applyDefaultSettings();
       loadSettingsFromServer();
-      fetchPage().then(function () {
+      preloadMy().then(function () {
         myBooted = true;
         if (loading) loading.style.display = "none";
         go();
@@ -3117,17 +3178,37 @@ window.createPlayerEngine = function (opts) {
   }
 
   function closeMyPlayer() {
+    snapshotCtx(myCtx);
     pauseAllMedia();
     if (musicPageEl) musicPageEl.classList.remove("show");
     rootEl.style.display = "none";
+    var mb = myPlayerBarEl();
+    if (mb) mb.style.display = "none";
     var tb = document.querySelector(".tabbar");
     if (tb) tb.style.display = "";
     if (profilePageEl) {
       profilePageEl.style.display = "";
       profilePageEl.classList.add("show");
     }
+    // 数据源仍为 my（停在我页），下次点封面直接复用
+    playMode = "my";
     myPlayerOpen = false;
     onClose();
+  }
+
+  // 切回首页：若刚从 my 播放/我页回来，恢复 home 上下文；否则只做视图切换
+  function enterHomePlayer() {
+    if (playMode === "my") { snapshotCtx(myCtx); restoreCtx(homeCtx); }
+    pauseAllMedia();
+    if (profilePageEl) { profilePageEl.classList.remove("show"); profilePageEl.style.display = ""; }
+    var mb = myPlayerBarEl();
+    if (mb) mb.style.display = "none";
+    rootEl.style.display = "block";
+    playMode = "home";
+    var tb = document.querySelector(".tabbar");
+    if (tb) tb.style.display = "";
+    try { layout(); } catch (e) { console.error("layout error", e); }
+    playCurrent();
   }
 
   // 启动：首页自动启动；my 等点封面时 open
@@ -3139,6 +3220,7 @@ window.createPlayerEngine = function (opts) {
     boot: bootHome,
     open: openMyPlayer,
     close: closeMyPlayer,
+    preloadMy: preloadMy,
     goNext: function () { return window.goNextSlide(); },
     goPrev: function () {
       try { if (current > 0) { current--; layout(); } } catch (e) {}

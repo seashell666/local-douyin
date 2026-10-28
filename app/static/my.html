@@ -186,14 +186,26 @@
   .tabbar-light .tab { color: rgba(0,0,0,.5); }
   .tabbar-light .tab.active { color: #000; }
   .tabbar-light .caret { color: #000; }
-  /* 加号：CSS 画 4px 加号，颜色随 .tab 文字色（首页黑底=白带灰 rgba(255,255,255,.55)，
-     非首页 .tabbar-light=深色 rgba(0,0,0,.5)）自动适配 */
-  .tab.plus { position: relative; width: 34px; height: 34px; font-size: 0; color: rgba(255,255,255,.55); }
+  /* 加号：圆角描边框 + 内部 4px 加号（仿抖音）。
+     颜色随 currentColor：首页黑底=白带灰（接近未选中 tab 的灰白），
+     非首页 .tabbar-light=深色；无填充，两态结构一致、线宽统一 4px。 */
+  .tab.plus {
+    position: relative;
+    width: 46px;
+    height: 32px;
+    flex: none;
+    font-size: 0;
+    color: rgba(255,255,255,.85);
+    background: transparent;
+    border: 3.5px solid currentColor;
+    border-radius: 10px;
+    box-sizing: border-box;
+    padding: 0;
+  }
   .tab.plus::before, .tab.plus::after { content: ""; position: absolute; left: 50%; top: 50%; background: currentColor; border-radius: 2px; transform: translate(-50%, -50%); }
-  .tab.plus::before { width: 4px; height: 26px; }
-  .tab.plus::after  { width: 26px; height: 4px; }
-  .tabbar-light .tab.plus { color: rgba(0,0,0,.5); }
-  .tab.plus { width: 48px; height: 34px; background: #fff; color: #000; border-radius: 8px; font-size: 26px; display: flex; align-items: center; justify-content: center; font-weight: 300; line-height: 1; }
+  .tab.plus::before { width: 4px; height: 15px; }
+  .tab.plus::after  { width: 15px; height: 4px; }
+  .tabbar-light .tab.plus { color: rgba(0,0,0,.55); }
   .tab .badge { background: #FE2C55; color: #fff; font-size: 12px; padding: 1px 5px; border-radius: 8px; margin-left: 2px; font-weight: 600; }
 
   /* 双击点赞爱心 */

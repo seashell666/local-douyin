@@ -6,7 +6,9 @@ function createMyDataSource() {
 
   function load() {
     if (_all) return Promise.resolve(_all);
-    return fetch("/my_posts.json")
+    // cache:no-store + 时间戳双保险：旧版 my_posts.json 是扁平结构（无 author），
+    // 一旦被浏览器/WebView 缓存，会导致头像、昵称全部读不到（显示"我"字占位）。
+    return fetch("/my_posts.json?cv=" + Date.now(), { cache: "no-store" })
       .then(function (r) {
         if (!r.ok) throw new Error("my_posts http " + r.status);
         return r.json();

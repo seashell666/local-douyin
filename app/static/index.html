@@ -186,14 +186,26 @@
   .tabbar-light .tab { color: rgba(0,0,0,.5); }
   .tabbar-light .tab.active { color: #000; }
   .tabbar-light .caret { color: #000; }
-  /* 加号：CSS 画 4px 加号，颜色随 .tab 文字色（首页黑底=白带灰 rgba(255,255,255,.55)，
-     非首页 .tabbar-light=深色 rgba(0,0,0,.5)）自动适配 */
-  .tab.plus { position: relative; width: 34px; height: 34px; font-size: 0; color: rgba(255,255,255,.55); }
+  /* 加号：圆角描边框 + 内部 4px 加号（仿抖音）。
+     颜色随 currentColor：首页黑底=白带灰（接近未选中 tab 的灰白），
+     非首页 .tabbar-light=深色；无填充，两态结构一致、线宽统一 4px。 */
+  .tab.plus {
+    position: relative;
+    width: 46px;
+    height: 32px;
+    flex: none;
+    font-size: 0;
+    color: rgba(255,255,255,.85);
+    background: transparent;
+    border: 3.5px solid currentColor;
+    border-radius: 10px;
+    box-sizing: border-box;
+    padding: 0;
+  }
   .tab.plus::before, .tab.plus::after { content: ""; position: absolute; left: 50%; top: 50%; background: currentColor; border-radius: 2px; transform: translate(-50%, -50%); }
-  .tab.plus::before { width: 4px; height: 26px; }
-  .tab.plus::after  { width: 26px; height: 4px; }
-  .tabbar-light .tab.plus { color: rgba(0,0,0,.5); }
-  .tab.plus { width: 48px; height: 34px; background: #fff; color: #000; border-radius: 8px; font-size: 26px; display: flex; align-items: center; justify-content: center; font-weight: 300; line-height: 1; }
+  .tab.plus::before { width: 4px; height: 15px; }
+  .tab.plus::after  { width: 15px; height: 4px; }
+  .tabbar-light .tab.plus { color: rgba(0,0,0,.55); }
   .tab .badge { background: #FE2C55; color: #fff; font-size: 12px; padding: 1px 5px; border-radius: 8px; margin-left: 2px; font-weight: 600; }
 
   /* 双击点赞爱心 */
@@ -399,6 +411,14 @@
 <body>
 <div id="splash"></div>
 <div id="stage"><div id="slider"></div></div>
+<!-- 我页全屏播放底部栏（替代 tabbar，仅在我的播放器里显示） -->
+<div id="myPlayerBar" style="display:none;position:fixed;left:0;right:0;bottom:0;height:calc(56px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:#000;border-top:1px solid rgba(255,255,255,.08);z-index:22;align-items:center;justify-content:space-between;padding-left:16px;padding-right:16px;">
+  <div style="display:flex;align-items:center;gap:6px;color:#fff;font-size:14px;">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="5" width="14" height="12" rx="2"></rect><polygon points="16,9 22,6 22,16 16,13" fill="#fff" stroke="none"></polygon></svg>
+    <span id="myViewsNum" style="font-size:13px;color:#e5e5e5;">浏览 0</span>
+  </div>
+  <button id="myPublicBtn" style="padding:5px 16px;border-radius:16px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:13px;cursor:pointer;">公开</button>
+</div>
 <div class="tabbar">
   <div class="tab active">首页<span class="caret">⌄</span></div>
   <div class="tab">朋友</div>
@@ -507,6 +527,123 @@
     <div class="profile-grid" id="profileGrid"></div>
     <div class="profile-empty" id="profileEmpty" style="display:none">暂无作品</div>
     <div class="profile-loading" id="profileLoading" style="display:none">加载中…</div>
+  </div>
+</div>
+<div id="profilePage">
+  <!-- 顶部背景区 -->
+  <div class="me-header">
+    <div class="me-bg" id="meBg"></div>
+    <div class="me-topbar">
+      <div class="me-add-friend">
+        <svg viewBox="0 0 24 24" fill="white"><path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        <span>添加好友</span>
+      </div>
+      <div class="me-top-actions">
+        <div class="me-action-icon">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3 3.1-3s3.1 1.29 3.1 3v2z"/></svg>
+        </div>
+        <div class="me-action-icon">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+          <span class="me-badge">2</span>
+        </div>
+        <div class="me-action-icon">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.5 16 10.5 16 8 14 6 11.5 6S7 8 7 10.5 9 15 11.5 15c1 0 2.09-.59 2.73-1.37l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-4 0C9.01 14 7 11.99 7 9.5S9.01 5 11.5 5 16 7.01 16 9.5 13.99 14 11.5 14z"/></svg>
+        </div>
+        <div class="me-action-icon">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+        </div>
+      </div>
+    </div>
+    <!-- 头像和昵称 -->
+    <div class="me-profile-row">
+      <div class="me-avatar-wrap">
+        <img class="me-avatar" id="meAvatar" src="" alt="">
+        <div class="me-avatar-plus">+</div>
+      </div>
+      <div class="me-name-area">
+        <div class="me-nickname" id="meNickname">主角只看精彩瞬间</div>
+        <div class="me-douyin-id">抖音号：shellhappyhappyhappy <span class="me-copy-icon">⧉</span></div>
+        <div class="me-ai-create">
+          <span>创建 AI 形象</span>
+          <span class="me-chevron">›</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 白色内容区 -->
+  <div class="me-content">
+    <!-- 数据栏 -->
+    <div class="me-stats">
+      <div class="me-stat">
+        <div class="me-stat-num">1.4万</div>
+        <div class="me-stat-label">获赞</div>
+      </div>
+      <div class="me-stat">
+        <div class="me-stat-num">25</div>
+        <div class="me-stat-label">互关</div>
+      </div>
+      <div class="me-stat">
+        <div class="me-stat-num">133</div>
+        <div class="me-stat-label">关注</div>
+      </div>
+      <div class="me-stat">
+        <div class="me-stat-num">877</div>
+        <div class="me-stat-label">粉丝</div>
+      </div>
+      <button class="me-edit-btn">编辑主页</button>
+    </div>
+    <!-- 简介 -->
+    <div class="me-bio">
+      <div>day12</div>
+      <div>没有天赋，只有重复</div>
+      <div>他的目光如磐石般坚硬，他的心中只剩下坚持</div>
+      <div>日更主角高光时刻 | 只看最美好的精彩瞬间</div>
+    </div>
+    <div class="me-tags">
+      <span class="me-tag">17岁</span>
+      <span class="me-tag me-tag-add">+ 添加性别等标签</span>
+    </div>
+    <!-- 功能入口行 -->
+    <div class="me-features">
+      <div class="me-feature">
+        <svg viewBox="0 0 24 24" fill="#161823"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+        <span>我的音乐</span>
+      </div>
+      <div class="me-feature">
+        <svg viewBox="0 0 24 24" fill="#161823"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8 8-8 8 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+        <span>观看历史</span>
+      </div>
+      <div class="me-feature">
+        <svg viewBox="0 0 24 24" fill="#161823"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        <span>常访问的人</span>
+      </div>
+      <div class="me-feature">
+        <svg viewBox="0 0 24 24" fill="#161823"><path d="M10 8v8l5-4-5-4zm9-5H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>
+        <span>稍后再看</span>
+      </div>
+      <div class="me-feature">
+        <svg viewBox="0 0 24 24" fill="#161823"><path d="M4 11h5V5H4v6zm0 8h5v-6H4v6zm7 0h5v-6h-5v6zm0-8h5V5h-5v6z"/></svg>
+        <span>全部功能</span>
+      </div>
+    </div>
+    <!-- Tab切换 -->
+    <div class="me-tabs">
+      <div class="me-tab active">作品 <span class="me-tab-caret">▼</span></div>
+      <div class="me-tab">日常</div>
+      <div class="me-tab">推荐</div>
+      <div class="me-tab">收藏</div>
+      <div class="me-tab">喜欢</div>
+    </div>
+    <!-- 私密作品条 -->
+    <div class="me-private-bar">
+      <div class="me-private-left">
+        <div class="me-private-thumb"></div>
+        <span>私密作品</span>
+      </div>
+      <span class="me-private-count">87 ›</span>
+    </div>
+    <!-- 作品九宫格 -->
+    <div class="me-grid" id="meGrid"></div>
   </div>
 </div>
 <div id="musicPage">
@@ -659,9 +796,10 @@
     <input id="iconFileInput" type="file" accept="image/png,image/webp,image/jpeg" style="display:none;">
   </div>
 </div>
-<script src="data-home.js?v=shared2"></script>
-<script src="player-engine.js?v=shared2"></script>
-<script src="menu-setup.js?v=shared2"></script>
-<script src="init-home.js?v=shared2"></script>
+<script src="data-home.js?v=single4"></script>
+<script src="data-my.js?v=single4"></script>
+<script src="player-engine.js?v=single4"></script>
+<script src="menu-setup.js?v=single4"></script>
+<script src="init-app.js?v=single4"></script>
 </body>
 </html>
